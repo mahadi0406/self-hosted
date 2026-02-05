@@ -1,0 +1,194 @@
+// 1. create_admins_table
+Schema::create('admins', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->string('password');
+    $table->string('two_factor_secret')->nullable();
+    $table->boolean('two_factor_enabled')->default(false);
+    $table->rememberToken();
+    $table->timestamps();
+});
+
+// 2. create_validation_results_table
+Schema::create('validation_results', function (Blueprint $table) {
+    $table->id();
+    $table->string('email');
+    $table->boolean('is_valid')->default(false);
+    $table->integer('score')->default(0);
+    $table->json('checks'); // all validation check results
+    $table->string('status'); // valid, invalid, risky
+    $table->string('suggestion')->nullable(); // typo suggestion
+    $table->foreignId('list_id')->nullable()->constrained('saved_lists')->onDelete('cascade');
+    $table->timestamps();
+    $table->index('email');
+    $table->index('is_valid');
+    $table->index('created_at');
+});
+
+// 3. create_saved_lists_table
+Schema::create('saved_lists', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->integer('total_emails')->default(0);
+    $table->integer('valid_emails')->default(0);
+    $table->integer('invalid_emails')->default(0);
+    $table->string('tags')->nullable(); // comma separated
+    $table->string('status'); // processing, completed, failed
+    $table->timestamps();
+});
+
+// 4. create_disposable_domains_table
+Schema::create('disposable_domains', function (Blueprint $table) {
+    $table->id();
+    $table->string('domain')->unique();
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+    $table->index('domain');
+});
+
+// 5. create_free_email_providers_table
+Schema::create('free_email_providers', function (Blueprint $table) {
+    $table->id();
+    $table->string('domain')->unique();
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// 6. create_role_based_keywords_table
+Schema::create('role_based_keywords', function (Blueprint $table) {
+    $table->id();
+    $table->string('keyword')->unique();
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// 7. create_api_keys_table
+Schema::create('api_keys', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('key')->unique();
+    $table->integer('requests_limit')->default(1000);
+    $table->integer('requests_used')->default(0);
+    $table->boolean('is_active')->default(true);
+    $table->timestamp('last_used_at')->nullable();
+    $table->timestamps();
+});
+
+// 8. create_api_logs_table
+Schema::create('api_logs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('api_key_id')->constrained()->onDelete('cascade');
+    $table->string('endpoint');
+    $table->string('method');
+    $table->ipAddress('ip_address');
+    $table->integer('response_code');
+    $table->timestamps();
+    $table->index('created_at');
+});
+
+// 9. create_settings_table
+Schema::create('settings', function (Blueprint $table) {
+    $table->id();
+    $table->string('key')->unique();
+    $table->text('value')->nullable();
+    $table->timestamps();
+});
+
+// 10. create_validation_templates_table
+Schema::create('validation_templates', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->json('rules'); // enabled checks configuration
+    $table->boolean('is_default')->default(false);
+    $table->timestamps();
+});
+
+// 11. create_scheduled_validations_table
+Schema::create('scheduled_validations', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('list_id')->constrained('saved_lists')->onDelete('cascade');
+    $table->dateTime('scheduled_at');
+    $table->string('status'); // pending, running, completed, failed
+    $table->foreignId('template_id')->nullable()->constrained('validation_templates')->onDelete('set null');
+    $table->timestamps();
+});
+
+// 12. create_activity_logs_table
+Schema::create('activity_logs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('admin_id')->constrained()->onDelete('cascade');
+    $table->string('action');
+    $table->text('description')->nullable();
+    $table->ipAddress('ip_address')->nullable();
+    $table->string('user_agent')->nullable();
+    $table->timestamps();
+    $table->index('created_at');
+});
+
+// 13. create_webhooks_table
+Schema::create('webhooks', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('url');
+    $table->string('event'); // validation_completed, list_completed
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// 14. create_webhook_logs_table
+Schema::create('webhook_logs', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('webhook_id')->constrained()->onDelete('cascade');
+    $table->integer('response_code')->nullable();
+    $table->text('response_body')->nullable();
+    $table->timestamps();
+});
+
+// 15. create_backups_table
+Schema::create('backups', function (Blueprint $table) {
+    $table->id();
+    $table->string('filename');
+    $table->string('path');
+    $table->bigInteger('size'); // in bytes
+    $table->string('type'); // full, lists_only, settings_only
+    $table->timestamps();
+});
+
+// 16. create_domain_reputation_table
+Schema::create('domain_reputation', function (Blueprint $table) {
+    $table->id();
+    $table->string('domain')->unique();
+    $table->integer('score')->default(50); // 0-100
+    $table->integer('total_validations')->default(0);
+    $table->integer('valid_count')->default(0);
+    $table->integer('invalid_count')->default(0);
+    $table->boolean('is_blacklisted')->default(false);
+    $table->timestamps();
+    $table->index('domain');
+});
+
+// 17. create_export_history_table
+Schema::create('export_history', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('list_id')->nullable()->constrained('saved_lists')->onDelete('cascade');
+    $table->string('format'); // csv, excel, json, pdf
+    $table->string('filename');
+    $table->string('path')->nullable();
+    $table->integer('records_count');
+    $table->timestamps();
+});
+
+// 18. create_ftp_configurations_table
+Schema::create('ftp_configurations', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('host');
+    $table->integer('port')->default(21);
+    $table->string('username');
+    $table->string('password');
+    $table->string('directory')->default('/');
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
