@@ -130,7 +130,8 @@ class ValidationController extends Controller
      */
     public function history(Request $request): Response
     {
-        $query = ValidationResult::query();
+        $query = ValidationResult::query()->with('list');
+
         if ($request->has('status') && $request->status !== 'all') {
             $query->where('status', $request->status);
         }
@@ -142,6 +143,7 @@ class ValidationController extends Controller
         if ($request->has('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);
         }
+
         if ($request->has('date_to')) {
             $query->whereDate('created_at', '<=', $request->date_to);
         }
@@ -150,11 +152,19 @@ class ValidationController extends Controller
             ->paginate(20)
             ->withQueryString();
 
+        $total = ValidationResult::count();
+        $valid = ValidationResult::where('status', 'valid')->count();
+        $invalid = ValidationResult::where('status', 'invalid')->count();
+        $risky = ValidationResult::where('status', 'risky')->count();
+
         $stats = [
-            'total' => ValidationResult::count(),
-            'valid' => ValidationResult::where('is_valid', true)->count(),
-            'invalid' => ValidationResult::where('is_valid', false)->count(),
-            'today' => ValidationResult::whereDate('created_at', today())->count(),
+            'total' => $total,
+            'valid' => $valid,
+            'invalid' => $invalid,
+            'risky' => $risky,
+            'valid_percentage' => $total > 0 ? round(($valid / $total) * 100, 2) : 0,
+            'invalid_percentage' => $total > 0 ? round(($invalid / $total) * 100, 2) : 0,
+            'risky_percentage' => $total > 0 ? round(($risky / $total) * 100, 2) : 0,
         ];
 
         return Inertia::render('Admin/Validation/History', [

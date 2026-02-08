@@ -192,3 +192,244 @@ Schema::create('ftp_configurations', function (Blueprint $table) {
     $table->boolean('is_active')->default(true);
     $table->timestamps();
 });
+// 19. create_email_campaigns_table
+Schema::create('email_campaigns', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('subject');
+    $table->text('body_html');
+    $table->foreignId('list_id')->nullable()->constrained('saved_lists')->onDelete('set null');
+    $table->string('from_email')->nullable();
+    $table->string('status')->default('draft'); // draft, scheduled, sending, sent, paused
+    $table->timestamp('scheduled_at')->nullable();
+    $table->timestamp('sent_at')->nullable();
+    $table->integer('total_sent')->default(0);
+    $table->integer('total_opened')->default(0);
+    $table->integer('total_clicked')->default(0);
+    $table->boolean('is_ai_generated')->default(false);
+    $table->timestamps();
+});
+
+// 20. create_email_sequences_table (Drip Campaigns)
+Schema::create('email_sequences', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->text('description')->nullable();
+    $table->foreignId('list_id')->nullable()->constrained('saved_lists')->onDelete('set null');
+    $table->string('status')->default('draft'); // draft, active, paused
+    $table->integer('total_subscribers')->default(0);
+    $table->timestamps();
+});
+
+// 21. create_sequence_steps_table
+Schema::create('sequence_steps', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('sequence_id')->constrained('email_sequences')->onDelete('cascade');
+    $table->integer('step_order')->default(1);
+    $table->string('subject');
+    $table->text('body_html');
+    $table->integer('delay_days')->default(0);
+    $table->string('condition')->nullable(); // opened_previous, clicked_previous, none
+    $table->boolean('is_ai_generated')->default(false);
+    $table->timestamps();
+});
+
+// 22. create_sequence_subscribers_table
+Schema::create('sequence_subscribers', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('sequence_id')->constrained('email_sequences')->onDelete('cascade');
+    $table->string('email');
+    $table->string('status')->default('active'); // active, paused, completed, unsubscribed
+    $table->integer('current_step')->default(0);
+    $table->timestamp('enrolled_at');
+    $table->timestamp('next_send_at')->nullable();
+    $table->timestamp('completed_at')->nullable();
+    $table->timestamps();
+});
+
+// 23. create_campaign_recipients_table
+Schema::create('campaign_recipients', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('campaign_id')->constrained('email_campaigns')->onDelete('cascade');
+    $table->string('email');
+    $table->string('status')->default('pending'); // pending, sent, opened, clicked, bounced
+    $table->timestamp('sent_at')->nullable();
+    $table->timestamp('opened_at')->nullable();
+    $table->timestamp('clicked_at')->nullable();
+    $table->integer('open_count')->default(0);
+    $table->integer('click_count')->default(0);
+    $table->timestamps();
+});
+
+// 24. create_email_templates_table
+Schema::create('email_templates', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('category')->default('general'); // welcome, promotional, newsletter, follow_up
+    $table->string('subject');
+    $table->text('body_html');
+    $table->boolean('is_ai_generated')->default(false);
+    $table->integer('usage_count')->default(0);
+    $table->timestamps();
+});
+
+// 25. create_contact_engagement_table
+Schema::create('contact_engagement', function (Blueprint $table) {
+    $table->id();
+    $table->string('email')->unique();
+    $table->string('first_name')->nullable();
+    $table->string('last_name')->nullable();
+    $table->integer('engagement_score')->default(0); // 0-100
+    $table->string('engagement_level')->default('cold'); // hot, warm, cold
+    $table->integer('total_sent')->default(0);
+    $table->integer('total_opened')->default(0);
+    $table->integer('total_clicked')->default(0);
+    $table->timestamp('last_sent_at')->nullable();
+    $table->timestamp('last_opened_at')->nullable();
+    $table->timestamps();
+});
+
+// 26. create_email_tracking_table
+Schema::create('email_tracking', function (Blueprint $table) {
+    $table->id();
+    $table->foreignId('campaign_id')->nullable()->constrained('email_campaigns')->onDelete('cascade');
+    $table->string('email');
+    $table->string('event_type'); // sent, opened, clicked, bounced
+    $table->string('link_url')->nullable();
+    $table->ipAddress('ip_address')->nullable();
+    $table->timestamps();
+});
+
+// 27. create_unsubscribes_table
+Schema::create('unsubscribes', function (Blueprint $table) {
+    $table->id();
+    $table->string('email')->unique();
+    $table->string('reason')->nullable();
+    $table->timestamps();
+});
+
+// 28. create_smtp_providers_table
+Schema::create('smtp_providers', function (Blueprint $table) {
+    $table->id();
+    $table->string('name');
+    $table->string('host');
+    $table->integer('port')->default(587);
+    $table->string('username');
+    $table->string('password');
+    $table->string('encryption')->default('tls'); // tls, ssl
+    $table->integer('daily_limit')->default(500);
+    $table->integer('daily_sent')->default(0);
+    $table->boolean('is_active')->default(true);
+    $table->timestamps();
+});
+
+// 29. create_ai_content_history_table
+Schema::create('ai_content_history', function (Blueprint $table) {
+    $table->id();
+    $table->text('prompt');
+    $table->string('content_type'); // subject, email_body, template
+    $table->text('generated_content');
+    $table->integer('rating')->nullable(); // 1-5 stars
+    $table->boolean('was_used')->default(false);
+    $table->timestamps();
+});
+```
+
+---
+
+## 📊 Summary: 11 New Tables Added
+
+**Total Tables: 29** (18 original + 11 new)
+
+### **New Marketing Tables:**
+
+19. **email_campaigns** - Store campaigns
+20. **email_sequences** - Drip campaigns container
+21. **sequence_steps** - Individual emails in sequence
+22. **sequence_subscribers** - Who's enrolled + progress
+23. **campaign_recipients** - Track individual sends
+24. **email_templates** - Reusable templates
+25. **contact_engagement** - Contact health scores
+26. **email_tracking** - Opens, clicks, bounces
+27. **unsubscribes** - Opt-out list
+28. **smtp_providers** - Email sending config
+29. **ai_content_history** - AI generated content log
+
+---
+
+## ✅ What Each Table Does (Simple Explanation)
+
+### **Campaigns:**
+- `email_campaigns` → One-time email blasts
+- `campaign_recipients` → Who got what email
+
+### **Drip Sequences:**
+- `email_sequences` → The sequence container
+- `sequence_steps` → Each email in the sequence
+- `sequence_subscribers` → Track progress per person
+
+### **Content:**
+- `email_templates` → Pre-made email designs
+- `ai_content_history` → Log of AI-generated emails
+
+### **Tracking:**
+- `email_tracking` → Every open/click event
+- `contact_engagement` → Overall contact score
+
+### **Management:**
+- `unsubscribes` → People who opted out
+- `smtp_providers` → How to send emails
+
+---
+
+## 🎯 Key Simplifications (vs SaaS version)
+
+**Removed:**
+- ❌ Multi-tenant fields
+- ❌ Complex A/B testing
+- ❌ Advanced workflow conditions
+- ❌ Multiple SMTP failover
+- ❌ Bounce categorization
+- ❌ Detailed analytics breakdowns
+- ❌ Custom field mapping
+- ❌ API webhook integrations
+
+**Kept:**
+- ✅ AI Email Writer
+- ✅ Drip Sequences (core automation)
+- ✅ Basic tracking (opens, clicks)
+- ✅ Engagement scores
+- ✅ Templates
+- ✅ SMTP configuration
+- ✅ Unsubscribe management
+
+---
+
+## 📋 Quick Reference
+
+### **For AI Email Writer:**
+```
+ai_content_history → Stores generated emails
+email_templates → Save AI emails as templates
+```
+
+### **For Campaigns:**
+```
+email_campaigns → Create campaign
+campaign_recipients → Add recipients
+email_tracking → Track results
+```
+
+### **For Drip Sequences:**
+```
+email_sequences → Create sequence
+sequence_steps → Add emails (Email 1, 2, 3...)
+sequence_subscribers → Enroll people
+email_tracking → Track opens/clicks
+```
+
+### **For Analytics:**
+```
+contact_engagement → Individual scores
+email_tracking → All events
+campaign_recipients → Campaign-specific stats

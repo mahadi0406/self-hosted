@@ -15,13 +15,10 @@ import {
     TooltipTrigger,
 } from "@/Components/UI/tooltip";
 import {
-    Home, CheckCircle, FolderOpen, FileText, Clock,
-    BarChart3, Activity, Download, Key,
-    FileCode, BookOpen, Globe, Webhook, Server,
-    Database, Settings,
+    Home, CheckCircle, FolderOpen,
+    BarChart3, Settings,
     ChevronDown, LogOut, Shield, Sparkles,
-    Mail, Zap, Users, TrendingUp, Eye,
-    AlertCircle, History, HardDrive, GitBranch
+    Mail, Zap, Users, TrendingUp
 } from 'lucide-react';
 
 

@@ -23,10 +23,10 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
 
     // Validation History
     Route::get('/validate/history', [ValidationController::class, 'history'])->name('validate.history');
-    Route::get('/validate/history/{id}', [ValidationController::class, 'show'])->name('validate.show');
-    Route::delete('/validate/history/{id}', [ValidationController::class, 'destroy'])->name('validate.destroy');
     Route::post('/validate/export', [ValidationController::class, 'export'])->name('validate.export');
-
+    Route::post('/validate/bulk-delete', [ValidationController::class, 'bulkDelete'])->name('validate.bulk-delete');
+    Route::delete('/validate/history/{id}', [ValidationController::class, 'destroy'])->name('validate.destroy');
+    Route::get('/validate/history/{id}', [ValidationController::class, 'show'])->name('validate.show');
     //Setting
     Route::get('/settings', [SettingsController::class, 'index'])->name('settings.index');
     Route::post('/settings/general', [SettingsController::class, 'updateGeneral'])->name('settings.general');
