@@ -1,123 +1,59 @@
-import {motion} from 'framer-motion';
+import { Card, CardContent } from '@/components/ui/card';
+import { Mail, CheckCircle, XCircle, AlertCircle } from 'lucide-react';
 
-const containerVariants = {
-    hidden: {opacity: 0},
-    visible: {
-        opacity: 1,
-        transition: {
-            staggerChildren: 0.08,
-            delayChildren: 0.1,
-        },
-    },
-};
-
-const cardVariants = {
-    hidden: {
-        opacity: 0,
-        y: 20,
-        scale: 0.95,
-    },
-    visible: {
-        opacity: 1,
-        y: 0,
-        scale: 1,
-        transition: {
-            type: 'spring',
-            stiffness: 100,
-            damping: 15,
-        },
-    },
-};
-
-export default function StatsCards({stats, theme}) {
+export default function StatsCards({ stats }) {
     return (
-        <>
-            <motion.div
-                className="stats-grid"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(4, 1fr)',
-                    gap: '12px',
-                    marginBottom: '24px',
-                }}
-            >
-                {stats.map((stat, index) => (
-                    <motion.div
-                        key={stat.id || index}
-                        className="stat-card"
-                        variants={cardVariants}
-                        whileHover={{
-                            y: -2,
-                            transition: {duration: 0.2}
-                        }}
-                        style={{
-                            backgroundColor: theme.bgCard,
-                            borderRadius: '10px',
-                            padding: '20px',
-                            border: `1px solid ${theme.border}`,
-                            cursor: 'default',
-                        }}
-                    >
-                        <p style={{
-                            fontSize: '13px',
-                            color: theme.textMuted,
-                            marginBottom: '10px',
-                            fontWeight: '500',
-                            letterSpacing: '0.01em',
-                        }}>
-                            {stat.label}
-                        </p>
-                        <motion.p
-                            initial={{opacity: 0, scale: 0.5}}
-                            animate={{opacity: 1, scale: 1}}
-                            transition={{
-                                delay: 0.2 + index * 0.08,
-                                type: 'spring',
-                                stiffness: 200,
-                            }}
-                            style={{
-                                fontSize: '28px',
-                                fontWeight: '600',
-                                color: theme.text,
-                                letterSpacing: '-0.02em',
-                                lineHeight: 1,
-                            }}
-                        >
-                            {stat.value}
-                        </motion.p>
-                    </motion.div>
-                ))}
-            </motion.div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Total Validated</p>
+                            <p className="text-2xl font-bold">{stats?.total || 0}</p>
+                        </div>
+                        <Mail className="h-8 w-8 text-muted-foreground" />
+                    </div>
+                </CardContent>
+            </Card>
 
-            <style>{`
-                @media (max-width: 768px) {
-                    .stats-grid {
-                        display: none !important;
-                    }
-                }
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Valid Emails</p>
+                            <p className="text-2xl font-bold text-emerald-600">{stats?.valid || 0}</p>
+                            <p className="text-xs text-muted-foreground">{stats?.valid_percentage || 0}%</p>
+                        </div>
+                        <CheckCircle className="h-8 w-8 text-emerald-500" />
+                    </div>
+                </CardContent>
+            </Card>
 
-                @media (max-width: 1024px) {
-                    .stats-grid {
-                        grid-template-columns: repeat(2, 1fr) !important;
-                    }
-                }
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Invalid Emails</p>
+                            <p className="text-2xl font-bold text-red-600">{stats?.invalid || 0}</p>
+                            <p className="text-xs text-muted-foreground">{stats?.invalid_percentage || 0}%</p>
+                        </div>
+                        <XCircle className="h-8 w-8 text-red-500" />
+                    </div>
+                </CardContent>
+            </Card>
 
-                @media (max-width: 480px) {
-                    .stats-grid {
-                        grid-template-columns: 1fr !important;
-                        gap: 10px !important;
-                    }
-                    .stat-card {
-                        padding: 16px !important;
-                    }
-                    .stat-card p:last-child {
-                        font-size: 24px !important;
-                    }
-                }
-            `}</style>
-        </>
+            <Card>
+                <CardContent className="pt-6">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-sm text-muted-foreground">Risky Emails</p>
+                            <p className="text-2xl font-bold text-yellow-600">{stats?.risky || 0}</p>
+                            <p className="text-xs text-muted-foreground">{stats?.risky_percentage || 0}%</p>
+                        </div>
+                        <AlertCircle className="h-8 w-8 text-yellow-500" />
+                    </div>
+                </CardContent>
+            </Card>
+        </div>
     );
 }
