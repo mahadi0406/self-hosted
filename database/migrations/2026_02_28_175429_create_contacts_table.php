@@ -22,6 +22,7 @@ return new class extends Migration
             $table->json('custom_fields')->nullable();
             $table->json('tags')->nullable();
             $table->enum('status', ['active', 'opted_out', 'blocked'])->default('active');
+            $table->string('ai_engagement_label')->nullable();
             $table->timestamp('last_messaged_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
