@@ -15,12 +15,27 @@ import {
     TooltipTrigger,
 } from "@/Components/UI/tooltip";
 import {
-    Home, CheckCircle, FolderOpen,
-    BarChart3, Settings,
-    ChevronDown, LogOut, Shield, Sparkles,
-    Mail, Zap, Users, TrendingUp
+    Home,
+    MessageSquare,
+    Send,
+    Users,
+    List,
+    FileText,
+    Zap,
+    Inbox,
+    BarChart3,
+    Settings,
+    Sparkles,
+    Radio,
+    Bot,
+    PhoneCall,
+    History,
+    PlusCircle,
+    Contact,
+    Tag, CheckCircle, FolderOpen,
+    ChevronDown, LogOut, Shield,
+    Mail, TrendingUp
 } from 'lucide-react';
-
 
 const Sidebar = ({
                      isOpen = true,
@@ -54,79 +69,103 @@ const Sidebar = ({
         {
             label: 'Dashboard',
             items: [
-                {title: 'Dashboard', icon: Home, route: '/admin/dashboard'},
+                { title: 'Dashboard', icon: Home, route: '/admin/dashboard' },
             ]
         },
         {
-            label: 'Email Validation',
+            label: 'Connections',
             items: [
                 {
-                    title: 'Validate',
-                    icon: CheckCircle,
+                    title: 'Channels',
+                    icon: Radio,
                     submenu: [
-                        {title: 'Single Validation', route: '/admin/validate/single'},
-                        {title: 'Bulk Validation', route: '/admin/validate/bulk'},
-                        {title: 'Validation History', route: '/admin/validate/history'},
+                        { title: 'All Channels',       route: '/admin/channels' },
+                        { title: 'Add WhatsApp',        route: '/admin/channels/whatsapp/create' },
+                        { title: 'Add Telegram',        route: '/admin/channels/telegram/create' },
                     ]
                 },
                 {
-                    title: 'Lists & Templates',
-                    icon: FolderOpen,
+                    title: 'Contact Lists',
+                    icon: List,
                     submenu: [
-                        {title: 'All Lists', route: '/admin/lists'},
-                        {title: 'Create List', route: '/admin/lists/create'},
-                        {title: 'Validation Templates', route: '/admin/templates'},
-                        {title: 'Scheduled Validations', route: '/admin/scheduled'},
+                        { title: 'All Lists',    route: '/admin/contact-lists' },
+                        { title: 'Create List',  route: '/admin/contact-lists/create' },
+                    ]
+                },
+                {
+                    title: 'Contacts',
+                    icon: Users,
+                    submenu: [
+                        { title: 'All Contacts',   route: '/admin/contacts' },
+                        { title: 'Add Contact',    route: '/admin/contacts/create' },
+                        { title: 'Import CSV',     route: '/admin/contacts/import' },
                     ]
                 },
             ]
         },
         {
-            label: 'AI Email Marketing',
+            label: 'Messaging',
             items: [
                 {
-                    title: 'AI Email Writer',
-                    icon: Sparkles,
-                    route: '/admin/ai-writer',
-                    badge: 'NEW'
+                    title: 'Templates',
+                    icon: FileText,
+                    submenu: [
+                        { title: 'All Templates',    route: '/admin/templates' },
+                        { title: 'Create Template',  route: '/admin/templates/create' },
+                    ]
                 },
                 {
                     title: 'Campaigns',
-                    icon: Mail,
+                    icon: Send,
                     submenu: [
-                        {title: 'All Campaigns', route: '/admin/campaigns'},
-                        {title: 'Create Campaign', route: '/admin/campaigns/create'},
-                        {title: 'Templates', route: '/admin/campaigns/templates'},
+                        { title: 'All Campaigns',    route: '/admin/campaigns' },
+                        { title: 'Create Campaign',  route: '/admin/campaigns/create' },
                     ]
                 },
                 {
                     title: 'Drip Sequences',
                     icon: Zap,
                     submenu: [
-                        {title: 'All Sequences', route: '/admin/sequences'},
-                        {title: 'Create Sequence', route: '/admin/sequences/create'},
+                        { title: 'All Sequences',   route: '/admin/drip-sequences' },
+                        { title: 'Create Sequence', route: '/admin/drip-sequences/create' },
                     ]
                 },
-                {title: 'Contacts & Engagement', icon: Users, route: '/admin/contacts'},
-                {title: 'Campaign Analytics', icon: TrendingUp, route: '/admin/analytics'},
+                {
+                    title: 'Inbox',
+                    icon: Inbox,
+                    route: '/admin/inbox',
+                    badge: 'LIVE'
+                },
             ]
         },
         {
-            label: 'Reports & Settings',
+            label: 'AI Features',
             items: [
-                {title: 'Statistics', icon: BarChart3, route: '/admin/statistics'},
-                {title: 'Domain Reputation', icon: Shield, route: '/admin/domain-reputation'},
                 {
-                    title: 'Configuration',
-                    icon: Settings,
-                    submenu: [
-                        {title: 'Domain Management', route: '/admin/domains'},
-                        {title: 'SMTP Providers', route: '/admin/smtp'},
-                        {title: 'API Keys', route: '/admin/api/keys'},
-                        {title: 'Webhooks', route: '/admin/webhooks'},
-                        {title: 'System Settings', route: '/admin/settings'},
-                    ]
+                    title: 'AI Message Writer',
+                    icon: Sparkles,
+                    route: '/admin/ai/message-writer',
+                    badge: 'AI'
                 },
+                {
+                    title: 'AI Campaign Planner',
+                    icon: Bot,
+                    route: '/admin/ai/campaign-planner',
+                    badge: 'AI'
+                },
+            ]
+        },
+        {
+            label: 'Analytics',
+            items: [
+                { title: 'Campaign Analytics', icon: BarChart3, route: '/admin/analytics/campaigns' },
+                { title: 'AI Logs',            icon: History,   route: '/admin/analytics/ai-logs' },
+            ]
+        },
+        {
+            label: 'Settings',
+            items: [
+                { title: 'Settings', icon: Settings, route: '/admin/settings' },
             ]
         },
     ];

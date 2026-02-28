@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmailTemplate;
 use Illuminate\Database\Seeder;
 use App\Models\Setting;
 
@@ -96,147 +95,9 @@ class SettingsSeeder extends Seeder
             );
         }
 
-        $emailTemplates = [
-            [
-                'slug' => 'welcome',
-                'name' => 'Welcome Email',
-                'subject' => 'Welcome to {site_name}!',
-                'body' => '<h1>Welcome {user_name}!</h1><p>Thank you for joining {site_name}. We are excited to have you on board.</p><p>Your account has been successfully created.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'password_reset',
-                'name' => 'Password Reset',
-                'subject' => 'Reset Your Password - {site_name}',
-                'body' => '<h1>Password Reset Request</h1><p>Hi {user_name},</p><p>You have requested to reset your password. Click the link below to reset it:</p><p><a href="{reset_link}">Reset Password</a></p><p>If you did not request this, please ignore this email.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'reset_link'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'p2p_trade_created',
-                'name' => 'P2P Trade Created',
-                'subject' => 'New P2P Trade Created - {site_name}',
-                'body' => '<h1>P2P Trade Created</h1><p>Hi {user_name},</p><p>A new P2P trade has been created.</p><p><strong>Trade Details:</strong></p><ul><li>Trade Number: {trade_number}</li><li>Amount: {crypto_amount} {crypto_currency}</li><li>Price: {fiat_amount} {fiat_currency}</li></ul><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'trade_number', 'crypto_amount', 'crypto_currency', 'fiat_amount', 'fiat_currency'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'p2p_trade_completed',
-                'name' => 'P2P Trade Completed',
-                'subject' => 'P2P Trade Completed - {site_name}',
-                'body' => '<h1>P2P Trade Completed</h1><p>Hi {user_name},</p><p>Your P2P trade has been completed successfully.</p><p><strong>Trade Details:</strong></p><ul><li>Trade Number: {trade_number}</li><li>Amount: {crypto_amount} {crypto_currency}</li></ul><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'trade_number', 'crypto_amount', 'crypto_currency'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'p2p_dispute_opened',
-                'name' => 'P2P Dispute Opened',
-                'subject' => 'Dispute Opened - {site_name}',
-                'body' => '<h1>Dispute Opened</h1><p>Hi {user_name},</p><p>A dispute has been opened for your P2P trade.</p><p><strong>Dispute Details:</strong></p><ul><li>Dispute Number: {dispute_number}</li><li>Trade Number: {trade_number}</li><li>Reason: {reason}</li></ul><p>Our support team will review this dispute.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'dispute_number', 'trade_number', 'reason'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'kyc_approved',
-                'name' => 'KYC Approved',
-                'subject' => 'KYC Verification Approved - {site_name}',
-                'body' => '<h1>KYC Verification Approved</h1><p>Hi {user_name},</p><p>Great news! Your KYC verification has been approved.</p><p>You now have full access to all platform features.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'kyc_rejected',
-                'name' => 'KYC Rejected',
-                'subject' => 'KYC Verification Declined - {site_name}',
-                'body' => '<h1>KYC Verification Declined</h1><p>Hi {user_name},</p><p>Unfortunately, your KYC verification has been declined.</p><p>Reason: {rejection_reason}</p><p>Please resubmit your documents or contact support.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'rejection_reason'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'exchange_order_created',
-                'name' => 'Exchange Order Created',
-                'subject' => 'Exchange Order Placed - {site_name}',
-                'body' => '<h1>Exchange Order Created</h1><p>Hi {user_name},</p><p>Your exchange order has been placed successfully.</p><p><strong>Order Details:</strong></p><ul><li>Order Number: {order_number}</li><li>From: {from_amount} {from_currency}</li><li>To: {to_amount} {to_currency}</li><li>Rate: {exchange_rate}</li><li>Status: {status}</li></ul><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'order_number', 'from_amount', 'from_currency', 'to_amount', 'to_currency', 'exchange_rate', 'status'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'exchange_order_completed',
-                'name' => 'Exchange Order Completed',
-                'subject' => 'Exchange Completed Successfully - {site_name}',
-                'body' => '<h1>Exchange Order Completed</h1><p>Hi {user_name},</p><p>Your exchange order has been completed successfully.</p><p><strong>Order Details:</strong></p><ul><li>Order Number: {order_number}</li><li>Exchanged: {from_amount} {from_currency}</li><li>Received: {to_amount} {to_currency}</li><li>Fee: {fee_amount}</li></ul><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'order_number', 'from_amount', 'from_currency', 'to_amount', 'to_currency', 'fee_amount'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'exchange_price_alert',
-                'name' => 'Exchange Price Alert',
-                'subject' => 'Price Alert Triggered - {site_name}',
-                'body' => '<h1>Price Alert Triggered</h1><p>Hi {user_name},</p><p>Your price alert has been triggered!</p><p><strong>Alert Details:</strong></p><ul><li>Pair: {pair_symbol}</li><li>Target Price: {target_price}</li><li>Current Price: {current_price}</li><li>Condition: {condition}</li></ul><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'pair_symbol', 'target_price', 'current_price', 'condition'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'deposit_initiated',
-                'name' => 'Deposit Initiated',
-                'subject' => 'Deposit Request Received - {site_name}',
-                'body' => '<h1>Deposit Request Received</h1><p>Hi {user_name},</p><p>We have received your deposit request.</p><p><strong>Deposit Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Payment Method: {payment_method}</li><li>Status: Pending</li></ul><p>Your deposit will be processed shortly. You will receive a confirmation email once it has been approved.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'payment_method'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'deposit_approved',
-                'name' => 'Deposit Approved',
-                'subject' => 'Deposit Approved - {site_name}',
-                'body' => '<h1>Deposit Approved</h1><p>Hi {user_name},</p><p>Great news! Your deposit has been approved and credited to your account.</p><p><strong>Deposit Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Payment Method: {payment_method}</li><li>Status: Completed</li></ul><p>Your new balance is: {new_balance} {currency}</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'payment_method', 'new_balance'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'deposit_rejected',
-                'name' => 'Deposit Rejected',
-                'subject' => 'Deposit Declined - {site_name}',
-                'body' => '<h1>Deposit Declined</h1><p>Hi {user_name},</p><p>Unfortunately, your deposit request has been declined.</p><p><strong>Deposit Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Payment Method: {payment_method}</li><li>Status: Rejected</li></ul><p><strong>Reason:</strong> {rejection_reason}</p><p>If you have any questions, please contact our support team.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'payment_method', 'rejection_reason'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'withdrawal_initiated',
-                'name' => 'Withdrawal Initiated',
-                'subject' => 'Withdrawal Request Received - {site_name}',
-                'body' => '<h1>Withdrawal Request Received</h1><p>Hi {user_name},</p><p>We have received your withdrawal request.</p><p><strong>Withdrawal Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Withdrawal Method: {withdrawal_method}</li><li>Fee: {fee_amount}</li><li>Net Amount: {net_amount}</li><li>Status: Pending</li></ul><p>Your withdrawal is being processed. You will receive a confirmation email once it has been approved.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'withdrawal_method', 'fee_amount', 'net_amount'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'withdrawal_approved',
-                'name' => 'Withdrawal Approved',
-                'subject' => 'Withdrawal Approved - {site_name}',
-                'body' => '<h1>Withdrawal Approved</h1><p>Hi {user_name},</p><p>Your withdrawal request has been approved and processed.</p><p><strong>Withdrawal Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Withdrawal Method: {withdrawal_method}</li><li>Fee: {fee_amount}</li><li>Net Amount: {net_amount}</li><li>Status: Completed</li></ul><p>The funds have been sent to your designated account/address.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'withdrawal_method', 'fee_amount', 'net_amount'],
-                'is_active' => true
-            ],
-            [
-                'slug' => 'withdrawal_rejected',
-                'name' => 'Withdrawal Rejected',
-                'subject' => 'Withdrawal Declined - {site_name}',
-                'body' => '<h1>Withdrawal Declined</h1><p>Hi {user_name},</p><p>Unfortunately, your withdrawal request has been declined.</p><p><strong>Withdrawal Details:</strong></p><ul><li>Transaction Number: {transaction_number}</li><li>Amount: {amount} {currency}</li><li>Withdrawal Method: {withdrawal_method}</li><li>Status: Rejected</li></ul><p><strong>Reason:</strong> {rejection_reason}</p><p>The amount has been refunded to your account balance.</p><p>If you have any questions, please contact our support team.</p><p>Best regards,<br>The {site_name} Team</p>',
-                'variables' => ['user_name', 'site_name', 'transaction_number', 'amount', 'currency', 'withdrawal_method', 'rejection_reason'],
-                'is_active' => true
-            ],
-        ];
-
-        foreach ($emailTemplates as $template) {
-            EmailTemplate::updateOrCreate(
-                ['slug' => $template['slug']],
-                $template
-            );
-        }
 
         $this->command->info('Settings seeder completed successfully!');
         $this->command->info('Created:');
         $this->command->info('- ' . count($allSettings) . ' system settings');
-        $this->command->info('- ' . count($emailTemplates) . ' email templates');
     }
 }
