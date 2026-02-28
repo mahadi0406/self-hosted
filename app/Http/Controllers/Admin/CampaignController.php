@@ -95,6 +95,7 @@ class CampaignController extends Controller
             'ai_goal'           => 'nullable|string|max:500',
         ]);
 
+        // Count total recipients
         $totalRecipients = ContactList::whereIn('id', $request->audience['list_ids'])
             ->sum('contacts_count');
 
@@ -103,7 +104,7 @@ class CampaignController extends Controller
             'channel_id'       => $request->channel_id,
             'template_id'      => $request->template_id,
             'type'             => $request->type,
-            'content'          => $request->content,
+            'content'          => $request->input('content'),
             'audience'         => $request->audience,
             'status'           => $request->type === 'scheduled' ? 'scheduled' : 'draft',
             'scheduled_at'     => $request->scheduled_at,

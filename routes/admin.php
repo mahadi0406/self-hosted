@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AiCampaignPlannerController;
 use App\Http\Controllers\Admin\AiMessageWriterController;
 use App\Http\Controllers\Admin\CampaignController;
 use App\Http\Controllers\Admin\ChannelController;
@@ -60,4 +61,7 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
 
     Route::get('/ai/message-writer',[AiMessageWriterController::class, 'index']);
     Route::post('/ai/message-writer/generate',[AiMessageWriterController::class, 'generate']);
+
+    Route::get('/ai/campaign-planner',[AiCampaignPlannerController::class, 'index']);
+    Route::post('/ai/campaign-planner/generate', [AiCampaignPlannerController::class, 'generate']);
 });
