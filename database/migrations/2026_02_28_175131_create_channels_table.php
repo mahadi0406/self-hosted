@@ -16,9 +16,12 @@ return new class extends Migration
             $table->string('name');
             $table->enum('type', ['whatsapp', 'telegram']);
             $table->string('phone_number')->nullable();
-            $table->string('bot_token')->nullable();
+            $table->text('bot_token')->nullable();
+            $table->string('bot_username')->nullable();
             $table->text('credentials')->nullable();
             $table->enum('status', ['connected', 'disconnected', 'error'])->default('disconnected');
+            $table->string('error_message')->nullable();
+            $table->timestamp('last_verified_at')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

@@ -28,6 +28,8 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
         Route::get('/telegram/create',[ChannelController::class, 'createTelegram']);
         Route::post('/telegram',[ChannelController::class, 'storeTelegram']);
         Route::delete('/{channel}',[ChannelController::class, 'destroy']);
+        Route::post('/{channel}/verify',[ChannelController::class, 'verify']);
+        Route::post('/{channel}/disconnect',[ChannelController::class, 'disconnect']);
     });
 
     Route::get('/contact-lists',[ContactListController::class, 'index'])->name('contact-lists.index');

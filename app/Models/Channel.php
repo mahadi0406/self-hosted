@@ -15,6 +15,7 @@ class Channel extends Model
         'type',
         'phone_number',
         'bot_token',
+        'bot_username',
         'credentials',
         'status',
         'error_message',
