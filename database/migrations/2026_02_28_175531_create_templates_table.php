@@ -22,8 +22,10 @@ return new class extends Migration
             $table->json('buttons')->nullable();
             $table->json('variables')->nullable();
             $table->enum('source', ['manual', 'ai_generated'])->default('manual');
+            $table->unsignedTinyInteger('ai_compliance_score')->nullable();
             $table->enum('status', ['draft', 'approved', 'rejected'])->default('draft');
             $table->integer('usage_count')->default(0);
+            $table->text('rejection_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

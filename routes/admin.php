@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AiCampaignPlannerController;
 use App\Http\Controllers\Admin\AiMessageWriterController;
+use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\CampaignController;
 use App\Http\Controllers\Admin\ChannelController;
 use App\Http\Controllers\Admin\ContactController;
@@ -9,6 +10,7 @@ use App\Http\Controllers\Admin\ContactListController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DripSequenceController;
 use App\Http\Controllers\Admin\InboxController;
+use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TemplateController;
 use Illuminate\Support\Facades\Route;
 
@@ -64,4 +66,10 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
 
     Route::get('/ai/campaign-planner',[AiCampaignPlannerController::class, 'index']);
     Route::post('/ai/campaign-planner/generate', [AiCampaignPlannerController::class, 'generate']);
+
+    Route::get('/analytics/campaigns',[AnalyticsController::class, 'campaigns'])->name('admin.analytics.campaigns');
+    Route::get('/analytics/ai-logs',[AnalyticsController::class, 'aiLogs'])->name('admin.analytics.ai-logs');
+
+    Route::get('/settings',[SettingsController::class, 'index'])->name('admin.settings.index');
+    Route::put('/settings/{group}',[SettingsController::class, 'update']);
 });

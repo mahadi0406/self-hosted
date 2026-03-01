@@ -25,6 +25,7 @@ return new class extends Migration
             $table->decimal('reply_rate', 5, 2)->default(0);
             $table->text('ai_summary')->nullable();
             $table->json('ai_recommendations')->nullable();
+            $table->timestamp('recorded_at')->nullable();
             $table->timestamps();
         });
     }

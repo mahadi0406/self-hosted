@@ -14,6 +14,7 @@ return new class extends Migration
             $table->text('description')->nullable();
             $table->foreignId('channel_id')->constrained('channels');
             $table->enum('status', ['active', 'paused', 'archived'])->default('active');
+            $table->unsignedInteger('total_steps')->default(0);
             $table->boolean('ai_generated')->default(false);
             $table->string('ai_goal')->nullable();
             $table->timestamps();

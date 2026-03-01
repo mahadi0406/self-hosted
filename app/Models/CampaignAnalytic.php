@@ -33,6 +33,7 @@ class CampaignAnalytic extends Model
         'read_rate'          => 'float',
         'reply_rate'         => 'float',
         'ai_recommendations' => 'array',
+        'recorded_at'        => 'datetime',
     ];
 
     public function campaign(): BelongsTo

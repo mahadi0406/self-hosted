@@ -19,6 +19,7 @@ return new class extends Migration
             $table->enum('type', ['instant', 'scheduled'])->default('instant');
             $table->json('content');
             $table->json('audience'); // {list_ids: [1,2]}
+            $table->text('ai_goal')->nullable();
             $table->enum('status', ['draft', 'scheduled', 'running', 'paused', 'completed', 'failed'])->default('draft');
             $table->timestamp('scheduled_at')->nullable();
             $table->timestamp('started_at')->nullable();
