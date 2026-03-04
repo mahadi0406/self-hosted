@@ -35,6 +35,11 @@ class SettingsController extends Controller
 
     public function update(Request $request, string $group): RedirectResponse
     {
+        \Log::info('Settings update', [
+            'group' => $group,
+            'data' => $request->all(),
+            'files' => $request->allFiles(),
+        ]);
         $settings = Setting::where('group', $group)->get();
 
         foreach ($settings as $setting) {
@@ -46,7 +51,7 @@ class SettingsController extends Controller
                     if ($newPath) {
                         $setting->update(['value' => $newPath]);
                     }
-                } elseif ($request->input($key) === '' || $request->input($key) === null) {
+                } elseif ($request->input($key) === '__REMOVE__') {
                     if ($setting->value) {
                         $this->removeFile($setting->value);
                     }
@@ -56,7 +61,8 @@ class SettingsController extends Controller
             }
 
             if ($setting->type === 'boolean') {
-                $setting->update(['value' => $request->has($key) ? '1' : '0']);
+                $value = $request->input($key);
+                $setting->update(['value' => ($value === '1' || $value === 'true' || $value === true) ? '1' : '0']);
                 continue;
             }
 

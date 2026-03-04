@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head } from '@inertiajs/react';
 import { toast } from 'sonner';
+import axios from 'axios';
 import {
     Settings, Globe, Sparkles, Smartphone,
     Send, Zap, Save, Eye, EyeOff, Upload, X,
@@ -249,7 +250,6 @@ const TabPanel = ({ group, groupSettings }) => {
     const onFileChange = (key, file) => {
         if (!file) return;
         setFiles(f => ({ ...f, [key]: file }));
-        // Local preview
         const url = URL.createObjectURL(file);
         setValues(v => ({ ...v, [key]: url }));
     };
@@ -259,28 +259,39 @@ const TabPanel = ({ group, groupSettings }) => {
         setSaving(true);
 
         const formData = new FormData();
+
         Object.entries(groupSettings).forEach(([key, setting]) => {
-            const val = values[key] ?? setting.value;
-            if (files[key]) {
-                formData.append(key, files[key]);
+            const val = values.hasOwnProperty(key) ? values[key] : setting.value;
+
+            if (setting.type === 'file') {
+                if (files[key]) {
+                    formData.append(key, files[key]);
+                } else if (values[key] === '') {
+                    formData.append(key, '__REMOVE__');
+                }
             } else if (setting.type === 'boolean') {
-                if (val === '1' || val === true || val === 1) formData.append(key, '1');
-            } else if (setting.type === 'file') {
-                if (values[key] === '') formData.append(key, '');
+                const boolVal = val === '1' || val === true || val === 1 ? '1' : '0';
+                formData.append(key, boolVal);
+            } else if (setting.type === 'json') {
+                const jsonVal = typeof val === 'string' ? val : JSON.stringify(val || []);
+                formData.append(key, jsonVal);
             } else {
                 formData.append(key, val ?? '');
             }
         });
+
         formData.append('_method', 'PUT');
 
         try {
-            await axios.post(`/admin/settings/${group}`, formData, {
+            const response = await axios.post(`/admin/settings/${group}`, formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
             toast.success('Settings saved successfully!');
             setFiles({});
         } catch (err) {
-            toast.error(err.response?.data?.message || 'Failed to save settings.');
+            console.error('Full error:', err);
+            console.error('Response:', err.response);
+            toast.error(err.response?.data?.message || err.message || 'Failed to save settings.');
         } finally {
             setSaving(false);
         }
