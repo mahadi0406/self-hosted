@@ -16,7 +16,6 @@ import {
 } from "@/Components/UI/tooltip";
 import {
     Home,
-    MessageSquare,
     Send,
     Users,
     List,
@@ -28,13 +27,8 @@ import {
     Sparkles,
     Radio,
     Bot,
-    PhoneCall,
     History,
-    PlusCircle,
-    Contact,
-    Tag, CheckCircle, FolderOpen,
-    ChevronDown, LogOut, Shield,
-    Mail, TrendingUp
+    ChevronDown, LogOut
 } from 'lucide-react';
 
 const Sidebar = ({

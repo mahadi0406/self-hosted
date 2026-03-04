@@ -19,16 +19,12 @@ export default function Login({ appName = "BlastBot" }) {
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        form.post("/admin/login", { onSuccess: () => form.reset("password") })
+        form.post("/login", { onSuccess: () => form.reset("password") })
     }
 
     return (
         <div className="min-h-screen flex bg-zinc-950">
-
-            {/* ── Left panel (dark branding) ── */}
             <div className="hidden lg:flex lg:w-[52%] relative flex-col justify-between p-12 overflow-hidden">
-
-                {/* Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-zinc-900 via-zinc-950 to-black" />
                 <div className="absolute inset-0 opacity-30"
                      style={{ backgroundImage: "radial-gradient(circle at 20% 50%, #22c55e22 0%, transparent 60%), radial-gradient(circle at 80% 20%, #16a34a18 0%, transparent 50%)" }} />
@@ -75,7 +71,6 @@ export default function Login({ appName = "BlastBot" }) {
                     </div>
                 </div>
 
-                {/* Demo banner */}
                 <div className="relative z-10">
                     <div className="flex items-start gap-3 p-4 rounded-xl bg-amber-500/8 border border-amber-500/20">
                         <div className="w-5 h-5 rounded-full bg-amber-500/20 flex items-center justify-center shrink-0 mt-0.5">
@@ -93,15 +88,9 @@ export default function Login({ appName = "BlastBot" }) {
                 </div>
             </div>
 
-            {/* ── Right panel (clean white design) ── */}
             <div className="flex-1 flex flex-col justify-center items-center px-6 py-12 bg-white relative">
-
-                {/* Subtle left border on desktop */}
                 <div className="hidden lg:block absolute left-0 top-0 bottom-0 w-px bg-zinc-200" />
-
                 <div className={`w-full max-w-sm transition-all duration-700 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-
-                    {/* Mobile logo */}
                     <div className="flex lg:hidden items-center gap-2 mb-10">
                         <div className="w-8 h-8 rounded-lg bg-emerald-500 flex items-center justify-center">
                             <MessageSquare className="w-4 h-4 text-white" strokeWidth={2.5} />
