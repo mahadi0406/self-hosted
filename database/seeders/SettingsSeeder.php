@@ -16,6 +16,22 @@ class SettingsSeeder extends Seeder
             ['key' => 'default_timezone', 'value' => 'UTC',   'type' => 'text',  'group' => 'general', 'label' => 'Default Timezone', 'description' => 'Default platform timezone'],
         ];
 
+        $loginPageSettings = [
+            ['key' => 'login_badge_text',     'value' => 'AI-Powered Messaging', 'type' => 'text',     'group' => 'login_page', 'label' => 'Badge Text',     'description' => 'Small badge text above headline'],
+            ['key' => 'login_headline',       'value' => 'Reach thousands',      'type' => 'text',     'group' => 'login_page', 'label' => 'Headline',       'description' => 'Main headline text'],
+            ['key' => 'login_headline_highlight', 'value' => 'in seconds.',      'type' => 'text',     'group' => 'login_page', 'label' => 'Headline Highlight', 'description' => 'Highlighted part of headline'],
+            ['key' => 'login_description',    'value' => 'The complete WhatsApp & Telegram broadcast platform with AI-driven campaign intelligence.', 'type' => 'textarea', 'group' => 'login_page', 'label' => 'Description', 'description' => 'Description text below headline'],
+            ['key' => 'login_features',       'value' => json_encode([
+                ['icon' => 'MessageSquare', 'label' => 'Bulk Messaging',  'desc' => 'WhatsApp & Telegram campaigns'],
+                ['icon' => 'Zap',           'label' => 'AI-Powered',      'desc' => 'Smart message generation'],
+                ['icon' => 'BarChart3',     'label' => 'Analytics',       'desc' => 'Real-time campaign insights'],
+                ['icon' => 'Shield',        'label' => 'Secure',          'desc' => 'Enterprise-grade security'],
+            ]), 'type' => 'json', 'group' => 'login_page', 'label' => 'Features', 'description' => 'Feature cards on login page (JSON array)'],
+            ['key' => 'login_demo_enabled',   'value' => '1',              'type' => 'boolean',  'group' => 'login_page', 'label' => 'Show Demo Credentials', 'description' => 'Show demo credentials box'],
+            ['key' => 'login_demo_email',     'value' => 'admin@blastbot.io', 'type' => 'text',  'group' => 'login_page', 'label' => 'Demo Email',     'description' => 'Demo account email'],
+            ['key' => 'login_demo_password',  'value' => 'password',       'type' => 'text',     'group' => 'login_page', 'label' => 'Demo Password',  'description' => 'Demo account password'],
+        ];
+
         $aiSettings = [
             ['key' => 'ai_provider',   'value' => 'claude',                      'type' => 'text',     'group' => 'ai', 'label' => 'AI Provider',    'description' => 'AI provider: claude or openai'],
             ['key' => 'ai_api_key',    'value' => '',                            'type' => 'password', 'group' => 'ai', 'label' => 'AI API Key',     'description' => 'Your Claude / OpenAI API key'],
@@ -42,6 +58,7 @@ class SettingsSeeder extends Seeder
 
         $allSettings = array_merge(
             $generalSettings,
+            $loginPageSettings,
             $aiSettings,
             $whatsappSettings,
             $telegramSettings,

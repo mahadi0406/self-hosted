@@ -15,11 +15,16 @@ class HandleInertiaRequests extends Middleware
     private $settings = null;
     protected $rootView = 'app';
 
-
     public function share(Request $request): array
     {
         $user = $request->user();
         $this->loadSettings();
+
+        $siteLogo = $this->getSetting('site_logo');
+
+        // Parse login features JSON
+        $loginFeatures = $this->getSetting('login_features');
+        $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
 
         return array_merge(parent::share($request), [
             'csrf_token' => csrf_token(),
@@ -43,8 +48,22 @@ class HandleInertiaRequests extends Middleware
 
             'currencySymbol' => $this->getSetting('currency_symbol', '$'),
             'currencyName' => $this->getSetting('default_currency', 'USD'),
-            'appName' => $this->getSetting('site_name', 'Experts-Trade'),
+            'appName' => $this->getSetting('site_name', 'BlastBot'),
+            'siteLogo' => $siteLogo ? asset('assets/files/' . $siteLogo) : null,
             'primaryColor' => $this->getSetting('primary_color', '#1f2937'),
+
+            'loginPage' => [
+                'badgeText' => $this->getSetting('login_badge_text', 'AI-Powered Messaging'),
+                'headline' => $this->getSetting('login_headline', 'Reach thousands'),
+                'headlineHighlight' => $this->getSetting('login_headline_highlight', 'in seconds.'),
+                'description' => $this->getSetting('login_description', 'The complete WhatsApp & Telegram broadcast platform with AI-driven campaign intelligence.'),
+                'features' => $features,
+                'demo' => [
+                    'enabled' => (bool) $this->getSetting('login_demo_enabled', true),
+                    'email' => $this->getSetting('login_demo_email', 'admin@blastbot.io'),
+                    'password' => $this->getSetting('login_demo_password', 'password'),
+                ],
+            ],
         ]);
     }
 
