@@ -131,7 +131,7 @@ class AdminAuthController extends Controller
      * @param Request $request
      * @return RedirectResponse
      */
-    public function logout(Request $request): RedirectResponse
+    public function logout(Request $request): \Symfony\Component\HttpFoundation\Response
     {
         $user = Auth::user();
 
@@ -149,7 +149,11 @@ class AdminAuthController extends Controller
         $request->session()->regenerateToken();
         $request->session()->forget(['2fa_verified', 'login_attempts', 'last_activity']);
 
-        return redirect('/admin')->with('success', 'You have been logged out successfully.');
+        if ($request->header('X-Inertia')) {
+            return Inertia::location('/login');
+        }
+
+        return redirect('/login')->with('success', 'You have been logged out successfully.');
     }
 
     /**

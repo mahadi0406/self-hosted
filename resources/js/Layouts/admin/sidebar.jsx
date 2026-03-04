@@ -251,7 +251,7 @@ const Sidebar = ({
 
     const handleLogout = () => {
         sessionStorage.removeItem(SCROLL_POSITION_KEY);
-        router.get(config.logoutRoute);
+        router.post(config.logoutRoute);
     };
 
     useEffect(() => {
