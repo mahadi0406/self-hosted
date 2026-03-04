@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Concerns\UploadedFile;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 use Inertia\Inertia;
 use Inertia\Response;
 
 class SettingsController extends Controller
 {
+    use UploadedFile;
+
     public function index(): Response
     {
         $settings = Setting::all()->groupBy('group')->map(fn($group) =>
@@ -37,12 +40,18 @@ class SettingsController extends Controller
         foreach ($settings as $setting) {
             $key = $setting->key;
 
-            if ($setting->type === 'file' && $request->hasFile($key)) {
-                $path = $request->file($key)->store("settings/{$group}", 'public');
-                if ($setting->value && Storage::disk('public')->exists($setting->value)) {
-                    Storage::disk('public')->delete($setting->value);
+            if ($setting->type === 'file') {
+                if ($request->hasFile($key)) {
+                    $newPath = $this->move($request->file($key), null, $setting->value ?: null);
+                    if ($newPath) {
+                        $setting->update(['value' => $newPath]);
+                    }
+                } elseif ($request->input($key) === '' || $request->input($key) === null) {
+                    if ($setting->value) {
+                        $this->removeFile($setting->value);
+                    }
+                    $setting->update(['value' => '']);
                 }
-                $setting->update(['value' => $path]);
                 continue;
             }
 
@@ -51,11 +60,23 @@ class SettingsController extends Controller
                 continue;
             }
 
+            if ($setting->type === 'json') {
+                if ($request->has($key)) {
+                    $value = $request->input($key);
+                    if (is_array($value)) {
+                        $value = json_encode($value);
+                    }
+                    $setting->update(['value' => $value]);
+                }
+                continue;
+            }
+
             if ($request->has($key)) {
                 $setting->update(['value' => $request->input($key)]);
             }
         }
 
-        return back()->with('success', ucfirst($group) . ' settings saved successfully.');
+        Cache::forget('all_frontend_settings');
+        return back()->with('success', ucfirst(str_replace('_', ' ', $group)) . ' settings saved successfully.');
     }
 }

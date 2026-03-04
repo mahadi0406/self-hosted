@@ -1,22 +1,29 @@
 import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
-import { Head, useForm, router } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { toast } from 'sonner';
 import {
     Settings, Globe, Sparkles, Smartphone,
     Send, Zap, Save, Eye, EyeOff, Upload, X,
+    LogIn, Plus, Trash2, GripVertical,
 } from "lucide-react";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition-colors";
 
 const tabs = [
-    { key: 'general',  label: 'General',  icon: Globe },
-    { key: 'ai',       label: 'AI',       icon: Sparkles },
-    { key: 'whatsapp', label: 'WhatsApp', icon: Smartphone },
-    { key: 'telegram', label: 'Telegram', icon: Send },
-    { key: 'campaign', label: 'Campaign', icon: Zap },
+    { key: 'general',    label: 'General',    icon: Globe },
+    { key: 'login_page', label: 'Login Page', icon: LogIn },
+    { key: 'ai',         label: 'AI',         icon: Sparkles },
+    { key: 'whatsapp',   label: 'WhatsApp',   icon: Smartphone },
+    { key: 'telegram',   label: 'Telegram',   icon: Send },
+    { key: 'campaign',   label: 'Campaign',   icon: Zap },
 ];
 
+const availableIcons = [
+    'MessageSquare', 'Zap', 'Shield', 'BarChart3',
+    'Send', 'Users', 'Clock', 'Globe', 'Star', 'Heart',
+    'Smartphone', 'Mail', 'Bell', 'Lock', 'Rocket'
+];
 
 const FieldWrapper = ({ setting, children }) => (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 border-b border-zinc-100 dark:border-zinc-800 last:border-0">
@@ -36,6 +43,17 @@ const TextField = ({ setting, value, onChange }) => (
             type="text"
             value={value ?? ''}
             onChange={e => onChange(setting.key, e.target.value)}
+            className={inputCls}
+        />
+    </FieldWrapper>
+);
+
+const TextareaField = ({ setting, value, onChange }) => (
+    <FieldWrapper setting={setting}>
+        <textarea
+            value={value ?? ''}
+            onChange={e => onChange(setting.key, e.target.value)}
+            rows={3}
             className={inputCls}
         />
     </FieldWrapper>
@@ -92,7 +110,7 @@ const BooleanField = ({ setting, value, onChange }) => (
 
 const FileField = ({ setting, value, onChange, onFileChange }) => {
     const previewUrl = value && !value.startsWith('blob:')
-        ? `/storage/${value}`
+        ? `/assets/files/${value}`
         : value || null;
 
     return (
@@ -125,6 +143,88 @@ const FileField = ({ setting, value, onChange, onFileChange }) => {
     );
 };
 
+const JsonFeaturesField = ({ setting, value, onChange }) => {
+    // Parse JSON value
+    let features = [];
+    try {
+        features = typeof value === 'string' ? JSON.parse(value) : (value || []);
+    } catch {
+        features = [];
+    }
+
+    const updateFeatures = (newFeatures) => {
+        onChange(setting.key, JSON.stringify(newFeatures));
+    };
+
+    const addFeature = () => {
+        updateFeatures([...features, { icon: 'Zap', label: '', desc: '' }]);
+    };
+
+    const removeFeature = (index) => {
+        updateFeatures(features.filter((_, i) => i !== index));
+    };
+
+    const updateFeature = (index, field, val) => {
+        const updated = [...features];
+        updated[index] = { ...updated[index], [field]: val };
+        updateFeatures(updated);
+    };
+
+    return (
+        <FieldWrapper setting={setting}>
+            <div className="space-y-3">
+                {features.map((feature, index) => (
+                    <div key={index} className="flex items-start gap-2 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/50">
+                        <div className="text-zinc-400 mt-2">
+                            <GripVertical className="w-4 h-4" />
+                        </div>
+                        <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                            <select
+                                value={feature.icon}
+                                onChange={e => updateFeature(index, 'icon', e.target.value)}
+                                className={`${inputCls} text-xs`}
+                            >
+                                {availableIcons.map(icon => (
+                                    <option key={icon} value={icon}>{icon}</option>
+                                ))}
+                            </select>
+                            <input
+                                type="text"
+                                value={feature.label}
+                                onChange={e => updateFeature(index, 'label', e.target.value)}
+                                placeholder="Label"
+                                className={`${inputCls} text-xs`}
+                            />
+                            <input
+                                type="text"
+                                value={feature.desc}
+                                onChange={e => updateFeature(index, 'desc', e.target.value)}
+                                placeholder="Description"
+                                className={`${inputCls} text-xs`}
+                            />
+                        </div>
+                        <button
+                            type="button"
+                            onClick={() => removeFeature(index)}
+                            className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-500 transition-colors mt-1"
+                        >
+                            <Trash2 className="w-4 h-4" />
+                        </button>
+                    </div>
+                ))}
+                <button
+                    type="button"
+                    onClick={addFeature}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-600 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-600 dark:hover:border-zinc-500 dark:hover:text-zinc-400 transition-colors"
+                >
+                    <Plus className="w-4 h-4" />
+                    Add Feature
+                </button>
+            </div>
+        </FieldWrapper>
+    );
+};
+
 const renderField = (setting, values, onChange, onFileChange) => {
     const value = values[setting.key] ?? setting.value;
     switch (setting.type) {
@@ -132,6 +232,8 @@ const renderField = (setting, values, onChange, onFileChange) => {
         case 'password': return <PasswordField key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'number':   return <NumberField   key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'file':     return <FileField     key={setting.key} setting={setting} value={value} onChange={onChange} onFileChange={onFileChange} />;
+        case 'textarea': return <TextareaField key={setting.key} setting={setting} value={value} onChange={onChange} />;
+        case 'json':     return <JsonFeaturesField key={setting.key} setting={setting} value={value} onChange={onChange} />;
         default:         return <TextField     key={setting.key} setting={setting} value={value} onChange={onChange} />;
     }
 };
@@ -157,13 +259,14 @@ const TabPanel = ({ group, groupSettings }) => {
         setSaving(true);
 
         const formData = new FormData();
-        // Merge seeded values with local overrides
         Object.entries(groupSettings).forEach(([key, setting]) => {
             const val = values[key] ?? setting.value;
             if (files[key]) {
                 formData.append(key, files[key]);
             } else if (setting.type === 'boolean') {
                 if (val === '1' || val === true || val === 1) formData.append(key, '1');
+            } else if (setting.type === 'file') {
+                if (values[key] === '') formData.append(key, '');
             } else {
                 formData.append(key, val ?? '');
             }
@@ -184,13 +287,14 @@ const TabPanel = ({ group, groupSettings }) => {
     };
 
     const settingsArray = Object.values(groupSettings);
+    const tabLabel = tabs.find(t => t.key === group)?.label || group;
 
     return (
         <form onSubmit={handleSave}>
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg">
                 <div className="px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
                     <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                        {tabs.find(t => t.key === group)?.label} Settings
+                        {tabLabel} Settings
                     </h2>
                 </div>
                 <div className="px-5">
@@ -213,10 +317,10 @@ const TabPanel = ({ group, groupSettings }) => {
     );
 };
 
-// ─── Main page ────────────────────────────────────────────────────────────────
 
 const Index = ({ settings }) => {
     const [activeTab, setActiveTab] = useState('general');
+    const availableTabs = tabs.filter(tab => settings[tab.key]);
 
     return (
         <Layout pageTitle="Settings" pageSection="Settings">
@@ -235,9 +339,8 @@ const Index = ({ settings }) => {
                     </div>
                 </div>
 
-                {/* Tabs */}
                 <div className="flex gap-1 overflow-x-auto pb-1">
-                    {tabs.map(({ key, label, icon: Icon }) => (
+                    {availableTabs.map(({ key, label, icon: Icon }) => (
                         <button
                             key={key}
                             onClick={() => setActiveTab(key)}
@@ -253,8 +356,7 @@ const Index = ({ settings }) => {
                     ))}
                 </div>
 
-                {/* Active Tab Panel */}
-                {tabs.map(({ key }) =>
+                {availableTabs.map(({ key }) =>
                     activeTab === key && settings[key] ? (
                         <TabPanel
                             key={key}
