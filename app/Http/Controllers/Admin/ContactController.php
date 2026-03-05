@@ -82,7 +82,7 @@ class ContactController extends Controller
                 'tags' => array_filter(array_map('trim', explode(',', $request->tags)))
             ]);
         }
-        
+
         $request->validate([
             'name'        => 'required|string|max:255',
             'phone'       => 'nullable|string|unique:contacts,phone',
@@ -102,10 +102,72 @@ class ContactController extends Controller
 
         if ($request->filled('list_ids')) {
             $contact->lists()->sync($request->list_ids);
+            $this->recalculateListCounts($request->list_ids);
         }
 
         return redirect()->route('admin.contacts.index')
             ->with('success', 'Contact created successfully.');
+    }
+
+    public function edit(Contact $contact): Response
+    {
+        $lists = ContactList::select('id', 'name')->get();
+
+        return Inertia::render('Admin/Contacts/Edit', [
+            'contact' => [
+                'id'          => $contact->id,
+                'name'        => $contact->name,
+                'phone'       => $contact->phone,
+                'telegram_id' => $contact->telegram_id,
+                'email'       => $contact->email,
+                'country'     => $contact->country,
+                'language'    => $contact->language,
+                'tags'        => $contact->tags ?? [],
+                'status'      => $contact->status,
+                'list_ids'    => $contact->lists()->pluck('contact_lists.id')->toArray(),
+            ],
+            'lists' => $lists,
+        ]);
+    }
+
+    public function update(Request $request, Contact $contact): RedirectResponse
+    {
+        if ($request->has('tags') && is_string($request->tags)) {
+            $request->merge([
+                'tags' => array_filter(array_map('trim', explode(',', $request->tags)))
+            ]);
+        }
+
+        $request->validate([
+            'name'        => 'required|string|max:255',
+            'phone'       => 'nullable|string|unique:contacts,phone,' . $contact->id,
+            'telegram_id' => 'nullable|string|unique:contacts,telegram_id,' . $contact->id,
+            'email'       => 'nullable|email',
+            'country'     => 'nullable|string|max:10',
+            'language'    => 'nullable|string|max:10',
+            'tags'        => 'nullable|array',
+            'status'      => 'nullable|in:active,opted_out,unsubscribed',
+            'list_ids'    => 'nullable|array',
+            'list_ids.*'  => 'exists:contact_lists,id',
+        ]);
+
+        $oldListIds = $contact->lists()->pluck('contact_lists.id')->toArray();
+
+        $contact->update($request->only([
+            'name', 'phone', 'telegram_id', 'email',
+            'country', 'language', 'tags', 'status',
+        ]));
+
+        $newListIds = $request->input('list_ids', []);
+        $contact->lists()->sync($newListIds);
+
+        $affectedIds = array_unique(array_merge($oldListIds, $newListIds));
+        if (!empty($affectedIds)) {
+            $this->recalculateListCounts($affectedIds);
+        }
+
+        return redirect()->route('admin.contacts.index')
+            ->with('success', 'Contact updated successfully.');
     }
 
     public function importView(): Response
@@ -164,15 +226,32 @@ class ContactController extends Controller
             $imported++;
         }
 
+        if ($request->filled('list_ids')) {
+            $this->recalculateListCounts($request->list_ids);
+        }
+
         return redirect()->route('admin.contacts.index')
             ->with('success', "Import complete. {$imported} imported, {$skipped} skipped.");
     }
 
     public function destroy(Contact $contact): RedirectResponse
     {
+        $listIds = $contact->lists()->pluck('contact_lists.id')->toArray();
+
         $contact->delete();
+
+        if (!empty($listIds)) {
+            $this->recalculateListCounts($listIds);
+        }
 
         return redirect()->route('admin.contacts.index')
             ->with('success', 'Contact deleted successfully.');
+    }
+
+    private function recalculateListCounts(array $listIds): void
+    {
+        ContactList::whereIn('id', $listIds)->each(function ($list) {
+            $list->update(['contacts_count' => $list->contacts()->count()]);
+        });
     }
 }

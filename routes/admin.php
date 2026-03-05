@@ -42,6 +42,8 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
     Route::post('/contacts',[ContactController::class, 'store']);
     Route::get('/contacts/import',[ContactController::class, 'importView']);
     Route::post('/contacts/import',[ContactController::class, 'import']);
+    Route::get('/contacts/{contact}/edit',[ContactController::class, 'edit'])->name('contacts.edit');
+    Route::put('/contacts/{contact}',[ContactController::class, 'update']);
     Route::delete('/contacts/{contact}',[ContactController::class, 'destroy']);
 
     Route::get('/templates',[TemplateController::class, 'index'])->name('templates.index');

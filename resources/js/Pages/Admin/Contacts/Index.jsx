@@ -4,7 +4,7 @@ import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
 import {
     Users, Plus, Trash2, Eye, Search,
-    Smartphone, Send, Upload, User,
+    Smartphone, Send, Upload, User, Pencil,
     Loader2, AlertTriangle,
 } from "lucide-react";
 import {
@@ -287,6 +287,13 @@ const Index = ({ contacts, stats, filters }) => {
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
+                                                <Link
+                                                    href={`/admin/contacts/${c.id}/edit`}
+                                                    title="Edit contact"
+                                                    className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
+                                                >
+                                                    <Pencil className="w-3.5 h-3.5" />
+                                                </Link>
                                                 <button
                                                     onClick={() => openDeleteModal(c)}
                                                     title="Delete"
