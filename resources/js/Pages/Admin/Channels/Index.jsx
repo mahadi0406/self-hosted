@@ -15,7 +15,6 @@ import {
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
 
-// ── Delete Confirmation Modal Component ───────────────────────────────────────
 const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
     <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent className="max-w-sm">
@@ -125,13 +124,11 @@ const Index = ({ channels, stats, filters }) => {
     const [type, setType]     = useState(filters?.type   || 'all');
     const [status, setStatus] = useState(filters?.status || 'all');
 
-    // Modal states
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal]   = useState(false);
     const [showDisconnectModal, setShowDisconnectModal] = useState(false);
     const [selectedChannel, setSelectedChannel]   = useState(null);
 
-    // Loading states
     const [verifying, setVerifying]         = useState({});
     const [deleting, setDeleting]           = useState(false);
     const [disconnecting, setDisconnecting] = useState(false);
@@ -149,13 +146,11 @@ const Index = ({ channels, stats, filters }) => {
         router.get('/admin/channels', {}, { preserveState: true, preserveScroll: true });
     };
 
-    // Open delete modal
     const openDeleteModal = (channel) => {
         setSelectedChannel(channel);
         setShowDeleteModal(true);
     };
 
-    // Confirm delete
     const confirmDelete = () => {
         if (!selectedChannel) return;
         setDeleting(true);
@@ -170,13 +165,11 @@ const Index = ({ channels, stats, filters }) => {
         });
     };
 
-    // Open disconnect modal
     const openDisconnectModal = (channel) => {
         setSelectedChannel(channel);
         setShowDisconnectModal(true);
     };
 
-    // Confirm disconnect
     const confirmDisconnect = async () => {
         if (!selectedChannel) return;
         setDisconnecting(true);
@@ -430,7 +423,6 @@ const Index = ({ channels, stats, filters }) => {
                 </DialogContent>
             </Dialog>
 
-            {/* Delete Confirmation Modal */}
             <DeleteConfirmModal
                 open={showDeleteModal}
                 onOpenChange={setShowDeleteModal}
@@ -440,7 +432,6 @@ const Index = ({ channels, stats, filters }) => {
                 description={`Are you sure you want to delete "${selectedChannel?.name}"? This will remove all associated data and cannot be undone.`}
             />
 
-            {/* Disconnect Confirmation Modal */}
             <DisconnectConfirmModal
                 open={showDisconnectModal}
                 onOpenChange={setShowDisconnectModal}

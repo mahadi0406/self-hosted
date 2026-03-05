@@ -10,6 +10,8 @@ import {
     Search,
     Users,
     FolderOpen,
+    Loader2,
+    AlertTriangle,
 } from "lucide-react";
 import {
     Dialog,
@@ -19,10 +21,49 @@ import {
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
 
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-sm">
+            <div className="flex flex-col items-center text-center pt-2">
+                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                </div>
+                <DialogHeader>
+                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                        {title || 'Delete Confirmation'}
+                    </DialogTitle>
+                </DialogHeader>
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                </p>
+                <div className="flex items-center gap-3 w-full">
+                    <button
+                        onClick={() => onOpenChange(false)}
+                        disabled={loading}
+                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        onClick={onConfirm}
+                        disabled={loading}
+                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                    >
+                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                        Delete
+                    </button>
+                </div>
+            </div>
+        </DialogContent>
+    </Dialog>
+);
+
 const Index = ({ lists, stats, filters }) => {
     const [search, setSearch]                     = useState(filters?.search || '');
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [showDeleteModal, setShowDeleteModal]   = useState(false);
     const [selectedList, setSelectedList]         = useState(null);
+    const [deleting, setDeleting]                 = useState(false);
 
     const handleSearch = () => {
         const params = {};
@@ -35,11 +76,22 @@ const Index = ({ lists, stats, filters }) => {
         router.get('/admin/contact-lists', {}, { preserveState: true, preserveScroll: true });
     };
 
-    const handleDelete = (list) => {
-        if (!confirm('Are you sure you want to delete this list?')) return;
-        router.delete(`/admin/contact-lists/${list.id}`, {
-            onSuccess: () => toast.success('Contact list deleted successfully!'),
-            onError:   () => toast.error('Failed to delete contact list.'),
+    const openDeleteModal = (list) => {
+        setSelectedList(list);
+        setShowDeleteModal(true);
+    };
+
+    const confirmDelete = () => {
+        if (!selectedList) return;
+        setDeleting(true);
+        router.delete(`/admin/contact-lists/${selectedList.id}`, {
+            onSuccess: () => {
+                toast.success('Contact list deleted successfully!');
+                setShowDeleteModal(false);
+                setSelectedList(null);
+            },
+            onError:  () => toast.error('Failed to delete contact list.'),
+            onFinish: () => setDeleting(false),
         });
     };
 
@@ -161,7 +213,7 @@ const Index = ({ lists, stats, filters }) => {
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
                                                 <button
-                                                    onClick={() => handleDelete(l)}
+                                                    onClick={() => openDeleteModal(l)}
                                                     title="Delete"
                                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 hover:border-red-200 transition-colors"
                                                 >
@@ -190,6 +242,15 @@ const Index = ({ lists, stats, filters }) => {
                     </div>
                 </section>
             </div>
+
+            <DeleteConfirmModal
+                open={showDeleteModal}
+                onOpenChange={setShowDeleteModal}
+                onConfirm={confirmDelete}
+                loading={deleting}
+                title="Delete Contact List"
+                description={`Are you sure you want to delete "${selectedList?.name}"? All contacts in this list will be unlinked. This action cannot be undone.`}
+            />
 
             {/* Details Modal */}
             <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
