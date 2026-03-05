@@ -21,22 +21,19 @@ class Setting extends Model
 
     public static function get(string $key, $default = null)
     {
-        $cacheKey = "setting.{$key}";
-        return Cache::remember($cacheKey, 3600, function () use ($key, $default) {
-            $setting = static::where('key', $key)->first();
+        return Cache::remember('all_frontend_settings', 3600, function () {
+            return static::all()->mapWithKeys(function ($setting) {
+                $value = match ($setting->type) {
+                    'boolean' => (bool) $setting->value,
+                    'integer' => (int) $setting->value,
+                    'float' => (float) $setting->value,
+                    'json' => json_decode($setting->value, true),
+                    default => $setting->value
+                };
 
-            if (!$setting) {
-                return $default;
-            }
-
-            return match ($setting->type) {
-                'boolean' => (bool) $setting->value,
-                'integer' => (int) $setting->value,
-                'float' => (float) $setting->value,
-                'json' => json_decode($setting->value, true),
-                default => $setting->value
-            };
-        });
+                return [$setting->key => $value];
+            });
+        })[$key] ?? $default;
     }
 
     public static function set($key, $value, $type = 'text', $label = null, $group = 'general'): void
@@ -61,13 +58,16 @@ class Setting extends Model
             ]);
         }
 
-        Cache::forget("setting.{$key}");
-
+        self::clearCache();
     }
 
     public static function getByGroup($group)
     {
-        return self::where('group', $group)->get()->mapWithKeys(function ($setting) {
+        $allSettings = Cache::remember('all_frontend_settings', 3600, function () {
+            return static::all();
+        });
+
+        return $allSettings->where('group', $group)->mapWithKeys(function ($setting) {
             $value = match($setting->type) {
                 'boolean' => (bool) $setting->value,
                 'json' => json_decode($setting->value, true),
@@ -78,18 +78,8 @@ class Setting extends Model
         });
     }
 
-
     public static function clearCache(): void
     {
-        $keys = static::pluck('key');
-        foreach ($keys as $key) {
-            Cache::forget("setting.{$key}");
-        }
-
-        $groups = static::distinct('group')->pluck('group');
-        foreach ($groups as $group) {
-            Cache::forget("settings.group.{$group}");
-        }
+        Cache::forget('all_frontend_settings');
     }
 }
-

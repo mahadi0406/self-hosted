@@ -35,11 +35,6 @@ class SettingsController extends Controller
 
     public function update(Request $request, string $group): RedirectResponse
     {
-        \Log::info('Settings update', [
-            'group' => $group,
-            'data' => $request->all(),
-            'files' => $request->allFiles(),
-        ]);
         $settings = Setting::where('group', $group)->get();
 
         foreach ($settings as $setting) {

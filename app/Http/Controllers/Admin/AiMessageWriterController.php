@@ -59,7 +59,6 @@ class AiMessageWriterController extends Controller
                 'language.required'      => 'Please select a language.',
             ]);
         } catch (ValidationException $e) {
-            dd($e->errors());
             return response()->json([
                 'message' => 'Validation failed',
                 'errors'  => $e->errors(),
@@ -67,7 +66,8 @@ class AiMessageWriterController extends Controller
         }
 
         $apiKey = Setting::get('ai_api_key');
-        $model  = Setting::get('ai_model', 'claude-sonnet-4-20250514');
+        $model  = Setting::get('ai_model', 'claude-sonnet-4-6');
+        Log::info('---------- AI API Request -----------------', [$apiKey]);
 
         if (!$apiKey) {
             return response()->json([
@@ -111,13 +111,19 @@ class AiMessageWriterController extends Controller
                     'error_message' => $errorMessage,
                 ]);
 
-                $userMessage = match ($response->status()) {
-                    401     => 'Invalid API key. Please check your settings.',
-                    429     => 'Rate limit exceeded. Please wait a moment and try again.',
-                    500,
-                    502,
-                    503     => 'AI service is temporarily unavailable. Please try again later.',
-                    default => 'Failed to generate message. Please try again.',
+                $userMessage = match (true) {
+                    $response->status() === 401
+                        => 'Invalid API key. Please check your Settings.',
+                    $response->status() === 429
+                        => 'Rate limit exceeded. Please wait a moment and try again.',
+                    in_array($response->status(), [500, 502, 503])
+                        => 'AI service is temporarily unavailable. Please try again later.',
+                    str_contains($errorMessage, 'credit balance')
+                        => 'Your Anthropic account has insufficient credits. Please top up at console.anthropic.com.',
+                    str_contains($errorMessage, 'model') && $response->status() === 400
+                        => 'Invalid AI model configured. Please update the model in Settings.',
+                    default
+                        => $errorMessage,
                 };
 
                 return response()->json(['error' => $userMessage], $response->status());
@@ -128,19 +134,8 @@ class AiMessageWriterController extends Controller
             $inputTokens  = $body['usage']['input_tokens'] ?? 0;
             $outputTokens = $body['usage']['output_tokens'] ?? 0;
 
-            // Parse JSON from response
-            $jsonStart = strpos($rawText, '[');
-            $jsonEnd   = strrpos($rawText, ']');
-            $variants  = [];
-
-            if ($jsonStart !== false && $jsonEnd !== false) {
-                $jsonStr  = substr($rawText, $jsonStart, $jsonEnd - $jsonStart + 1);
-                $decoded  = json_decode($jsonStr, true);
-
-                if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
-                    $variants = $decoded;
-                }
-            }
+            // Parse JSON from response - handle various AI response formats
+            $variants = $this->parseVariants($rawText);
 
             // Log the AI call
             AiLog::create([
@@ -154,7 +149,7 @@ class AiMessageWriterController extends Controller
             ]);
 
             if (empty($variants)) {
-                Log::warning('AI returned unexpected format', [
+                Log::info('AI returned unexpected format', [
                     'raw_text' => $rawText,
                 ]);
 
@@ -215,6 +210,60 @@ class AiMessageWriterController extends Controller
                 'error' => 'An unexpected error occurred. Please try again.',
             ], 500);
         }
+    }
+
+    private function parseVariants(string $rawText): array
+    {
+        $text = trim($rawText);
+
+        // Method 1: Direct JSON decode (clean response)
+        $decoded = json_decode($text, true);
+        if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+            return $decoded;
+        }
+
+        // Method 2: Extract from markdown code fence anywhere in the text
+        // Handles preamble like "Here are 3 variants:\n```json\n[...]\n```"
+        if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $text, $matches)) {
+            $decoded = json_decode(trim($matches[1]), true);
+            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                return $decoded;
+            }
+        }
+
+        // Method 3: Balanced-bracket extraction — correctly handles ] inside string values
+        $jsonStart = strpos($text, '[');
+        if ($jsonStart !== false) {
+            $depth    = 0;
+            $inString = false;
+            $escape   = false;
+            $len      = strlen($text);
+
+            for ($i = $jsonStart; $i < $len; $i++) {
+                $char = $text[$i];
+
+                if ($escape) { $escape = false; continue; }
+                if ($char === '\\' && $inString) { $escape = true; continue; }
+                if ($char === '"') { $inString = !$inString; continue; }
+
+                if (!$inString) {
+                    if ($char === '[') $depth++;
+                    elseif ($char === ']') {
+                        $depth--;
+                        if ($depth === 0) {
+                            $jsonStr = substr($text, $jsonStart, $i - $jsonStart + 1);
+                            $decoded = json_decode($jsonStr, true);
+                            if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
+                                return $decoded;
+                            }
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+
+        return [];
     }
 
     private function buildPrompt(array $data): string
