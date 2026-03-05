@@ -233,6 +233,35 @@ const Dashboard = ({
                         />
                     </section>
 
+                    {/* Campaign Stats Summary */}
+                    <section>
+                        <SectionHeader title="Campaign Stats Summary" href="/admin/campaigns" />
+                        <Table
+                            heads={['Status', 'Count', 'Percentage']}
+                            rows={[
+                                [
+                                    <span className="font-medium text-zinc-800 dark:text-zinc-200">Total</span>,
+                                    <span className="text-sm text-zinc-600 dark:text-zinc-300">{campaign_stats.total.toLocaleString()}</span>,
+                                    <span className="text-xs text-zinc-500">100%</span>,
+                                ],
+                                [
+                                    <Badge status="completed" />,
+                                    <span className="text-sm text-zinc-600 dark:text-zinc-300">{campaign_stats.completed.toLocaleString()}</span>,
+                                    <span className="text-xs text-zinc-500">{campaign_stats.total > 0 ? ((campaign_stats.completed / campaign_stats.total) * 100).toFixed(1) : 0}%</span>,
+                                ],
+                                [
+                                    <Badge status="scheduled" />,
+                                    <span className="text-sm text-zinc-600 dark:text-zinc-300">{campaign_stats.scheduled.toLocaleString()}</span>,
+                                    <span className="text-xs text-zinc-500">{campaign_stats.total > 0 ? ((campaign_stats.scheduled / campaign_stats.total) * 100).toFixed(1) : 0}%</span>,
+                                ],
+                                [
+                                    <Badge status="failed" />,
+                                    <span className="text-sm text-zinc-600 dark:text-zinc-300">{campaign_stats.failed.toLocaleString()}</span>,
+                                    <span className="text-xs text-zinc-500">{campaign_stats.total > 0 ? ((campaign_stats.failed / campaign_stats.total) * 100).toFixed(1) : 0}%</span>,
+                                ],
+                            ]}
+                        />
+                    </section>
                 </div>
             </div>
         </Layout>

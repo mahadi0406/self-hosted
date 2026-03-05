@@ -24,8 +24,7 @@ class Channel extends Model
     ];
 
     protected $casts = [
-        'credentials'      => 'encrypted',
-        'bot_token'        => 'encrypted',
+        'credentials'      => 'json',
         'meta'             => 'array',
         'last_verified_at' => 'datetime',
     ];
