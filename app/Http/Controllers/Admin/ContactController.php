@@ -77,6 +77,12 @@ class ContactController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        if ($request->has('tags') && is_string($request->tags)) {
+            $request->merge([
+                'tags' => array_filter(array_map('trim', explode(',', $request->tags)))
+            ]);
+        }
+        
         $request->validate([
             'name'        => 'required|string|max:255',
             'phone'       => 'nullable|string|unique:contacts,phone',
