@@ -67,7 +67,6 @@ class AiMessageWriterController extends Controller
 
         $apiKey = Setting::get('ai_api_key');
         $model  = Setting::get('ai_model', 'claude-sonnet-4-6');
-        Log::info('---------- AI API Request -----------------', [$apiKey]);
 
         if (!$apiKey) {
             return response()->json([
@@ -78,7 +77,7 @@ class AiMessageWriterController extends Controller
         $prompt = $this->buildPrompt($validated);
 
         try {
-            $response = Http::timeout(60)
+            $response = Http::timeout(45)
                 ->withHeaders([
                     'x-api-key'         => $apiKey,
                     'anthropic-version' => '2023-06-01',
