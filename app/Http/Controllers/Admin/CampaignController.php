@@ -95,7 +95,6 @@ class CampaignController extends Controller
             'ai_goal'           => 'nullable|string|max:500',
         ]);
 
-        // Count total recipients
         $totalRecipients = ContactList::whereIn('id', $request->audience['list_ids'])
             ->sum('contacts_count');
 

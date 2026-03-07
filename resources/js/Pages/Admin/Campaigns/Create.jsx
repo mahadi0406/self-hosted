@@ -75,9 +75,30 @@ const Create = ({ channels, contactLists, templates }) => {
         setData('content', { ...data.content, body: template.body });
     };
 
-    const submit = (e) => {
+    // Handle moving to next step - prevents any form submission
+    const handleNext = (e) => {
         e.preventDefault();
-        post('/admin/campaigns');
+        e.stopPropagation();
+        if (canNext() && step < steps.length - 1) {
+            setStep(s => s + 1);
+        }
+    };
+
+    // Handle moving to previous step
+    const handleBack = (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (step > 0) {
+            setStep(s => s - 1);
+        }
+    };
+
+    // Handle final form submission - only on Review step
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        if (step === steps.length - 1) {
+            post('/admin/campaigns');
+        }
     };
 
     const canNext = () => {
@@ -109,7 +130,8 @@ const Create = ({ channels, contactLists, templates }) => {
                     <StepIndicator current={step} />
                 </div>
 
-                <form onSubmit={submit}>
+                {/* Form - onSubmit only triggers on final step */}
+                <form onSubmit={handleSubmit}>
 
                     {/* Step 0 — Setup */}
                     {step === 0 && (
@@ -295,39 +317,45 @@ const Create = ({ channels, contactLists, templates }) => {
                         </div>
                     )}
 
-                    {/* Nav Buttons */}
-                    <div className="flex items-center justify-between mt-5">
+                </form>
+
+                {/* Nav Buttons - OUTSIDE the form to prevent accidental submission */}
+                <div className="flex items-center justify-between">
+                    <button
+                        type="button"
+                        onClick={handleBack}
+                        disabled={step === 0}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                    >
+                        <ChevronLeft className="w-4 h-4" /> Back
+                    </button>
+
+                    {/* Next button - only shown on steps 0, 1, 2 */}
+                    {step < steps.length - 1 && (
                         <button
                             type="button"
-                            onClick={() => setStep(s => s - 1)}
-                            disabled={step === 0}
-                            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            onClick={handleNext}
+                            disabled={!canNext()}
+                            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                         >
-                            <ChevronLeft className="w-4 h-4" /> Back
+                            Next <ChevronRight className="w-4 h-4" />
                         </button>
+                    )}
 
-                        {step < steps.length - 1 ? (
-                            <button
-                                type="button"
-                                onClick={() => setStep(s => s + 1)}
-                                disabled={!canNext()}
-                                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 disabled:cursor-not-allowed text-white dark:text-zinc-900 text-sm font-medium transition-colors"
-                            >
-                                Next <ChevronRight className="w-4 h-4" />
-                            </button>
-                        ) : (
-                            <button
-                                type="submit"
-                                disabled={processing}
-                                className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
-                            >
-                                <Send className="w-4 h-4" />
-                                {processing ? 'Creating...' : 'Create Campaign'}
-                            </button>
-                        )}
-                    </div>
+                    {/* Submit button - only shown on Review step (step 3) */}
+                    {step === steps.length - 1 && (
+                        <button
+                            type="button"
+                            onClick={handleSubmit}
+                            disabled={processing}
+                            className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
+                        >
+                            <Send className="w-4 h-4" />
+                            {processing ? 'Creating...' : 'Create Campaign'}
+                        </button>
+                    )}
+                </div>
 
-                </form>
             </div>
         </Layout>
     );
