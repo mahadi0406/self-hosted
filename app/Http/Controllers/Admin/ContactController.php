@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
@@ -185,6 +186,43 @@ class ContactController extends Controller
                 'contacts_count' => $list->contacts()->where('status', 'active')->count(),
             ]);
         });
+    }
+
+    public function export(): StreamedResponse
+    {
+        $headers = [
+            'Content-Type'        => 'text/csv',
+            'Content-Disposition' => 'attachment; filename="contacts_' . date('Y-m-d') . '.csv"',
+            'Pragma'              => 'no-cache',
+            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires'             => '0',
+        ];
+
+        return response()->stream(function () {
+            $handle = fopen('php://output', 'w');
+
+            fputcsv($handle, ['name', 'phone', 'telegram_id', 'email', 'country', 'language', 'tags', 'status', 'ai_engagement_label', 'last_messaged_at', 'created_at']);
+
+            Contact::query()->orderBy('id')->chunk(500, function ($contacts) use ($handle) {
+                foreach ($contacts as $c) {
+                    fputcsv($handle, [
+                        $c->name,
+                        $c->phone         ?? '',
+                        $c->telegram_id   ?? '',
+                        $c->email         ?? '',
+                        $c->country       ?? '',
+                        $c->language      ?? '',
+                        is_array($c->tags) ? implode(';', $c->tags) : ($c->tags ?? ''),
+                        $c->status,
+                        $c->ai_engagement_label ?? '',
+                        $c->last_messaged_at?->format('Y-m-d H:i') ?? '',
+                        $c->created_at->format('Y-m-d H:i'),
+                    ]);
+                }
+            });
+
+            fclose($handle);
+        }, 200, $headers);
     }
 
     public function importView(): Response

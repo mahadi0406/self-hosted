@@ -2,12 +2,6 @@
 
 use Illuminate\Support\Facades\Schedule;
 
-Schedule::command('queue:work --stop-when-empty')
-    ->everyMinute()
-    ->withoutOverlapping()
-    ->onOneServer()
-    ->runInBackground();
-
 Schedule::command('campaigns:dispatch-scheduled')
     ->everyMinute()
     ->withoutOverlapping()

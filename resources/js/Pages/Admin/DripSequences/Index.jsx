@@ -6,7 +6,7 @@ import {
     Zap, Plus, Trash2, Eye, Search,
     Smartphone, Send, CheckCircle, PauseCircle,
     Archive, Users, Sparkles, ListOrdered,
-    Loader2, AlertTriangle,
+    Loader2, AlertTriangle, UserPlus,
 } from "lucide-react";
 import {
     Dialog,
@@ -76,7 +76,7 @@ const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description,
     </Dialog>
 );
 
-const Index = ({ sequences, stats, channels, filters }) => {
+const Index = ({ sequences, stats, channels, lists, filters }) => {
     const [search, setSearch]             = useState(filters?.search     || '');
     const [status, setStatus]             = useState(filters?.status     || 'all');
     const [channelId, setChannelId]       = useState(filters?.channel_id || 'all');
@@ -85,6 +85,42 @@ const Index = ({ sequences, stats, channels, filters }) => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [deleteTarget, setDeleteTarget] = useState(null);
     const [deleting, setDeleting]         = useState(false);
+    const [showEnrollModal, setShowEnrollModal] = useState(false);
+    const [enrollTarget, setEnrollTarget] = useState(null);
+    const [selectedLists, setSelectedLists] = useState([]);
+    const [enrolling, setEnrolling]       = useState(false);
+
+    const openEnrollModal = (seq) => {
+        setEnrollTarget(seq);
+        setSelectedLists([]);
+        setShowEnrollModal(true);
+    };
+
+    const toggleList = (id) => {
+        setSelectedLists(prev =>
+            prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+        );
+    };
+
+    const confirmEnroll = () => {
+        if (!enrollTarget || selectedLists.length === 0) return;
+        setEnrolling(true);
+        router.post(`/admin/drip-sequences/${enrollTarget.id}/enroll`,
+            { list_ids: selectedLists },
+            {
+                preserveState: true,
+                preserveScroll: true,
+                onSuccess: () => {
+                    toast.success('Contacts enrolled successfully!');
+                    setShowEnrollModal(false);
+                    setEnrollTarget(null);
+                    setSelectedLists([]);
+                },
+                onError: () => toast.error('Failed to enroll contacts.'),
+                onFinish: () => setEnrolling(false),
+            }
+        );
+    };
 
     const handleSearch = () => {
         const params = {};
@@ -262,6 +298,13 @@ const Index = ({ sequences, stats, channels, filters }) => {
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
                                                 <button
+                                                    onClick={() => openEnrollModal(s)}
+                                                    title="Enroll contacts"
+                                                    className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:text-emerald-600 hover:border-emerald-200 transition-colors"
+                                                >
+                                                    <UserPlus className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
                                                     onClick={() => openDeleteModal(s)}
                                                     title="Delete"
                                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 hover:border-red-200 transition-colors"
@@ -300,6 +343,61 @@ const Index = ({ sequences, stats, channels, filters }) => {
                 title="Delete Drip Sequence"
                 description={`Are you sure you want to delete "${deleteTarget?.name}"? All enrolled contacts will be unenrolled. This action cannot be undone.`}
             />
+
+            {/* Enroll Contacts Modal */}
+            <Dialog open={showEnrollModal} onOpenChange={setShowEnrollModal}>
+                <DialogContent className="max-w-md">
+                    <DialogHeader>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+                            Enroll Contacts
+                        </DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 pt-1">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                            Select contact lists to enroll into <span className="font-medium text-zinc-700 dark:text-zinc-300">"{enrollTarget?.name}"</span>. Only active contacts not already enrolled will be added.
+                        </p>
+                        {lists && lists.length > 0 ? (
+                            <div className="space-y-2 max-h-60 overflow-y-auto">
+                                {lists.map(list => (
+                                    <label key={list.id} className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+                                        <input
+                                            type="checkbox"
+                                            checked={selectedLists.includes(list.id)}
+                                            onChange={() => toggleList(list.id)}
+                                            className="rounded border-zinc-300 dark:border-zinc-600 text-zinc-900"
+                                        />
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{list.name}</p>
+                                            <p className="text-xs text-zinc-400">{list.contacts_count ?? 0} contacts</p>
+                                        </div>
+                                    </label>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-zinc-400 text-center py-4">No contact lists available.</p>
+                        )}
+                        <div className="flex items-center gap-3 pt-2">
+                            <button
+                                onClick={() => setShowEnrollModal(false)}
+                                disabled={enrolling}
+                                className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmEnroll}
+                                disabled={enrolling || selectedLists.length === 0}
+                                className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50"
+                            >
+                                {enrolling
+                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Enrolling...</>
+                                    : <><UserPlus className="w-4 h-4" /> Enroll Contacts</>
+                                }
+                            </button>
+                        </div>
+                    </div>
+                </DialogContent>
+            </Dialog>
 
             {/* Details Modal */}
             <Dialog open={showModal} onOpenChange={setShowModal}>

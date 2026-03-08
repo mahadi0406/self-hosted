@@ -57,8 +57,8 @@ class SendDripStepJob implements ShouldQueue
         if (!$contact->phone) return false;
 
         $credentials = $channel->credentials;
-        $token       = $credentials['access_token'] ?? null;
-        $phoneId     = $credentials['phone_id']     ?? null;
+        $token       = $credentials['access_token']                              ?? null;
+        $phoneId     = $credentials['phone_number_id'] ?? $credentials['phone_id'] ?? null;
 
         if (!$token || !$phoneId) return false;
 

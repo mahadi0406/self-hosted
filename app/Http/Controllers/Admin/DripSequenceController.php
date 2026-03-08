@@ -3,6 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Contact;
+use App\Models\ContactList;
+use App\Models\DripEnrollment;
 use App\Models\DripSequence;
 use App\Models\DripStep;
 use App\Models\Channel;
@@ -56,10 +59,13 @@ class DripSequenceController extends Controller
 
         $channels = Channel::where('status', 'connected')->select('id', 'name', 'type')->get();
 
+        $lists = ContactList::select('id', 'name', 'contacts_count')->get();
+
         return Inertia::render('Admin/DripSequences/Index', [
             'sequences' => $sequences,
             'stats'     => $stats,
             'channels'  => $channels,
+            'lists'     => $lists,
             'filters'   => $request->only(['search', 'status', 'channel_id']),
         ]);
     }
@@ -117,6 +123,39 @@ class DripSequenceController extends Controller
 
         return redirect()->route('admin.drip-sequences.index')
             ->with('success', 'Drip sequence created successfully.');
+    }
+
+    public function enroll(Request $request, DripSequence $dripSequence): RedirectResponse
+    {
+        $request->validate([
+            'list_ids'   => 'required|array|min:1',
+            'list_ids.*' => 'exists:contact_lists,id',
+        ]);
+
+        $contactIds = Contact::whereHas('lists', fn($q) => $q->whereIn('contact_lists.id', $request->list_ids))
+            ->where('status', 'active')
+            ->pluck('id');
+
+        $enrolled = 0;
+
+        foreach ($contactIds as $contactId) {
+            $exists = DripEnrollment::where('drip_sequence_id', $dripSequence->id)
+                ->where('contact_id', $contactId)
+                ->exists();
+
+            if (!$exists) {
+                DripEnrollment::create([
+                    'drip_sequence_id' => $dripSequence->id,
+                    'contact_id'       => $contactId,
+                    'status'           => 'active',
+                    'enrolled_at'      => now(),
+                ]);
+                $enrolled++;
+            }
+        }
+
+        return redirect()->back()
+            ->with('success', "{$enrolled} contact(s) enrolled into \"{$dripSequence->name}\".");
     }
 
     public function destroy(DripSequence $dripSequence): RedirectResponse
