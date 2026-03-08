@@ -14,46 +14,35 @@ class ProfileController extends Controller
 {
     public function show(): Response
     {
-        $user = auth()->user();
-
-        return Inertia::render('Admin/Profile', [
-            'auth' => [
-                'user' => [
-                    'name'  => $user->name,
-                    'email' => $user->email,
-                ],
-            ],
-        ]);
+        return Inertia::render('Admin/Profile');
     }
 
     public function update(Request $request): RedirectResponse
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        $request->validate([
+        $validated = $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
         ]);
 
-        $user->update([
-            'name'  => $request->name,
-            'email' => $request->email,
-        ]);
+        $user->fill($validated);
+        $user->save();
 
-        return redirect()->back()->with('success', 'Profile updated successfully.');
+        return redirect()->back();
     }
 
     public function updatePassword(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
             'password'         => ['required', 'confirmed', Password::min(8)],
         ]);
 
-        auth()->user()->update([
-            'password' => Hash::make($request->password),
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
         ]);
 
-        return redirect()->back()->with('success', 'Password updated successfully.');
+        return redirect()->back();
     }
 }

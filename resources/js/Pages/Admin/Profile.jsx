@@ -1,12 +1,15 @@
 import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, usePage } from '@inertiajs/react';
+import { toast } from 'sonner';
 import { User, Lock, Save, Loader2 } from 'lucide-react';
 
-const Profile = ({ auth }) => {
+const Profile = () => {
+    const { auth } = usePage().props;
+
     const profileForm = useForm({
-        name:  auth.user.name  || '',
-        email: auth.user.email || '',
+        name:  auth.user?.name  || '',
+        email: auth.user?.email || '',
     });
 
     const passwordForm = useForm({
@@ -17,19 +20,28 @@ const Profile = ({ auth }) => {
 
     const handleProfileSubmit = (e) => {
         e.preventDefault();
-        profileForm.put(route('admin.profile.update'), { preserveScroll: true });
+        profileForm.put('/admin/profile', {
+            preserveScroll: true,
+            onSuccess: () => toast.success('Profile updated successfully.'),
+            onError:   () => toast.error('Failed to update profile.'),
+        });
     };
 
     const handlePasswordSubmit = (e) => {
         e.preventDefault();
         passwordForm.put('/admin/profile/password', {
             preserveScroll: true,
-            onSuccess: () => passwordForm.reset(),
+            onSuccess: () => {
+                passwordForm.reset();
+                toast.success('Password updated successfully.');
+            },
+            onError: () => toast.error('Failed to update password.'),
         });
     };
 
     const inputClass = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600";
     const labelClass = "block text-xs font-medium text-zinc-500 uppercase tracking-wider mb-1.5";
+    const buttonClass = "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors disabled:opacity-50";
 
     return (
         <Layout pageTitle="Profile" pageSection="Settings">
@@ -76,16 +88,17 @@ const Profile = ({ auth }) => {
                             )}
                         </div>
                         <div className="flex justify-end pt-2">
-                            <button
-                                type="submit"
-                                disabled={profileForm.processing}
-                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors disabled:opacity-50"
-                            >
-                                {profileForm.processing
-                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving...</>
-                                    : <><Save className="w-4 h-4" /> Save Changes</>
-                                }
-                            </button>
+                            {profileForm.processing ? (
+                                <button type="button" disabled className={buttonClass}>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Saving...</span>
+                                </button>
+                            ) : (
+                                <button type="submit" className={buttonClass}>
+                                    <Save className="w-4 h-4" />
+                                    <span>Save Changes</span>
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>
@@ -139,16 +152,17 @@ const Profile = ({ auth }) => {
                             />
                         </div>
                         <div className="flex justify-end pt-2">
-                            <button
-                                type="submit"
-                                disabled={passwordForm.processing}
-                                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors disabled:opacity-50"
-                            >
-                                {passwordForm.processing
-                                    ? <><Loader2 className="w-4 h-4 animate-spin" /> Updating...</>
-                                    : <><Lock className="w-4 h-4" /> Update Password</>
-                                }
-                            </button>
+                            {passwordForm.processing ? (
+                                <button type="button" disabled className={buttonClass}>
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                    <span>Updating...</span>
+                                </button>
+                            ) : (
+                                <button type="submit" className={buttonClass}>
+                                    <Lock className="w-4 h-4" />
+                                    <span>Update Password</span>
+                                </button>
+                            )}
                         </div>
                     </form>
                 </div>
