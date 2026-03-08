@@ -25,35 +25,43 @@ class SendCampaignJob implements ShouldQueue
 
     public function handle(): void
     {
-        $campaign = $this->campaign->fresh(['channel']);
+        $campaign = $this->campaign->fresh(['channel', 'template']);
 
         if ($campaign->status !== 'running') {
             Log::info("Campaign #{$campaign->id} is not running, skipping.");
             return;
         }
 
-        $channel    = $campaign->channel;
-        $batchSize  = (int) Setting::get('campaign_batch_size', 100);
-        $delaySecs  = (int) Setting::get('campaign_delay_seconds', 1);
-        $listIds    = $campaign->audience['list_ids'] ?? [];
-        $messageBody= $campaign->content['body'] ?? '';
+        $channel   = $campaign->channel;
+        $batchSize = (int) Setting::get('campaign_batch_size', 100);
+        $delaySecs = (int) Setting::get('campaign_delay_seconds', 1);
+        $listIds   = $campaign->audience['list_ids'] ?? [];
+
+        // Determine send mode: template or plain text
+        $useTemplate = $channel->type === 'whatsapp'
+            && $campaign->template
+            && $campaign->template->status === 'approved'
+            && !empty($campaign->template->whatsapp_template_id ?? $campaign->template->name);
+
+        $messageBody = $campaign->content['body'] ?? '';
 
         $sent = $delivered = $failed = 0;
 
         Contact::whereHas('lists', fn($q) => $q->whereIn('contact_lists.id', $listIds))
             ->where('status', 'active')
-            ->select('id', 'name', 'phone', 'telegram_id', 'language')
+            ->select('id', 'name', 'phone', 'telegram_id', 'language', 'email')
             ->chunk($batchSize, function ($contacts) use (
                 $channel, $messageBody, $delaySecs,
+                $useTemplate, $campaign,
                 &$sent, &$delivered, &$failed
             ) {
                 foreach ($contacts as $contact) {
                     try {
-                        $message = $this->personalize($messageBody, $contact);
-
                         $success = match ($channel->type) {
-                            'whatsapp' => $this->sendWhatsapp($channel, $contact, $message),
-                            'telegram' => $this->sendTelegram($channel, $contact, $message),
+                            'whatsapp' => $useTemplate
+                                ? $this->sendWhatsappTemplate($channel, $contact, $campaign->template)
+                                : $this->sendWhatsapp($channel, $contact, $this->personalize($messageBody, $contact)),
+                            'telegram' => $this->sendTelegram($channel, $contact, $this->personalize($messageBody, $contact)),
                             default    => false,
                         };
 
@@ -61,6 +69,7 @@ class SendCampaignJob implements ShouldQueue
                         $sent++;
 
                         $contact->update(['last_messaged_at' => now()]);
+
                         if ($delaySecs > 0) {
                             sleep($delaySecs);
                         }
@@ -72,7 +81,6 @@ class SendCampaignJob implements ShouldQueue
                     }
                 }
             });
-
 
         $this->campaign->update([
             'status'       => 'completed',
@@ -93,7 +101,63 @@ class SendCampaignJob implements ShouldQueue
         Log::info("Campaign #{$this->campaign->id} completed. Sent: {$sent}, Delivered: {$delivered}, Failed: {$failed}");
     }
 
+    // ── WhatsApp: approved template send ─────────────────────────────────────
+    private function sendWhatsappTemplate($channel, $contact, $template): bool
+    {
+        if (!$contact->phone) return false;
 
+        $credentials = $channel->credentials;
+        $token       = $credentials['access_token'] ?? null;
+        $phoneId     = $credentials['phone_number_id'] ?? $credentials['phone_id'] ?? null;
+
+        if (!$token || !$phoneId) return false;
+
+        $phone        = preg_replace('/[^0-9]/', '', $contact->phone);
+        $templateName = strtolower(str_replace([' ', '-'], '_', $template->name));
+        $language     = $template->language ?? 'en';
+
+        // Build body parameters from personalization variables
+        $bodyParams = [];
+        if (str_contains($template->body, '{{1}}')) {
+            $bodyParams[] = ['type' => 'text', 'text' => $contact->name ?? ''];
+        }
+        if (str_contains($template->body, '{{2}}')) {
+            $bodyParams[] = ['type' => 'text', 'text' => $contact->phone ?? ''];
+        }
+        if (str_contains($template->body, '{{3}}')) {
+            $bodyParams[] = ['type' => 'text', 'text' => $contact->email ?? ''];
+        }
+
+        $components = [];
+        if (!empty($bodyParams)) {
+            $components[] = [
+                'type'       => 'body',
+                'parameters' => $bodyParams,
+            ];
+        }
+
+        $payload = [
+            'messaging_product' => 'whatsapp',
+            'recipient_type'    => 'individual',
+            'to'                => $phone,
+            'type'              => 'template',
+            'template'          => [
+                'name'       => $templateName,
+                'language'   => ['code' => $language],
+                'components' => $components,
+            ],
+        ];
+
+        $response = Http::withToken($token)
+            ->timeout(10)
+            ->post("https://graph.facebook.com/v19.0/{$phoneId}/messages", $payload);
+
+        Log::info("WhatsApp template to {$phone} → Status: {$response->status()} | Body: {$response->body()}");
+
+        return $response->successful() && isset($response->json()['messages']);
+    }
+
+    // ── WhatsApp: plain text send (only works within 24hr session) ────────────
     private function sendWhatsapp($channel, $contact, string $message): bool
     {
         if (!$contact->phone) return false;
@@ -116,7 +180,8 @@ class SendCampaignJob implements ShouldQueue
                 'text'              => ['body' => $message],
             ]);
 
-        Log::info("WhatsApp to {$phone} → Status: {$response->status()} | Body: {$response->body()}");
+        Log::info("WhatsApp text to {$phone} → Status: {$response->status()} | Body: {$response->body()}");
+
         return $response->successful() && isset($response->json()['messages']);
     }
 
@@ -124,7 +189,7 @@ class SendCampaignJob implements ShouldQueue
     {
         if (!$contact->telegram_id) return false;
 
-        $botToken = $channel->bot_token;
+        $botToken = $channel->credentials['bot_token'] ?? $channel->bot_token ?? null;
         if (!$botToken) return false;
 
         $response = Http::timeout(10)
@@ -137,22 +202,20 @@ class SendCampaignJob implements ShouldQueue
         return $response->successful() && $response->json('ok');
     }
 
-
     private function personalize(string $message, $contact): string
     {
         return str_replace(
             ['{{name}}', '{{phone}}', '{{email}}'],
-            [$contact->name, $contact->phone ?? '', $contact->email ?? ''],
+            [$contact->name ?? '', $contact->phone ?? '', $contact->email ?? ''],
             $message
         );
     }
 
-
     public function failed(\Throwable $e): void
     {
         $this->campaign->update([
-            'status'        => 'failed',
-            'completed_at'  => now(),
+            'status'       => 'failed',
+            'completed_at' => now(),
         ]);
 
         Log::error("Campaign #{$this->campaign->id} job failed: " . $e->getMessage());
