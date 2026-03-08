@@ -3,11 +3,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Channel;
 use App\Models\Template;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 use Inertia\Response;
-use Illuminate\Http\RedirectResponse;
 
 class TemplateController extends Controller
 {
@@ -54,6 +58,7 @@ class TemplateController extends Controller
         $stats = [
             'total'        => Template::count(),
             'approved'     => Template::where('status', 'approved')->count(),
+            'pending'      => Template::where('status', 'pending')->count(),
             'draft'        => Template::where('status', 'draft')->count(),
             'ai_generated' => Template::where('source', 'ai_generated')->count(),
         ];
@@ -107,21 +112,21 @@ class TemplateController extends Controller
             ->with('success', 'Template deleted successfully.');
     }
 
-
-    public function submit(Template $template): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    public function submit(Request $request, Template $template): JsonResponse
     {
+        // Telegram templates are auto-approved (no review process)
         if ($template->channel !== 'whatsapp') {
             $template->update(['status' => 'approved']);
-            return redirect()->back()->with('success', 'Template approved.');
+            return response()->json(['message' => 'Template approved.', 'status' => 'approved']);
         }
 
-        $channel     = \App\Models\Channel::where('type', 'whatsapp')->first();
-        $credentials = $channel->credentials;
+        $channel     = Channel::where('type', 'whatsapp')->first();
+        $credentials = $channel?->credentials ?? [];
         $token       = $credentials['access_token'] ?? null;
         $wabaId      = $credentials['waba_id'] ?? null;
 
         if (!$token || !$wabaId) {
-            return redirect()->back()->with('error', 'WhatsApp credentials missing.');
+            return response()->json(['error' => 'WhatsApp credentials missing. Check Settings.'], 422);
         }
 
         $components = [];
@@ -187,7 +192,6 @@ class TemplateController extends Controller
             }
         }
 
-
         $payload = [
             'name'       => strtolower(str_replace([' ', '-'], '_', $template->name)),
             'language'   => $template->language,
@@ -195,28 +199,109 @@ class TemplateController extends Controller
             'components' => $components,
         ];
 
-        \Illuminate\Support\Facades\Log::info('Template payload: ' . json_encode($payload));
+        Log::info('Template payload: ' . json_encode($payload));
 
-        $response = \Illuminate\Support\Facades\Http::withToken($token)
+        $response = Http::withToken($token)
             ->post("https://graph.facebook.com/v19.0/{$wabaId}/message_templates", $payload);
 
-        \Illuminate\Support\Facades\Log::info('Template submit response: ' . $response->body());
+        Log::info('Template submit response: ' . $response->body());
 
         if ($response->successful() && $response->json('id')) {
+            $waStatus    = strtoupper($response->json('status') ?? 'PENDING');
+            $localStatus = match ($waStatus) {
+                'APPROVED'          => 'approved',
+                'REJECTED'          => 'rejected',
+                default             => 'pending',   // PENDING, IN_APPEAL, etc.
+            };
+
             $template->update([
-                'status'               => 'approved',
+                'status'               => $localStatus,
                 'whatsapp_template_id' => $response->json('id'),
+                'rejection_reason'     => $waStatus === 'REJECTED'
+                    ? ($response->json('rejection_reason') ?? 'Rejected by WhatsApp. Please review content and resubmit.')
+                    : null,
             ]);
 
-            return redirect()->back()->with('success', 'Template submitted to WhatsApp successfully.');
+            $message = match ($localStatus) {
+                'approved' => 'Template approved by WhatsApp!',
+                'rejected' => 'Template rejected by WhatsApp. See rejection reason and resubmit.',
+                default    => 'Template submitted for review. WhatsApp will review it shortly.',
+            };
+
+            return response()->json(['message' => $message, 'status' => $localStatus]);
         }
 
-        $errorMessage = $response->json('error.message') ?? 'Unknown error';
+        $errorMessage = $response->json('error.message') ?? 'Unknown error from WhatsApp API.';
         $template->update([
             'status'           => 'rejected',
             'rejection_reason' => $errorMessage,
         ]);
 
-        return redirect()->back()->with('error', "Submission failed: {$errorMessage}");
+        return response()->json(['error' => "Submission failed: {$errorMessage}"], 422);
+    }
+
+    /**
+     * Pull the current status of a submitted template from the WhatsApp API.
+     * Useful for templates stuck in 'pending' review.
+     */
+    public function syncStatus(Template $template): JsonResponse
+    {
+        if ($template->channel !== 'whatsapp') {
+            return response()->json(['error' => 'Only applicable to WhatsApp templates.'], 400);
+        }
+
+        if (!$template->whatsapp_template_id) {
+            return response()->json(['error' => 'Template has not been submitted to WhatsApp yet.'], 400);
+        }
+
+        $channel     = Channel::where('type', 'whatsapp')->first();
+        $credentials = $channel?->credentials ?? [];
+        $token       = $credentials['access_token'] ?? null;
+        $wabaId      = $credentials['waba_id'] ?? null;
+
+        if (!$token || !$wabaId) {
+            return response()->json(['error' => 'WhatsApp credentials missing.'], 422);
+        }
+
+        $templateName = strtolower(str_replace([' ', '-'], '_', $template->name));
+
+        $response = Http::withToken($token)
+            ->get("https://graph.facebook.com/v19.0/{$wabaId}/message_templates", [
+                'name'   => $templateName,
+                'fields' => 'id,status,rejection_reason',
+            ]);
+
+        Log::info("Template sync status response for #{$template->id}: " . $response->body());
+
+        if ($response->successful()) {
+            $data = $response->json('data') ?? [];
+
+            // Match by WA template ID or fall back to first result
+            $waTemplate = collect($data)->firstWhere('id', $template->whatsapp_template_id)
+                ?? ($data[0] ?? null);
+
+            if ($waTemplate) {
+                $waStatus    = strtoupper($waTemplate['status'] ?? 'PENDING');
+                $localStatus = match ($waStatus) {
+                    'APPROVED' => 'approved',
+                    'REJECTED' => 'rejected',
+                    default    => 'pending',
+                };
+
+                $template->update([
+                    'status'           => $localStatus,
+                    'rejection_reason' => $waStatus === 'REJECTED'
+                        ? ($waTemplate['rejection_reason'] ?? 'Rejected by WhatsApp.')
+                        : null,
+                ]);
+
+                return response()->json([
+                    'message' => "Status synced: {$waStatus}",
+                    'status'  => $localStatus,
+                ]);
+            }
+        }
+
+        return response()->json(['error' => 'Could not fetch template status from WhatsApp.'], 422);
     }
 }

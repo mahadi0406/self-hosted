@@ -43,6 +43,11 @@ class SendCampaignJob implements ShouldQueue
             && $campaign->template->status === 'approved'
             && !empty($campaign->template->whatsapp_template_id ?? $campaign->template->name);
 
+        // Warn if a template was selected but can't be used
+        if ($channel->type === 'whatsapp' && $campaign->template && !$useTemplate) {
+            Log::warning("Campaign #{$campaign->id}: template '{$campaign->template->name}' status is '{$campaign->template->status}' (not approved). Falling back to plain text. Note: plain text only works within 24h of user-initiated contact.");
+        }
+
         $messageBody = $campaign->content['body'] ?? '';
 
         $sent = $delivered = $failed = 0;

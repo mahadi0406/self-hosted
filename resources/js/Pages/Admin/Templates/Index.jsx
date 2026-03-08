@@ -20,6 +20,7 @@ import Pagination from "@/Components/UI/pagination.jsx";
 const statusColor = (status) => {
     const map = {
         approved: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20',
+        pending:  'text-blue-600 bg-blue-50 dark:bg-blue-900/20',
         draft:    'text-amber-600 bg-amber-50 dark:bg-amber-900/20',
         rejected: 'text-red-600 bg-red-50 dark:bg-red-900/20',
     };
@@ -103,6 +104,7 @@ const Index = ({ templates, stats, filters }) => {
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [deleting, setDeleting]                 = useState(false);
     const [submitting, setSubmitting]             = useState({});
+    const [syncing, setSyncing]                   = useState({});
 
     const handleSearch = () => {
         const params = {};
@@ -146,13 +148,30 @@ const Index = ({ templates, stats, filters }) => {
         setSubmitting(v => ({ ...v, [template.id]: true }));
         try {
             const res = await axios.post(`/admin/templates/${template.id}/submit`);
-            toast.success(res.data.message ?? 'Template submitted to WhatsApp!');
+            if (res.data.status === 'rejected') {
+                toast.error(res.data.message ?? 'Template rejected by WhatsApp.');
+            } else {
+                toast.success(res.data.message ?? 'Template submitted!');
+            }
             router.reload({ only: ['templates', 'stats'] });
         } catch (err) {
-            toast.error(err.response?.data?.message ?? 'Submission failed.');
+            toast.error(err.response?.data?.error ?? err.response?.data?.message ?? 'Submission failed.');
             router.reload({ only: ['templates', 'stats'] });
         } finally {
             setSubmitting(v => ({ ...v, [template.id]: false }));
+        }
+    };
+
+    const handleSyncStatus = async (template) => {
+        setSyncing(v => ({ ...v, [template.id]: true }));
+        try {
+            const res = await axios.post(`/admin/templates/${template.id}/sync-status`);
+            toast.success(res.data.message ?? 'Status synced.');
+            router.reload({ only: ['templates', 'stats'] });
+        } catch (err) {
+            toast.error(err.response?.data?.error ?? 'Could not sync status.');
+        } finally {
+            setSyncing(v => ({ ...v, [template.id]: false }));
         }
     };
 
@@ -213,6 +232,7 @@ const Index = ({ templates, stats, filters }) => {
                                 <select value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
                                     <option value="all">All Status</option>
                                     <option value="approved">Approved</option>
+                                    <option value="pending">Pending Review</option>
                                     <option value="draft">Draft</option>
                                     <option value="rejected">Rejected</option>
                                 </select>
@@ -307,17 +327,32 @@ const Index = ({ templates, stats, filters }) => {
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
 
-                                                {/* Submit to WhatsApp — draft whatsapp only */}
-                                                {t.channel === 'whatsapp' && t.status === 'draft' && (
+                                                {/* Submit / Resubmit — draft or rejected whatsapp */}
+                                                {t.channel === 'whatsapp' && (t.status === 'draft' || t.status === 'rejected') && (
                                                     <button
                                                         onClick={() => handleSubmit(t)}
                                                         disabled={submitting[t.id]}
-                                                        title="Submit to WhatsApp"
+                                                        title={t.status === 'rejected' ? 'Resubmit to WhatsApp' : 'Submit to WhatsApp'}
                                                         className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 disabled:opacity-50 transition-colors"
                                                     >
                                                         {submitting[t.id]
                                                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                             : <Send className="w-3.5 h-3.5" />
+                                                        }
+                                                    </button>
+                                                )}
+
+                                                {/* Sync status — pending/approved whatsapp templates */}
+                                                {t.channel === 'whatsapp' && (t.status === 'pending' || t.status === 'approved') && (
+                                                    <button
+                                                        onClick={() => handleSyncStatus(t)}
+                                                        disabled={syncing[t.id]}
+                                                        title="Check status from WhatsApp"
+                                                        className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 disabled:opacity-50 transition-colors"
+                                                    >
+                                                        {syncing[t.id]
+                                                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                            : <Clock className="w-3.5 h-3.5" />
                                                         }
                                                     </button>
                                                 )}
@@ -415,7 +450,7 @@ const Index = ({ templates, stats, filters }) => {
                             {/* Modal Footer */}
                             <div className="flex items-center justify-between pt-1">
                                 <div className="flex gap-2">
-                                    {selectedTemplate.channel === 'whatsapp' && selectedTemplate.status === 'draft' && (
+                                    {selectedTemplate.channel === 'whatsapp' && (selectedTemplate.status === 'draft' || selectedTemplate.status === 'rejected') && (
                                         <button
                                             onClick={() => { setShowDetailsModal(false); handleSubmit(selectedTemplate); }}
                                             disabled={submitting[selectedTemplate.id]}
@@ -425,7 +460,20 @@ const Index = ({ templates, stats, filters }) => {
                                                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                 : <Send className="w-3.5 h-3.5" />
                                             }
-                                            Submit to WhatsApp
+                                            {selectedTemplate.status === 'rejected' ? 'Resubmit to WhatsApp' : 'Submit to WhatsApp'}
+                                        </button>
+                                    )}
+                                    {selectedTemplate.channel === 'whatsapp' && (selectedTemplate.status === 'pending' || selectedTemplate.status === 'approved') && (
+                                        <button
+                                            onClick={() => { setShowDetailsModal(false); handleSyncStatus(selectedTemplate); }}
+                                            disabled={syncing[selectedTemplate.id]}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors disabled:opacity-50"
+                                        >
+                                            {syncing[selectedTemplate.id]
+                                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                : <Clock className="w-3.5 h-3.5" />
+                                            }
+                                            Check Status
                                         </button>
                                     )}
                                 </div>
