@@ -108,6 +108,8 @@ const Index = ({ sequences, stats, channels, filters }) => {
         if (!deleteTarget) return;
         setDeleting(true);
         router.delete(`/admin/drip-sequences/${deleteTarget.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Drip sequence deleted!');
                 setShowDeleteModal(false);

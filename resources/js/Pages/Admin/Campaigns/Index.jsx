@@ -133,6 +133,8 @@ const Index = ({ campaigns, stats, channels, filters }) => {
         if (!deleteTarget) return;
         setDeleting(true);
         router.delete(`/admin/campaigns/${deleteTarget.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Campaign deleted successfully!');
                 setShowDeleteModal(false);

@@ -85,6 +85,8 @@ const Index = ({ lists, stats, filters }) => {
         if (!selectedList) return;
         setDeleting(true);
         router.delete(`/admin/contact-lists/${selectedList.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Contact list deleted successfully!');
                 setShowDeleteModal(false);

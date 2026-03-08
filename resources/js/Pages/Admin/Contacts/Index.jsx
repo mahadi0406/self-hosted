@@ -110,6 +110,8 @@ const Index = ({ contacts, stats, filters }) => {
         if (!selectedContact) return;
         setDeleting(true);
         router.delete(`/admin/contacts/${selectedContact.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Contact deleted successfully!');
                 setShowDeleteModal(false);

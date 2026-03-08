@@ -129,6 +129,8 @@ const Index = ({ templates, stats, filters }) => {
         if (!selectedTemplate) return;
         setDeleting(true);
         router.delete(`/admin/templates/${selectedTemplate.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Template deleted successfully!');
                 setShowDeleteModal(false);

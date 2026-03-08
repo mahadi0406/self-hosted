@@ -155,6 +155,8 @@ const Index = ({ channels, stats, filters }) => {
         if (!selectedChannel) return;
         setDeleting(true);
         router.delete(`/admin/channels/${selectedChannel.id}`, {
+            preserveState: true,
+            preserveScroll: true,
             onSuccess: () => {
                 toast.success('Channel deleted successfully!');
                 setShowDeleteModal(false);
