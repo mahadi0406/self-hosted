@@ -57,7 +57,6 @@ class ContactSeeder extends Seeder
             }
         }
 
-        // Update contact counts on lists
         ContactList::all()->each(function ($list) {
             $list->update(['contacts_count' => $list->contacts()->count()]);
         });

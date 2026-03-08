@@ -149,10 +149,7 @@ class AiCampaignPlannerController extends Controller
             $inputTokens = $body['usage']['input_tokens'] ?? 0;
             $outputTokens = $body['usage']['output_tokens'] ?? 0;
 
-            // Parse JSON from response
             $plan = $this->parsePlan($rawText);
-
-            // Log the AI call
             AiLog::create([
                 'feature' => 'campaign_planner',
                 'model' => $model,
@@ -173,7 +170,6 @@ class AiCampaignPlannerController extends Controller
                 ], 422);
             }
 
-            // Validate and structure the plan
             $validatedPlan = [
                 'campaign_name' => $plan['campaign_name'] ?? 'Untitled Campaign',
                 'overview' => $plan['overview'] ?? '',

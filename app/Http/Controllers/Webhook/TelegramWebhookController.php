@@ -11,11 +11,8 @@ use Illuminate\Http\Response;
 
 class TelegramWebhookController extends Controller
 {
-    public function receive(Request $request, int $channelId): Response
+    public function receive(Request $request, Channel $channel): Response
     {
-        $channel = Channel::find($channelId);
-        if (!$channel) return response('Not Found', 404);
-
         $payload = $request->all();
         $message = $payload['message'] ?? null;
         if (!$message) return response('OK', 200);

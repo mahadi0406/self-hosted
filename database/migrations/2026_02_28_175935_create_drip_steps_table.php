@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->integer('delay_days')->default(0);
             $table->integer('delay_hours')->default(0);
-            $table->string('send_at_time')->nullable(); // e.g. "10:00"
+            $table->string('send_at_time')->nullable();
             $table->foreignId('template_id')->nullable()->constrained('templates')->nullOnDelete();
             $table->json('content')->nullable();
             $table->timestamps();

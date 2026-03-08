@@ -10,13 +10,6 @@ class TemplateSeeder extends Seeder
     public function run(): void
     {
         $templates = [
-
-            // ─────────────────────────────────────────────────────────────
-            // WhatsApp — MARKETING templates
-            // Rules: no emojis, no ALL-CAPS words, no aggressive language,
-            //        sequential variables {{1}} {{2}} …, buttons as objects
-            // ─────────────────────────────────────────────────────────────
-
             [
                 'name'                => 'Welcome Message',
                 'channel'             => 'whatsapp',
@@ -101,12 +94,6 @@ class TemplateSeeder extends Seeder
                 'ai_compliance_score' => 93,
                 'usage_count'         => 0,
             ],
-
-            // ─────────────────────────────────────────────────────────────
-            // WhatsApp — UTILITY templates
-            // These have higher approval rates as they serve a clear purpose
-            // ─────────────────────────────────────────────────────────────
-
             [
                 'name'                => 'Order Confirmation',
                 'channel'             => 'whatsapp',
@@ -186,11 +173,6 @@ class TemplateSeeder extends Seeder
                 'ai_compliance_score' => 100,
                 'usage_count'         => 0,
             ],
-
-            // ─────────────────────────────────────────────────────────────
-            // WhatsApp — Rejected example (for demo)
-            // ─────────────────────────────────────────────────────────────
-
             [
                 'name'                => 'Aggressive Sales Push',
                 'channel'             => 'whatsapp',
@@ -207,11 +189,6 @@ class TemplateSeeder extends Seeder
                 'ai_compliance_score' => 22,
                 'usage_count'         => 0,
             ],
-
-            // ─────────────────────────────────────────────────────────────
-            // Telegram templates — emojis are fine on Telegram
-            // ─────────────────────────────────────────────────────────────
-
             [
                 'name'                => 'Telegram Welcome',
                 'channel'             => 'telegram',
@@ -239,7 +216,6 @@ class TemplateSeeder extends Seeder
                 'ai_compliance_score' => 92,
                 'usage_count'         => 76,
             ],
-
             [
                 'name'                => 'Telegram Update',
                 'channel'             => 'telegram',

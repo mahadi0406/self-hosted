@@ -22,7 +22,6 @@ class HandleInertiaRequests extends Middleware
 
         $siteLogo = $this->getSetting('site_logo');
 
-        // Parse login features JSON
         $loginFeatures = $this->getSetting('login_features');
         $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
 

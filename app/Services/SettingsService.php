@@ -15,13 +15,4 @@ class SettingsService
             ->pluck('value', 'key')
             ->toArray();
     }
-
-
-    /**
-     * @return bool
-     */
-    public static function isRegistrationEnabled(): bool
-    {
-        return (bool) Setting::get('user_registration', true);
-    }
 }

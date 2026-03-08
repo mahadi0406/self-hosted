@@ -12,7 +12,6 @@ class AiLogSeeder extends Seeder
         $model = 'claude-sonnet-4-20250514';
 
         $logs = [
-            // Message Writer logs
             [
                 'feature'       => 'message_writer',
                 'model'         => $model,
@@ -64,8 +63,6 @@ class AiLogSeeder extends Seeder
                 'success'       => true,
                 'created_at'    => now()->subDays(2),
             ],
-
-            // Campaign Planner logs
             [
                 'feature'       => 'campaign_planner',
                 'model'         => $model,
