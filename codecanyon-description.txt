@@ -1,0 +1,357 @@
+<blockquote>
+<strong>Alert:</strong> We are not responsible for any issues caused by using nulled versions of this software. Such versions may contain malicious code, backdoors, or spam links, risking fund loss, security breaches, and lack of updates or bug fixes. Always use the official version to ensure safety and reliability.
+</blockquote>
+
+<p><strong>Platform Core Features:</strong></p>
+
+<p>📲 <strong>WhatsApp Broadcasting</strong> — Send bulk campaigns via the official WhatsApp Business API with approved message templates and real-time delivery tracking.</p>
+
+<p>✈️ <strong>Telegram Broadcasting</strong> — Broadcast messages to unlimited Telegram contacts through your own bot with Markdown formatting support.</p>
+
+<p>🔁 <strong>Drip Sequences</strong> — Automate multi-step message sequences with custom day and hour delays to nurture leads on autopilot.</p>
+
+<p>🤖 <strong>AI Message Tools</strong> — Generate high-converting message variants and full campaign plans using Claude AI (Anthropic) in seconds.</p>
+
+<p><strong>Current Version: 1.0.0</strong></p>
+
+<p><strong>BlastBot</strong> is a self-hosted WhatsApp and Telegram messaging platform that lets businesses reach thousands of customers from a single, clean admin panel. Built with Laravel 12 and React (Inertia.js), BlastBot combines bulk broadcasting, intelligent drip automation, AI-powered content creation, and real-time inbox management — giving marketing teams and agencies everything they need to run professional messaging campaigns at scale.</p>
+
+<p>Install it on your own server, connect your WhatsApp Business API and Telegram bots, import your contacts, build drip sequences, and start sending. From template submission and approval tracking to Claude AI-generated campaign plans, BlastBot covers the entire messaging lifecycle — no third-party subscription fees, no per-message pricing, full control over your data.</p>
+
+<p><strong>Own your messaging infrastructure. No recurring fees. No vendor lock-in.</strong></p>
+
+<h3>Demo Link:</h3>
+<hr />
+<table>
+<tr>
+<td>
+<p><strong>Admin Panel</strong></p>
+<p>Email: admin@blastbot.io</p>
+<p>Password: password</p>
+</td>
+</tr>
+</table>
+<hr />
+
+<h3><strong>Key Highlights:</strong></h3>
+
+<ul>
+<li>
+<p><strong>WhatsApp Business API Integration:</strong> Connect your official WhatsApp Business account via the Facebook Graph API. Create message templates, submit them for Meta review, sync approval status in real time, and send compliant bulk campaigns to thousands of contacts.</p>
+</li>
+<li>
+<p><strong>Telegram Bot Integration:</strong> Connect unlimited Telegram bots, receive inbound messages via webhooks, and broadcast rich Markdown-formatted messages to your entire subscriber base with a single click.</p>
+</li>
+<li>
+<p><strong>AI Message Writer (Claude-Powered):</strong> Generate 3 ready-to-send message variants in seconds. Set your business type, goal, tone, language, emoji preference, and call-to-action — Claude AI returns compliance-scored variants ready to copy directly into your campaigns.</p>
+</li>
+<li>
+<p><strong>AI Campaign Planner (Claude-Powered):</strong> Describe your business and goal and get a complete campaign plan back instantly — including campaign name, overview, estimated reach, expected open and reply rates, best send times, step-by-step message sequence, tips, and warnings.</p>
+</li>
+<li>
+<p><strong>Drip Sequence Automation:</strong> Build multi-step automated message flows with day and hour-level delay control. Enroll contact lists into sequences and let the scheduler send each step at exactly the right time — fully automated via background queue jobs.</p>
+</li>
+<li>
+<p><strong>WhatsApp Template Management:</strong> Create, submit, and track WhatsApp message templates directly from the admin panel. Templates are submitted to Meta via the Graph API, and approval status (Approved / Pending / Rejected) is synced back with a single click.</p>
+</li>
+<li>
+<p><strong>Contact Management &amp; Import/Export:</strong> Manage your audience with full CRUD, CSV import, and CSV export. Organize contacts into lists, assign tags, track AI engagement labels (Hot / Warm / Cold / Dormant), and segment by status for precise targeting.</p>
+</li>
+<li>
+<p><strong>Unified Inbox:</strong> All inbound WhatsApp and Telegram replies appear in a single inbox. Messages are received via webhooks in real time, auto-classified by AI, and marked read individually or in bulk.</p>
+</li>
+<li>
+<p><strong>Campaign Analytics:</strong> Track every campaign with delivery and engagement metrics. Monitor AI tool usage, token consumption, and success rates through the dedicated AI Logs analytics page.</p>
+</li>
+<li>
+<p><strong>Background Queue Processing:</strong> Campaigns and drip steps are dispatched via Laravel queue jobs — no timeouts, no browser dependency. Supervisor keeps workers running 24/7 with automatic retries on failure.</p>
+</li>
+</ul>
+
+<h3><strong>Complete Feature List:</strong></h3>
+<hr />
+
+<h4><strong>Channel Management</strong></h4>
+<ul>
+<li>WhatsApp Business API (Facebook Graph API v19)</li>
+<li>Telegram Bot API Integration</li>
+<li>Unlimited Channel Connections</li>
+<li>One-Click Channel Verification</li>
+<li>Phone Number Auto-Detection from API</li>
+<li>Bot Username Auto-Detection</li>
+<li>Connect / Disconnect / Delete Channels</li>
+<li>Channel Status Tracking (Connected, Disconnected, Error)</li>
+<li>Secure Credential Storage</li>
+<li>Last Verified Timestamp</li>
+</ul>
+
+<h4><strong>Contact Management System</strong></h4>
+<ul>
+<li>Full Contact CRUD (Create, Read, Update, Delete)</li>
+<li>CSV Bulk Import with Header Auto-Mapping</li>
+<li>CSV Export (All Fields)</li>
+<li>Contact List Organization</li>
+<li>Multi-List Assignment per Contact</li>
+<li>Tag System (Comma-Separated)</li>
+<li>Status Management (Active, Opted Out, Unsubscribed)</li>
+<li>AI Engagement Labels (Hot, Warm, Cold, Dormant)</li>
+<li>Country and Language Fields</li>
+<li>Phone Number (WhatsApp) and Telegram ID Fields</li>
+<li>Email Address Field</li>
+<li>Last Messaged Tracking</li>
+<li>Real-Time List Count Recalculation</li>
+<li>Search and Filter by Status, Label</li>
+<li>Paginated Contact Table</li>
+</ul>
+
+<h4><strong>Contact List Management</strong></h4>
+<ul>
+<li>Unlimited Contact Lists</li>
+<li>Create and Delete Lists</li>
+<li>Live Contact Count per List</li>
+<li>Used in Campaign Targeting</li>
+<li>Used in Drip Sequence Enrollment</li>
+<li>Denormalized Count with Auto-Sync</li>
+<li>Daily Count Sync Command (contacts:sync-counts)</li>
+</ul>
+
+<h4><strong>WhatsApp Template System</strong></h4>
+<ul>
+<li>Template Creation with Header, Body, Footer, Buttons</li>
+<li>Button Type Support (Quick Reply)</li>
+<li>Language Configuration</li>
+<li>Submit to Meta for Review via Graph API</li>
+<li>Real-Time Status Sync (Approved / Pending / Rejected)</li>
+<li>Rejection Reason Display</li>
+<li>AI Compliance Score per Template</li>
+<li>Usage Count Tracking</li>
+<li>Source Tracking (Manual / AI Generated)</li>
+<li>Status Filter (All, Approved, Pending, Draft, Rejected)</li>
+<li>13 Pre-Configured Templates (WhatsApp + Telegram)</li>
+</ul>
+
+<h4><strong>Campaign Broadcasting System</strong></h4>
+<ul>
+<li>Broadcast to One or Multiple Contact Lists</li>
+<li>WhatsApp Text and Template Campaigns</li>
+<li>Telegram Text Campaigns with Markdown Support</li>
+<li>Scheduled Campaign Dispatch</li>
+<li>Background Queue Processing (No Browser Timeout)</li>
+<li>Personalization Variables ({{name}}, {{phone}}, {{email}})</li>
+<li>Per-Contact Message Personalization</li>
+<li>Automatic Fallback to Text When Template Not Approved</li>
+<li>Campaign Status Tracking (Draft, Scheduled, Sending, Sent, Failed)</li>
+<li>Sent / Failed Count Tracking</li>
+<li>Scheduled At Timestamp</li>
+<li>Automatic Retry on Job Failure (3 Attempts)</li>
+<li>campaigns:dispatch-scheduled Artisan Command</li>
+</ul>
+
+<h4><strong>Drip Sequence Automation</strong></h4>
+<ul>
+<li>Multi-Step Message Sequences</li>
+<li>Day-Level and Hour-Level Delay Control per Step</li>
+<li>Optional Send Time Configuration per Step</li>
+<li>Optional Template per Step</li>
+<li>Personalization Variables in Step Content</li>
+<li>Enroll Contacts by Contact List</li>
+<li>Duplicate Enrollment Prevention</li>
+<li>Active / Paused / Archived Sequence Status</li>
+<li>Enrollment Count Tracking</li>
+<li>AI-Generated Sequence Flag</li>
+<li>AI Goal Description Field</li>
+<li>drip:dispatch-steps Artisan Command (Every 5 Minutes)</li>
+<li>Step Log per Contact (Prevents Re-Sending)</li>
+<li>Background Queue Dispatch</li>
+</ul>
+
+<h4><strong>Unified Inbox System</strong></h4>
+<ul>
+<li>Inbound Messages from WhatsApp and Telegram</li>
+<li>Real-Time Webhook Reception</li>
+<li>WhatsApp Webhook Verification (hub.mode + hub.verify_token)</li>
+<li>Telegram Webhook via Route Model Binding</li>
+<li>Auto-Create Contact on First Message</li>
+<li>Read / Unread Status per Message</li>
+<li>Mark Single Message as Read</li>
+<li>Mark All Messages as Read</li>
+<li>AI Classification of Inbound Messages</li>
+<li>inbox:classify-messages Command (Every 2 Minutes)</li>
+<li>Channel and Contact Linked per Message</li>
+<li>Direction Tracking (Inbound / Outbound)</li>
+<li>Received At Timestamp</li>
+</ul>
+
+<h4><strong>AI Message Writer</strong></h4>
+<ul>
+<li>Powered by Claude AI (Anthropic)</li>
+<li>3 Message Variants per Generation</li>
+<li>Business Type and Goal Input</li>
+<li>Tone Selection (Friendly, Professional, Urgent, Casual, Formal)</li>
+<li>Channel Selection (WhatsApp / Telegram)</li>
+<li>Language Selection</li>
+<li>Emoji Toggle</li>
+<li>Call-to-Action Toggle</li>
+<li>Compliance Score per Variant (0–100)</li>
+<li>Character Count per Variant</li>
+<li>One-Click Copy to Clipboard</li>
+<li>Recent Generation History (Last 10)</li>
+<li>Full AI Log with Token Usage</li>
+</ul>
+
+<h4><strong>AI Campaign Planner</strong></h4>
+<ul>
+<li>Powered by Claude AI (Anthropic)</li>
+<li>Campaign Name and Overview Generation</li>
+<li>Estimated Reach Projection</li>
+<li>Expected Open Rate and Reply Rate</li>
+<li>Best Send Times Suggestion</li>
+<li>Step-by-Step Message Sequence (Up to 5 Steps)</li>
+<li>Step Type (Broadcast / Drip)</li>
+<li>Per-Step Objective Summary</li>
+<li>Campaign Tips and Warnings</li>
+<li>Business Type, Goal, Tone, Language, Duration, Audience Size Inputs</li>
+<li>Campaign Type Selection (Drip / Broadcast / Mixed)</li>
+<li>Recent Planner History (Last 8)</li>
+<li>Full AI Log with Token Usage</li>
+</ul>
+
+<h4><strong>Analytics &amp; Reporting</strong></h4>
+<ul>
+<li>Campaign Analytics Dashboard</li>
+<li>Per-Campaign Sent and Failed Counts</li>
+<li>AI Tool Usage Logs</li>
+<li>Token Consumption Tracking (Input + Output)</li>
+<li>Feature-Level AI Analytics (Message Writer vs Campaign Planner)</li>
+<li>Success Rate per AI Call</li>
+<li>Error Message Logging</li>
+<li>Daily Log Cleanup (logs:cleanup at 02:00)</li>
+</ul>
+
+<h4><strong>Settings &amp; Profile System</strong></h4>
+<ul>
+<li>Grouped Settings Panel (General, AI, WhatsApp, etc.)</li>
+<li>AI API Key Configuration (Anthropic)</li>
+<li>AI Model Selection</li>
+<li>WhatsApp Verify Token Setting</li>
+<li>Site Name, Logo, Favicon, Primary Color</li>
+<li>Currency and Timezone Configuration</li>
+<li>Demo Login Toggle with Credentials</li>
+<li>Login Page Customization (Badge, Headline, Description, Features)</li>
+<li>Profile Name and Email Update</li>
+<li>Password Change with Current Password Verification</li>
+</ul>
+
+<h4><strong>Background Jobs &amp; Scheduling</strong></h4>
+<ul>
+<li>Laravel Queue (Database Driver) for All Sends</li>
+<li>campaigns:dispatch-scheduled — Every Minute</li>
+<li>drip:dispatch-steps — Every 5 Minutes</li>
+<li>inbox:classify-messages — Every 2 Minutes</li>
+<li>telegram:register-webhooks — Hourly</li>
+<li>contacts:sync-counts — Daily at 03:00</li>
+<li>logs:cleanup — Daily at 02:00</li>
+<li>Supervisor-Ready (Recommended Worker Management)</li>
+<li>Job Retries: 3 Attempts with 60s Timeout</li>
+<li>Failed Job Logging</li>
+</ul>
+
+<h4><strong>Security &amp; Architecture</strong></h4>
+<ul>
+<li>CSRF Protection (Webhooks Exempted)</li>
+<li>XSS Protection Middleware</li>
+<li>Security Headers Middleware</li>
+<li>Role-Based Access Control (Admin Role)</li>
+<li>Throttle: 200 Requests per Minute (Admin)</li>
+<li>Throttle: 10 Requests per Minute (Login)</li>
+<li>Soft Deletes on Channels and Contacts</li>
+<li>Database Transactions on Multi-Table Writes</li>
+<li>Webhook Signature Handling (WhatsApp hub.verify_token)</li>
+<li>Sensitive Fields Hidden on Channel Model</li>
+</ul>
+
+<h4><strong>Technical Specifications</strong></h4>
+<ul>
+<li>Built with Laravel 12.x Framework</li>
+<li>PHP 8.2+ Compatibility</li>
+<li>React 18 Frontend via Inertia.js (SPA Experience)</li>
+<li>Tailwind CSS 4 with Dark Mode Support</li>
+<li>Vite Asset Bundling</li>
+<li>MySQL 8+ / MariaDB 10.6+ Database</li>
+<li>WhatsApp Business API (Facebook Graph API v19.0)</li>
+<li>Telegram Bot API</li>
+<li>Anthropic Claude API (claude-sonnet-4-6)</li>
+<li>Database-Backed Queue Driver</li>
+<li>Laravel Scheduler (schedule:run via Cron)</li>
+<li>Inertia.js Server-Side Rendering Ready</li>
+<li>Sonner Toast Notifications</li>
+<li>Lucide React Icons</li>
+<li>Fully Responsive (Mobile, Tablet, Desktop)</li>
+<li>Clean MVC Architecture</li>
+<li>Paginated Results Throughout</li>
+</ul>
+
+<h3><strong>What's Included:</strong></h3>
+<hr />
+<ul>
+<li>Complete source code (Laravel + React)</li>
+<li>Database migrations and seeders</li>
+<li>13 pre-configured message templates (WhatsApp + Telegram)</li>
+<li>Full demo data seeders (channels, contacts, campaigns, drip sequences, inbox, analytics)</li>
+<li>Installation and configuration guide</li>
+<li>All frontend and backend dependencies</li>
+<li>Webhook setup instructions</li>
+<li>Queue worker and scheduler setup instructions</li>
+</ul>
+
+<h3><strong>Requirements:</strong></h3>
+<hr />
+<ul>
+<li>PHP 8.2+</li>
+<li>MySQL 8+ or MariaDB 10.6+</li>
+<li>Composer</li>
+<li>Node.js 18+ and NPM (for asset building)</li>
+<li>A publicly accessible server (for webhooks)</li>
+<li>WhatsApp Business API access (Meta Developer Account)</li>
+<li>Telegram Bot Token (from @BotFather)</li>
+<li>Anthropic API Key (for AI features)</li>
+<li>Cron job access for Laravel Scheduler</li>
+<li>Supervisor or equivalent for queue workers (recommended)</li>
+</ul>
+
+<h3><strong>Perfect For:</strong></h3>
+<hr />
+<ul>
+<li>Marketing agencies managing client campaigns</li>
+<li>E-commerce businesses running WhatsApp promotions</li>
+<li>SaaS companies sending onboarding drip sequences</li>
+<li>Customer support teams managing inbound messaging</li>
+<li>Entrepreneurs launching a messaging-as-a-service platform</li>
+<li>Developers building WhatsApp and Telegram marketing tools</li>
+<li>Businesses replacing expensive third-party broadcast services</li>
+</ul>
+
+<h3>Changelog</h3>
+<hr />
+<p><strong>Version 1.0.0 – Initial Release</strong></p>
+<pre>
+## Core Features Included ##
+- WhatsApp Business API integration with template management
+- Telegram Bot API integration with webhook support
+- Bulk campaign broadcasting (WhatsApp + Telegram)
+- Multi-step drip sequence automation
+- Contact management with CSV import and export
+- Contact list segmentation
+- Unified inbound message inbox
+- AI Message Writer (Claude — 3 variants with compliance scoring)
+- AI Campaign Planner (Claude — full campaign plan generation)
+- Campaign analytics dashboard
+- AI usage log with token tracking
+- Role-based admin panel
+- Settings management with grouped configuration
+- Profile and password management
+- Background queue job processing
+- Laravel scheduler with 6 automated commands
+- Dark mode support
+- Fully responsive design
+</pre>
