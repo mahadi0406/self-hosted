@@ -204,7 +204,6 @@ class ChannelController extends Controller
         return response()->json(['success' => false, 'message' => $error], 422);
     }
 
-    // ── Disconnect ────────────────────────────────────────────────────────────
 
     public function disconnect(Channel $channel): JsonResponse
     {
@@ -212,7 +211,6 @@ class ChannelController extends Controller
         return response()->json(['success' => true, 'message' => 'Channel disconnected.']);
     }
 
-    // ── Delete ────────────────────────────────────────────────────────────────
 
     public function destroy(Channel $channel): RedirectResponse
     {

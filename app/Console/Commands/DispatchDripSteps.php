@@ -2,6 +2,8 @@
 
 namespace App\Console\Commands;
 
+use App\Jobs\SendDripStepJob;
+use App\Models\Contact;
 use App\Models\DripSequence;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -21,14 +23,12 @@ class DispatchDripSteps extends Command
         $dispatched = 0;
 
         foreach ($sequences as $sequence) {
-            // Contacts enrolled in this sequence
             $enrollments = DB::table('drip_sequence_contacts')
                 ->where('drip_sequence_id', $sequence->id)
                 ->get();
 
             foreach ($sequence->steps as $step) {
                 foreach ($enrollments as $enrollment) {
-                    // Already sent this step to this contact?
                     $alreadySent = DB::table('drip_step_logs')
                         ->where('drip_step_id', $step->id)
                         ->where('contact_id',   $enrollment->contact_id)
@@ -36,7 +36,6 @@ class DispatchDripSteps extends Command
 
                     if ($alreadySent) continue;
 
-                    // Is it time to send this step?
                     $sendAfter = \Carbon\Carbon::parse($enrollment->enrolled_at)
                         ->addDays($step->delay_days)
                         ->addHours($step->delay_hours ?? 0);

@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\SendCampaignJob;
 use App\Models\Campaign;
 use App\Models\Channel;
 use App\Models\ContactList;
 use App\Models\Template;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
@@ -58,7 +60,6 @@ class CampaignController extends Controller
         ];
 
         $channels = Channel::where('status', 'connected')->select('id', 'name', 'type')->get();
-
         return Inertia::render('Admin/Campaigns/Index', [
             'campaigns' => $campaigns,
             'stats'     => $stats,
@@ -82,7 +83,7 @@ class CampaignController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'              => 'required|string|max:255',
             'channel_id'        => 'required|exists:channels,id',
             'template_id'       => 'nullable|exists:templates,id',
@@ -95,31 +96,47 @@ class CampaignController extends Controller
             'ai_goal'           => 'nullable|string|max:500',
         ]);
 
-        $totalRecipients = ContactList::whereIn('id', $request->audience['list_ids'])
-            ->sum('contacts_count');
+        $listIds = $request->input('audience.list_ids');
 
-        Campaign::create([
-            'name'             => $request->name,
-            'channel_id'       => $request->channel_id,
-            'template_id'      => $request->template_id,
-            'type'             => $request->type,
-            'content'          => $request->input('content'),
-            'audience'         => $request->audience,
-            'status'           => $request->type === 'scheduled' ? 'scheduled' : 'draft',
-            'scheduled_at'     => $request->scheduled_at,
-            'ai_goal'          => $request->ai_goal,
-            'total_recipients' => $totalRecipients,
-        ]);
+        try {
+           DB::transaction(function () use ($validated, $listIds) {
+                $totalRecipients = ContactList::whereIn('id', $listIds)
+                    ->sum('contacts_count');
 
-        return redirect()->route('admin.campaigns.index')
-            ->with('success', 'Campaign created successfully.');
+                $campaign = Campaign::create([
+                    'name'             => $validated['name'],
+                    'channel_id'       => $validated['channel_id'],
+                    'template_id'      => $validated['template_id'] ?? null,
+                    'type'             => $validated['type'],
+                    'content'          => $validated['content'],
+                    'audience'         => $validated['audience'],
+                    'status'           => $validated['type'] === 'scheduled' ? 'scheduled' : 'running',
+                    'scheduled_at'     => $validated['scheduled_at'] ?? null,
+                    'ai_goal'          => $validated['ai_goal'] ?? null,
+                    'total_recipients' => $totalRecipients,
+                ]);
+
+                if ($validated['type'] === 'instant') {
+                    SendCampaignJob::dispatch($campaign);
+                }
+
+                return $campaign;
+           });
+
+           return redirect()->route('admin.campaigns.index')->with('success', 'Campaign created successfully.');
+
+        } catch (\Throwable $e) {
+            report($e);
+
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create campaign. Please try again.');
+        }
     }
 
     public function destroy(Campaign $campaign): RedirectResponse
     {
         $campaign->delete();
-
-        return redirect()->route('admin.campaigns.index')
-            ->with('success', 'Campaign deleted successfully.');
+        return redirect()->route('admin.campaigns.index')->with('success', 'Campaign deleted successfully.');
     }
 }
