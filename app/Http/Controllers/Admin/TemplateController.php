@@ -106,4 +106,117 @@ class TemplateController extends Controller
         return redirect()->route('admin.templates.index')
             ->with('success', 'Template deleted successfully.');
     }
+
+
+    public function submit(Template $template): \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
+    {
+        if ($template->channel !== 'whatsapp') {
+            $template->update(['status' => 'approved']);
+            return redirect()->back()->with('success', 'Template approved.');
+        }
+
+        $channel     = \App\Models\Channel::where('type', 'whatsapp')->first();
+        $credentials = $channel->credentials;
+        $token       = $credentials['access_token'] ?? null;
+        $wabaId      = $credentials['waba_id'] ?? null;
+
+        if (!$token || !$wabaId) {
+            return redirect()->back()->with('error', 'WhatsApp credentials missing.');
+        }
+
+        $components = [];
+
+        if ($template->header) {
+            $cleanHeader = preg_replace('/[\x{1F000}-\x{1FFFF}|\x{2600}-\x{27FF}|\x{FE00}-\x{FEFF}|\x{1F900}-\x{1F9FF}|\x{1FA00}-\x{1FA9F}]/u', '', $template->header);
+            $cleanHeader = preg_replace('/[\n\r\*\_\~]/u', '', $cleanHeader);
+            $cleanHeader = trim($cleanHeader);
+
+            if ($cleanHeader) {
+                $components[] = [
+                    'type'   => 'HEADER',
+                    'format' => 'TEXT',
+                    'text'   => $cleanHeader,
+                ];
+            }
+        }
+
+        $components[] = [
+            'type' => 'BODY',
+            'text' => $template->body,
+        ];
+
+        if ($template->footer) {
+            $components[] = [
+                'type' => 'FOOTER',
+                'text' => $template->footer,
+            ];
+        }
+
+        if (!empty($template->buttons)) {
+            $formattedButtons = collect($template->buttons)
+                ->map(function ($button) {
+                    $type = strtoupper($button['type'] ?? '');
+
+                    return match ($type) {
+                        'QUICK_REPLY' => [
+                            'type' => 'QUICK_REPLY',
+                            'text' => $button['text'],
+                        ],
+                        'URL' => [
+                            'type' => 'URL',
+                            'text' => $button['text'],
+                            'url'  => $button['url'],
+                        ],
+                        'PHONE_NUMBER' => [
+                            'type'         => 'PHONE_NUMBER',
+                            'text'         => $button['text'],
+                            'phone_number' => $button['phone_number'],
+                        ],
+                        default => null,
+                    };
+                })
+                ->filter()
+                ->values()
+                ->toArray();
+
+            if (!empty($formattedButtons)) {
+                $components[] = [
+                    'type'    => 'BUTTONS',
+                    'buttons' => $formattedButtons,
+                ];
+            }
+        }
+
+
+        $payload = [
+            'name'       => strtolower(str_replace([' ', '-'], '_', $template->name)),
+            'language'   => $template->language,
+            'category'   => 'MARKETING',
+            'components' => $components,
+        ];
+
+        \Illuminate\Support\Facades\Log::info('Template payload: ' . json_encode($payload));
+
+        $response = \Illuminate\Support\Facades\Http::withToken($token)
+            ->post("https://graph.facebook.com/v19.0/{$wabaId}/message_templates", $payload);
+
+        \Illuminate\Support\Facades\Log::info('Template submit response: ' . $response->body());
+
+        if ($response->successful() && $response->json('id')) {
+            $template->update([
+                'status'               => 'approved',
+                'whatsapp_template_id' => $response->json('id'),
+            ]);
+
+            return redirect()->back()->with('success', 'Template submitted to WhatsApp successfully.');
+        }
+
+        $errorMessage = $response->json('error.message') ?? 'Unknown error';
+        $template->update([
+            'status'           => 'rejected',
+            'rejection_reason' => $errorMessage,
+        ]);
+
+        return redirect()->back()->with('error', "Submission failed: {$errorMessage}");
+    }
 }

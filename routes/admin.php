@@ -50,6 +50,7 @@ Route::middleware(['auth','role:admin', 'throttle:200,1', 'xss', 'security.heade
     Route::get('/templates/create',[TemplateController::class, 'create']);
     Route::post('/templates',[TemplateController::class, 'store']);
     Route::delete('/templates/{template}',[TemplateController::class, 'destroy']);
+    Route::post('templates/{template}/submit', [TemplateController::class, 'submit'])->name('admin.templates.submit');
 
     Route::get('/campaigns',[CampaignController::class, 'index'])->name('campaigns.index');
     Route::get('/campaigns/create',[CampaignController::class, 'create']);

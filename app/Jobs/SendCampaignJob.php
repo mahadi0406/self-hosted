@@ -100,7 +100,7 @@ class SendCampaignJob implements ShouldQueue
 
         $credentials = $channel->credentials;
         $token       = $credentials['access_token'] ?? null;
-        $phoneId     = $credentials['phone_id']     ?? null;
+        $phoneId     = $credentials['phone_number_id'] ?? $credentials['phone_id'] ?? null;
 
         if (!$token || !$phoneId) return false;
 
@@ -116,7 +116,8 @@ class SendCampaignJob implements ShouldQueue
                 'text'              => ['body' => $message],
             ]);
 
-        return $response->successful();
+        Log::info("WhatsApp to {$phone} → Status: {$response->status()} | Body: {$response->body()}");
+        return $response->successful() && isset($response->json()['messages']);
     }
 
     private function sendTelegram($channel, $contact, string $message): bool

@@ -151,6 +151,8 @@ class ContactController extends Controller
             'list_ids.*'  => 'exists:contact_lists,id',
         ]);
 
+        $oldStatus  = $contact->status;
+        $newStatus  = $request->input('status', $oldStatus);
         $oldListIds = $contact->lists()->pluck('contact_lists.id')->toArray();
 
         $contact->update($request->only([
@@ -158,16 +160,31 @@ class ContactController extends Controller
             'country', 'language', 'tags', 'status',
         ]));
 
-        $newListIds = $request->input('list_ids', []);
+        $newListIds    = $request->input('list_ids', []);
         $contact->lists()->sync($newListIds);
 
         $affectedIds = array_unique(array_merge($oldListIds, $newListIds));
+
         if (!empty($affectedIds)) {
-            $this->recalculateListCounts($affectedIds);
+            $statusChanged = $oldStatus !== $newStatus;
+            if ($statusChanged) {
+                $this->recalculateListCounts($affectedIds);
+            } else {
+                $this->recalculateListCounts($affectedIds);
+            }
         }
 
         return redirect()->route('admin.contacts.index')
             ->with('success', 'Contact updated successfully.');
+    }
+
+    private function recalculateListCounts(array $listIds): void
+    {
+        ContactList::whereIn('id', $listIds)->each(function ($list) {
+            $list->update([
+                'contacts_count' => $list->contacts()->where('status', 'active')->count(),
+            ]);
+        });
     }
 
     public function importView(): Response
@@ -248,10 +265,4 @@ class ContactController extends Controller
             ->with('success', 'Contact deleted successfully.');
     }
 
-    private function recalculateListCounts(array $listIds): void
-    {
-        ContactList::whereIn('id', $listIds)->each(function ($list) {
-            $list->update(['contacts_count' => $list->contacts()->count()]);
-        });
-    }
 }

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
+import axios from 'axios';
 import {
     FileText, Plus, Trash2, Eye, Search,
     Smartphone, Send, Sparkles, CheckCircle,
@@ -101,10 +102,11 @@ const Index = ({ templates, stats, filters }) => {
     const [showDeleteModal, setShowDeleteModal]   = useState(false);
     const [selectedTemplate, setSelectedTemplate] = useState(null);
     const [deleting, setDeleting]                 = useState(false);
+    const [submitting, setSubmitting]             = useState({});
 
     const handleSearch = () => {
         const params = {};
-        if (search)           params.search  = search;
+        if (search)            params.search  = search;
         if (channel !== 'all') params.channel = channel;
         if (status  !== 'all') params.status  = status;
         if (source  !== 'all') params.source  = source;
@@ -138,6 +140,20 @@ const Index = ({ templates, stats, filters }) => {
     const openDetails = (template) => {
         setSelectedTemplate(template);
         setShowDetailsModal(true);
+    };
+
+    const handleSubmit = async (template) => {
+        setSubmitting(v => ({ ...v, [template.id]: true }));
+        try {
+            const res = await axios.post(`/admin/templates/${template.id}/submit`);
+            toast.success(res.data.message ?? 'Template submitted to WhatsApp!');
+            router.reload({ only: ['templates', 'stats'] });
+        } catch (err) {
+            toast.error(err.response?.data?.message ?? 'Submission failed.');
+            router.reload({ only: ['templates', 'stats'] });
+        } finally {
+            setSubmitting(v => ({ ...v, [template.id]: false }));
+        }
     };
 
     return (
@@ -259,8 +275,8 @@ const Index = ({ templates, stats, filters }) => {
                                         <td className="px-4 py-3">
                                             {t.source === 'ai_generated' ? (
                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-purple-600 bg-purple-50 dark:bg-purple-900/20">
-                                                        <Sparkles className="w-3 h-3" /> AI
-                                                    </span>
+                                                    <Sparkles className="w-3 h-3" /> AI
+                                                </span>
                                             ) : (
                                                 <span className="text-xs text-zinc-500">Manual</span>
                                             )}
@@ -269,19 +285,20 @@ const Index = ({ templates, stats, filters }) => {
                                             <ComplianceScore score={t.ai_compliance_score} />
                                         </td>
                                         <td className="px-4 py-3">
-                                                <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
-                                                    <Star className="w-3 h-3 text-zinc-300" />
-                                                    {t.usage_count}
-                                                </span>
+                                            <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
+                                                <Star className="w-3 h-3 text-zinc-300" />
+                                                {t.usage_count}
+                                            </span>
                                         </td>
                                         <td className="px-4 py-3">
-                                                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(t.status)}`}>
-                                                    <StatusIcon status={t.status} />
-                                                    {t.status}
-                                                </span>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(t.status)}`}>
+                                                <StatusIcon status={t.status} />
+                                                {t.status}
+                                            </span>
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-1.5">
+                                                {/* View */}
                                                 <button
                                                     onClick={() => openDetails(t)}
                                                     title="View details"
@@ -289,6 +306,23 @@ const Index = ({ templates, stats, filters }) => {
                                                 >
                                                     <Eye className="w-3.5 h-3.5" />
                                                 </button>
+
+                                                {/* Submit to WhatsApp — draft whatsapp only */}
+                                                {t.channel === 'whatsapp' && t.status === 'draft' && (
+                                                    <button
+                                                        onClick={() => handleSubmit(t)}
+                                                        disabled={submitting[t.id]}
+                                                        title="Submit to WhatsApp"
+                                                        className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 disabled:opacity-50 transition-colors"
+                                                    >
+                                                        {submitting[t.id]
+                                                            ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                            : <Send className="w-3.5 h-3.5" />
+                                                        }
+                                                    </button>
+                                                )}
+
+                                                {/* Delete */}
                                                 <button
                                                     onClick={() => openDeleteModal(t)}
                                                     title="Delete"
@@ -354,6 +388,7 @@ const Index = ({ templates, stats, filters }) => {
                                     </div>
                                 ))}
                             </div>
+
                             {selectedTemplate.header && (
                                 <div className="space-y-1">
                                     <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Header</p>
@@ -376,8 +411,28 @@ const Index = ({ templates, stats, filters }) => {
                                     <p className="text-xs text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-2.5 rounded-lg">{selectedTemplate.rejection_reason}</p>
                                 </div>
                             )}
-                            <div className="flex justify-end pt-1">
-                                <button onClick={() => setShowDetailsModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+
+                            {/* Modal Footer */}
+                            <div className="flex items-center justify-between pt-1">
+                                <div className="flex gap-2">
+                                    {selectedTemplate.channel === 'whatsapp' && selectedTemplate.status === 'draft' && (
+                                        <button
+                                            onClick={() => { setShowDetailsModal(false); handleSubmit(selectedTemplate); }}
+                                            disabled={submitting[selectedTemplate.id]}
+                                            className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white transition-colors disabled:opacity-50"
+                                        >
+                                            {submitting[selectedTemplate.id]
+                                                ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                                : <Send className="w-3.5 h-3.5" />
+                                            }
+                                            Submit to WhatsApp
+                                        </button>
+                                    )}
+                                </div>
+                                <button
+                                    onClick={() => setShowDetailsModal(false)}
+                                    className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                                >
                                     Close
                                 </button>
                             </div>

@@ -53,7 +53,7 @@ class AnalyticsController extends Controller
                 'read_rate'        => $a->delivered > 0 ? round(($a->read / $a->delivered) * 100, 1) : 0,
                 'reply_rate'       => $a->delivered > 0 ? round(($a->replied / $a->delivered) * 100, 1) : 0,
                 'ai_recommendations' => $a->ai_recommendations,
-                'recorded_at'      => $a->recorded_at->format('Y-m-d H:i'),
+                'recorded_at'      => $a->recorded_at?->format('Y-m-d H:i'),
             ]);
 
         // Overall stats
