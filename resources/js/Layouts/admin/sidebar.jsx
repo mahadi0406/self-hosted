@@ -299,7 +299,7 @@ const Sidebar = ({
                             className={cn(
                                 "w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors",
                                 "hover:bg-muted",
-                                (childActive || expanded) ? "bg-muted text-foreground" : "text-muted-foreground",
+                                childActive ? "bg-muted text-foreground" : "text-muted-foreground",
                                 !isOpen && "justify-center px-2"
                             )}
                         >
