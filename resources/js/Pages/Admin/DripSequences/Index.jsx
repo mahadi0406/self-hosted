@@ -104,23 +104,31 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
 
     const confirmEnroll = () => {
         if (!enrollTarget || selectedLists.length === 0) return;
+
+        // Save values before closing modal — Radix Dialog focus trap conflicts
+        // with Inertia navigation if the dialog is still mounted during the request
+        const sequenceId = enrollTarget.id;
+        const listIds    = [...selectedLists];
+
+        setShowEnrollModal(false);
+        setEnrollTarget(null);
+        setSelectedLists([]);
         setEnrolling(true);
-        router.post(`/admin/drip-sequences/${enrollTarget.id}/enroll`,
-            { list_ids: selectedLists },
+
+        router.post(
+            `/admin/drip-sequences/${sequenceId}/enroll`,
+            { list_ids: listIds },
             {
-                preserveState: true,
                 preserveScroll: true,
-                onSuccess: () => {
-                    toast.success('Contacts enrolled successfully!');
-                    setShowEnrollModal(false);
-                    setEnrollTarget(null);
-                    setSelectedLists([]);
-                },
-                onError: () => toast.error('Failed to enroll contacts.'),
-                onFinish: () => setEnrolling(false),
+                onSuccess: () => toast.success('Contacts enrolled successfully!'),
+                onError:   () => toast.error('Failed to enroll contacts.'),
+                onFinish:  () => setEnrolling(false),
             }
         );
     };
+
+    const allSelected = lists && lists.length > 0 && selectedLists.length === lists.length;
+    const toggleAll   = () => setSelectedLists(allSelected ? [] : lists.map(l => l.id));
 
     const handleSearch = () => {
         const params = {};
@@ -357,21 +365,35 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
                             Select contact lists to enroll into <span className="font-medium text-zinc-700 dark:text-zinc-300">"{enrollTarget?.name}"</span>. Only active contacts not already enrolled will be added.
                         </p>
                         {lists && lists.length > 0 ? (
-                            <div className="space-y-2 max-h-60 overflow-y-auto">
-                                {lists.map(list => (
-                                    <label key={list.id} className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                        <input
-                                            type="checkbox"
-                                            checked={selectedLists.includes(list.id)}
-                                            onChange={() => toggleList(list.id)}
-                                            className="rounded border-zinc-300 dark:border-zinc-600 text-zinc-900"
-                                        />
-                                        <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{list.name}</p>
-                                            <p className="text-xs text-zinc-400">{list.contacts_count ?? 0} contacts</p>
-                                        </div>
-                                    </label>
-                                ))}
+                            <div>
+                                {/* Select All */}
+                                <label className="flex items-center gap-3 px-3 py-2 mb-1 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={allSelected}
+                                        onChange={toggleAll}
+                                        className="rounded border-zinc-300 dark:border-zinc-600"
+                                    />
+                                    <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                                        {allSelected ? 'Deselect All' : 'Select All'}
+                                    </span>
+                                </label>
+                                <div className="space-y-2 max-h-52 overflow-y-auto">
+                                    {lists.map(list => (
+                                        <label key={list.id} className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedLists.includes(list.id)}
+                                                onChange={() => toggleList(list.id)}
+                                                className="rounded border-zinc-300 dark:border-zinc-600 text-zinc-900"
+                                            />
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{list.name}</p>
+                                                <p className="text-xs text-zinc-400">{list.contacts_count ?? 0} active contacts</p>
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
                             </div>
                         ) : (
                             <p className="text-sm text-zinc-400 text-center py-4">No contact lists available.</p>
