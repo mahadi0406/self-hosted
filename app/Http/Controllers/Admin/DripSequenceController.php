@@ -38,7 +38,6 @@ class DripSequenceController extends Controller
         $paginator   = $query->withCount('enrollments')->latest()->paginate(15)->withQueryString();
         $sequenceIds = $paginator->pluck('id');
 
-        // Precompute enrolled contact-list IDs per sequence (1 query instead of N)
         $enrolledBySequence = DB::table('contact_list_contact')
             ->join('drip_enrollments', function ($join) use ($sequenceIds) {
                 $join->on('contact_list_contact.contact_id', '=', 'drip_enrollments.contact_id')
@@ -148,8 +147,6 @@ class DripSequenceController extends Controller
         ]);
 
         $listIds = array_map('intval', (array) $request->list_ids);
-
-        // Direct pivot query — avoids ORM whereHas subquery ambiguity
         $contactIds = Contact::whereIn('id', function ($q) use ($listIds) {
                 $q->select('contact_id')
                   ->from('contact_list_contact')
@@ -158,7 +155,6 @@ class DripSequenceController extends Controller
             ->where('status', 'active')
             ->pluck('id');
 
-        // Bulk-insert new enrollments, skip already-enrolled contacts
         $alreadyEnrolled = DripEnrollment::where('drip_sequence_id', $dripSequence->id)
             ->whereIn('contact_id', $contactIds)
             ->pluck('contact_id')

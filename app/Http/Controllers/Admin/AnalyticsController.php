@@ -56,7 +56,6 @@ class AnalyticsController extends Controller
                 'recorded_at'      => $a->recorded_at?->format('Y-m-d H:i'),
             ]);
 
-        // Overall stats
         $totals = CampaignAnalytic::selectRaw('
             SUM(sent) as total_sent,
             SUM(delivered) as total_delivered,

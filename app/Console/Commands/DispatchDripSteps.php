@@ -23,7 +23,6 @@ class DispatchDripSteps extends Command
         $dispatched = 0;
 
         foreach ($sequences as $sequence) {
-            // Use the proper DripEnrollment model (drip_enrollments table)
             $enrollments = DripEnrollment::where('drip_sequence_id', $sequence->id)
                 ->where('status', 'active')
                 ->get();

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Channel;
 use App\Models\Template;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -114,7 +115,6 @@ class TemplateController extends Controller
 
     public function submit(Request $request, Template $template): JsonResponse
     {
-        // Telegram templates are auto-approved (no review process)
         if ($template->channel !== 'whatsapp') {
             $template->update(['status' => 'approved']);
             return response()->json(['message' => 'Template approved.', 'status' => 'approved']);
@@ -130,7 +130,6 @@ class TemplateController extends Controller
         }
 
         $components = [];
-
         if ($template->header) {
             $cleanHeader = preg_replace('/[\x{1F000}-\x{1FFFF}|\x{2600}-\x{27FF}|\x{FE00}-\x{FEFF}|\x{1F900}-\x{1F9FF}|\x{1FA00}-\x{1FA9F}]/u', '', $template->header);
             $cleanHeader = preg_replace('/[\n\r\*\_\~]/u', '', $cleanHeader);
@@ -211,7 +210,7 @@ class TemplateController extends Controller
             $localStatus = match ($waStatus) {
                 'APPROVED'          => 'approved',
                 'REJECTED'          => 'rejected',
-                default             => 'pending',   // PENDING, IN_APPEAL, etc.
+                default             => 'pending',
             };
 
             $template->update([
@@ -240,10 +239,7 @@ class TemplateController extends Controller
         return response()->json(['error' => "Submission failed: {$errorMessage}"], 422);
     }
 
-    /**
-     * Pull the current status of a submitted template from the WhatsApp API.
-     * Useful for templates stuck in 'pending' review.
-     */
+
     public function syncStatus(Template $template): JsonResponse
     {
         if ($template->channel !== 'whatsapp') {
@@ -275,8 +271,6 @@ class TemplateController extends Controller
 
         if ($response->successful()) {
             $data = $response->json('data') ?? [];
-
-            // Match by WA template ID or fall back to first result
             $waTemplate = collect($data)->firstWhere('id', $template->whatsapp_template_id)
                 ?? ($data[0] ?? null);
 

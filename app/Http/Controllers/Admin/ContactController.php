@@ -202,7 +202,7 @@ class ContactController extends Controller
     public function import(Request $request): RedirectResponse
     {
         $request->validate([
-            'file'       => 'required|file|mimes:csv,txt|max:102400', // 100 MB
+            'file' => 'required|file|mimes:csv,txt|max:10240',
             'list_ids'   => 'nullable|array',
             'list_ids.*' => 'exists:contact_lists,id',
         ]);

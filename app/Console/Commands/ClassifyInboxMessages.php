@@ -70,7 +70,7 @@ class ClassifyInboxMessages extends Command
                     }
                 }
 
-                usleep(200000); // 200ms delay between API calls
+                usleep(200000);
 
             } catch (\Exception $e) {
                 Log::error("Inbox classification failed #{$message->id}: " . $e->getMessage());

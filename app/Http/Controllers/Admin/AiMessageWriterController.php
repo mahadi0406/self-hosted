@@ -157,7 +157,6 @@ class AiMessageWriterController extends Controller
                 ], 422);
             }
 
-            // Validate variant structure
             $validatedVariants = array_map(function ($v) {
                 return [
                     'variant'          => $v['variant'] ?? 0,
@@ -222,7 +221,6 @@ class AiMessageWriterController extends Controller
         }
 
         // Method 2: Extract from markdown code fence anywhere in the text
-        // Handles preamble like "Here are 3 variants:\n```json\n[...]\n```"
         if (preg_match('/```(?:json)?\s*([\s\S]*?)\s*```/i', $text, $matches)) {
             $decoded = json_decode(trim($matches[1]), true);
             if (json_last_error() === JSON_ERROR_NONE && is_array($decoded)) {
