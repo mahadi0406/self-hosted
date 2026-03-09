@@ -29,6 +29,10 @@ class ImportContactsJob implements ShouldQueue
         $fullPath = 'assets/files/' . $this->filePath;
 
         if (!file_exists($fullPath)) {
+            $fullPath = public_path('assets/files/' . $this->filePath);
+        }
+
+        if (!file_exists($fullPath)) {
             Log::error("ImportContactsJob: file not found at {$fullPath}");
             return;
         }
