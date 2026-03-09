@@ -104,25 +104,21 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
 
     const confirmEnroll = () => {
         if (!enrollTarget || selectedLists.length === 0) return;
-
-        // Save values before closing modal — Radix Dialog focus trap conflicts
-        // with Inertia navigation if the dialog is still mounted during the request
-        const sequenceId = enrollTarget.id;
-        const listIds    = [...selectedLists];
-
-        setShowEnrollModal(false);
-        setEnrollTarget(null);
-        setSelectedLists([]);
         setEnrolling(true);
-
         router.post(
-            `/admin/drip-sequences/${sequenceId}/enroll`,
-            { list_ids: listIds },
+            `/admin/drip-sequences/${enrollTarget.id}/enroll`,
+            { list_ids: selectedLists },
             {
+                preserveState:  true,
                 preserveScroll: true,
-                onSuccess: () => toast.success('Contacts enrolled successfully!'),
-                onError:   () => toast.error('Failed to enroll contacts.'),
-                onFinish:  () => setEnrolling(false),
+                onSuccess: () => {
+                    toast.success('Contacts enrolled successfully!');
+                    setShowEnrollModal(false);
+                    setEnrollTarget(null);
+                    setSelectedLists([]);
+                },
+                onError:  () => toast.error('Failed to enroll contacts.'),
+                onFinish: () => setEnrolling(false),
             }
         );
     };

@@ -137,7 +137,6 @@ class DripSequenceController extends Controller
             ->pluck('id');
 
         $enrolled = 0;
-
         foreach ($contactIds as $contactId) {
             $exists = DripEnrollment::where('drip_sequence_id', $dripSequence->id)
                 ->where('contact_id', $contactId)
@@ -154,8 +153,7 @@ class DripSequenceController extends Controller
             }
         }
 
-        return redirect()->route('admin.drip-sequences.index')
-            ->with('success', "{$enrolled} contact(s) enrolled into \"{$dripSequence->name}\".");
+        return redirect()->back();
     }
 
     public function destroy(DripSequence $dripSequence): RedirectResponse
