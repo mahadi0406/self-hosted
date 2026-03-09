@@ -343,13 +343,13 @@ const Sidebar = ({
                                     <div className={cn(
                                         "flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-colors",
                                         "hover:bg-muted",
-                                        isActive(sub.route)
+                                        url === sub.route
                                             ? "text-foreground font-medium"
                                             : "text-muted-foreground"
                                     )}>
                                         <span className={cn(
                                             "w-1.5 h-1.5 rounded-full",
-                                            isActive(sub.route) ? "bg-foreground" : "bg-muted-foreground/40"
+                                            url === sub.route ? "bg-foreground" : "bg-muted-foreground/40"
                                         )}/>
                                         {sub.title}
                                     </div>
@@ -499,11 +499,11 @@ const Sidebar = ({
                             <div className={cn(
                                 "flex items-center gap-2 px-3 py-2 text-sm transition-colors",
                                 "hover:bg-muted",
-                                isActive(sub.route) ? "text-foreground font-medium" : "text-muted-foreground"
+                                url === sub.route ? "text-foreground font-medium" : "text-muted-foreground"
                             )}>
                                 <span className={cn(
                                     "w-1.5 h-1.5 rounded-full",
-                                    isActive(sub.route) ? "bg-foreground" : "bg-muted-foreground/40"
+                                    url === sub.route ? "bg-foreground" : "bg-muted-foreground/40"
                                 )}/>
                                 {sub.title}
                             </div>
