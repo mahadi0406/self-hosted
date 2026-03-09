@@ -17,7 +17,7 @@ class ImportContactsJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels, UploadedFile;
 
     public int $tries   = 1;
-    public int $timeout = 3600; // 1 hour — supports millions of rows
+    public int $timeout = 3600;
 
     public function __construct(
         public string $filePath,
@@ -86,7 +86,6 @@ class ImportContactsJob implements ShouldQueue
         fclose($handle);
         $this->removeFile($this->filePath);
 
-        // Recalculate contact list counts once after all inserts
         if (!empty($this->listIds)) {
             ContactList::whereIn('id', $this->listIds)->each(function ($list) {
                 $list->update([
@@ -103,7 +102,6 @@ class ImportContactsJob implements ShouldQueue
         $imported = 0;
 
         foreach ($batch as $row) {
-            // Check for duplicate phone or telegram_id
             $exists = Contact::where(function ($q) use ($row) {
                 if ($row['phone'])      $q->orWhere('phone',       $row['phone']);
                 if ($row['telegramId']) $q->orWhere('telegram_id', $row['telegramId']);
