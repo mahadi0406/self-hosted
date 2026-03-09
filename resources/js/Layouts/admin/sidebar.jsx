@@ -28,6 +28,7 @@ import {
     Radio,
     Bot,
     History,
+    Terminal,
     ChevronDown, LogOut
 } from 'lucide-react';
 
@@ -159,7 +160,8 @@ const Sidebar = ({
         {
             label: 'Settings',
             items: [
-                { title: 'Settings', icon: Settings, route: '/admin/settings' },
+                { title: 'Settings',     icon: Settings,  route: '/admin/settings' },
+                { title: 'Automations',  icon: Terminal,  route: '/admin/automations' },
             ]
         },
     ];

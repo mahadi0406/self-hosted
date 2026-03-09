@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AiCampaignPlannerController;
+use App\Http\Controllers\Admin\AutomationsController;
 use App\Http\Controllers\Admin\AiMessageWriterController;
 use App\Http\Controllers\Admin\AnalyticsController;
 use App\Http\Controllers\Admin\CampaignController;
@@ -82,6 +83,9 @@ Route::middleware(['auth', 'role:admin', 'throttle:200,1', 'xss', 'security.head
     // ── Analytics ─────────────────────────────────────────────────────────────
     Route::get('/analytics/campaigns', [AnalyticsController::class, 'campaigns'])->name('analytics.campaigns');
     Route::get('/analytics/ai-logs',   [AnalyticsController::class, 'aiLogs'])->name('analytics.ai-logs');
+
+    // ── Automations ───────────────────────────────────────────────────────────
+    Route::get('/automations', [AutomationsController::class, 'index'])->name('automations');
 
     // ── Settings & Profile ────────────────────────────────────────────────────
     Route::get('/settings',             [SettingsController::class, 'index'])->name('settings.index');
