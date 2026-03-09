@@ -35,20 +35,35 @@ class DripSequenceController extends Controller
             $query->where('channel_id', $request->channel_id);
         }
 
-        $sequences = $query->withCount('enrollments')->latest()->paginate(15)->withQueryString()
-            ->through(fn($s) => [
-                'id'                 => $s->id,
-                'name'               => $s->name,
-                'description'        => $s->description,
-                'channel_name'       => $s->channel->name,
-                'channel_type'       => $s->channel->type,
-                'status'             => $s->status,
-                'total_steps'        => $s->total_steps,
-                'enrollments_count'  => $s->enrollments_count,
-                'ai_generated'       => $s->ai_generated,
-                'ai_goal'            => $s->ai_goal,
-                'created_at'         => $s->created_at->format('Y-m-d H:i'),
-            ]);
+        $paginator   = $query->withCount('enrollments')->latest()->paginate(15)->withQueryString();
+        $sequenceIds = $paginator->pluck('id');
+
+        // Precompute enrolled contact-list IDs per sequence (1 query instead of N)
+        $enrolledBySequence = DB::table('contact_list_contact')
+            ->join('drip_enrollments', function ($join) use ($sequenceIds) {
+                $join->on('contact_list_contact.contact_id', '=', 'drip_enrollments.contact_id')
+                     ->whereIn('drip_enrollments.drip_sequence_id', $sequenceIds);
+            })
+            ->select('drip_enrollments.drip_sequence_id', 'contact_list_contact.contact_list_id')
+            ->distinct()
+            ->get()
+            ->groupBy('drip_sequence_id')
+            ->map(fn($items) => $items->pluck('contact_list_id')->unique()->values()->toArray());
+
+        $sequences = $paginator->through(fn($s) => [
+            'id'                 => $s->id,
+            'name'               => $s->name,
+            'description'        => $s->description,
+            'channel_name'       => $s->channel->name,
+            'channel_type'       => $s->channel->type,
+            'status'             => $s->status,
+            'total_steps'        => $s->total_steps,
+            'enrollments_count'  => $s->enrollments_count,
+            'ai_generated'       => $s->ai_generated,
+            'ai_goal'            => $s->ai_goal,
+            'created_at'         => $s->created_at->format('Y-m-d H:i'),
+            'enrolled_list_ids'  => $enrolledBySequence->get($s->id, []),
+        ]);
 
         $stats = [
             'total'      => DripSequence::count(),
@@ -132,28 +147,40 @@ class DripSequenceController extends Controller
             'list_ids.*' => 'exists:contact_lists,id',
         ]);
 
-        $contactIds = Contact::whereHas('lists', fn($q) => $q->whereIn('contact_lists.id', $request->list_ids))
+        $listIds = array_map('intval', (array) $request->list_ids);
+
+        // Direct pivot query — avoids ORM whereHas subquery ambiguity
+        $contactIds = Contact::whereIn('id', function ($q) use ($listIds) {
+                $q->select('contact_id')
+                  ->from('contact_list_contact')
+                  ->whereIn('contact_list_id', $listIds);
+            })
             ->where('status', 'active')
             ->pluck('id');
 
-        $enrolled = 0;
-        foreach ($contactIds as $contactId) {
-            $exists = DripEnrollment::where('drip_sequence_id', $dripSequence->id)
-                ->where('contact_id', $contactId)
-                ->exists();
+        // Bulk-insert new enrollments, skip already-enrolled contacts
+        $alreadyEnrolled = DripEnrollment::where('drip_sequence_id', $dripSequence->id)
+            ->whereIn('contact_id', $contactIds)
+            ->pluck('contact_id')
+            ->flip();
 
-            if (!$exists) {
-                DripEnrollment::create([
-                    'drip_sequence_id' => $dripSequence->id,
-                    'contact_id'       => $contactId,
-                    'status'           => 'active',
-                    'enrolled_at'      => now(),
-                ]);
-                $enrolled++;
-            }
+        $now      = now();
+        $enrolled = 0;
+
+        foreach ($contactIds as $contactId) {
+            if ($alreadyEnrolled->has($contactId)) continue;
+
+            DripEnrollment::create([
+                'drip_sequence_id' => $dripSequence->id,
+                'contact_id'       => $contactId,
+                'status'           => 'active',
+                'enrolled_at'      => $now,
+            ]);
+            $enrolled++;
         }
 
-        return redirect()->back();
+        return redirect()->route('admin.drip-sequences.index')
+            ->with('success', "{$enrolled} contact(s) enrolled into \"{$dripSequence->name}\".");
     }
 
     public function destroy(DripSequence $dripSequence): RedirectResponse

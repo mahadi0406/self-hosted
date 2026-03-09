@@ -123,8 +123,10 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
         );
     };
 
-    const allSelected = lists && lists.length > 0 && selectedLists.length === lists.length;
-    const toggleAll   = () => setSelectedLists(allSelected ? [] : lists.map(l => l.id));
+    const enrolledIds    = enrollTarget?.enrolled_list_ids ?? [];
+    const availableLists = (lists ?? []).filter(l => !enrolledIds.includes(l.id));
+    const allSelected    = availableLists.length > 0 && selectedLists.length === availableLists.length;
+    const toggleAll      = () => setSelectedLists(allSelected ? [] : availableLists.map(l => l.id));
 
     const handleSearch = () => {
         const params = {};
@@ -255,7 +257,12 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
                                 {sequences.data?.length > 0 ? sequences.data.map((s) => (
                                     <tr key={s.id} className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
                                         <td className="px-4 py-3">
-                                            <div className="font-medium text-zinc-800 dark:text-zinc-200">{s.name}</div>
+                                            <button
+                                                onClick={() => { setSelected(s); setShowModal(true); }}
+                                                className="font-medium text-zinc-800 dark:text-zinc-200 hover:text-emerald-600 dark:hover:text-emerald-400 text-left transition-colors"
+                                            >
+                                                {s.name}
+                                            </button>
                                             {s.description && <div className="text-xs text-zinc-400 line-clamp-1 max-w-[180px]">{s.description}</div>}
                                             <div className="text-xs text-zinc-400">{s.created_at}</div>
                                         </td>
@@ -362,33 +369,49 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
                         </p>
                         {lists && lists.length > 0 ? (
                             <div>
-                                {/* Select All */}
-                                <label className="flex items-center gap-3 px-3 py-2 mb-1 cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        checked={allSelected}
-                                        onChange={toggleAll}
-                                        className="rounded border-zinc-300 dark:border-zinc-600"
-                                    />
-                                    <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-                                        {allSelected ? 'Deselect All' : 'Select All'}
-                                    </span>
-                                </label>
+                                {/* Select All (only available lists) */}
+                                {availableLists.length > 0 && (
+                                    <label className="flex items-center gap-3 px-3 py-2 mb-1 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            checked={allSelected}
+                                            onChange={toggleAll}
+                                            className="rounded border-zinc-300 dark:border-zinc-600"
+                                        />
+                                        <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+                                            {allSelected ? 'Deselect All' : 'Select All'}
+                                        </span>
+                                    </label>
+                                )}
                                 <div className="space-y-2 max-h-52 overflow-y-auto">
-                                    {lists.map(list => (
-                                        <label key={list.id} className="flex items-center gap-3 p-3 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                            <input
-                                                type="checkbox"
-                                                checked={selectedLists.includes(list.id)}
-                                                onChange={() => toggleList(list.id)}
-                                                className="rounded border-zinc-300 dark:border-zinc-600 text-zinc-900"
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                                <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{list.name}</p>
-                                                <p className="text-xs text-zinc-400">{list.contacts_count ?? 0} active contacts</p>
-                                            </div>
-                                        </label>
-                                    ))}
+                                    {lists.map(list => {
+                                        const isEnrolled = enrolledIds.includes(list.id);
+                                        return (
+                                            <label
+                                                key={list.id}
+                                                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                                                    isEnrolled
+                                                        ? 'border-emerald-200 dark:border-emerald-800/50 bg-emerald-50/40 dark:bg-emerald-900/10 cursor-not-allowed'
+                                                        : 'border-zinc-200 dark:border-zinc-700 cursor-pointer hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                                                }`}
+                                            >
+                                                <input
+                                                    type="checkbox"
+                                                    checked={isEnrolled || selectedLists.includes(list.id)}
+                                                    onChange={() => !isEnrolled && toggleList(list.id)}
+                                                    disabled={isEnrolled}
+                                                    className="rounded border-zinc-300 dark:border-zinc-600 text-zinc-900"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200">{list.name}</p>
+                                                    <p className={`text-xs ${isEnrolled ? 'text-emerald-600 dark:text-emerald-400' : 'text-zinc-400'}`}>
+                                                        {isEnrolled ? 'Already enrolled' : `${list.contacts_count ?? 0} active contacts`}
+                                                    </p>
+                                                </div>
+                                                {isEnrolled && <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />}
+                                            </label>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         ) : (
