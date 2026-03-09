@@ -127,17 +127,16 @@ const Index = ({ templates, stats, filters }) => {
 
     const confirmDelete = () => {
         if (!selectedTemplate) return;
+        const template = selectedTemplate;
+        setShowDeleteModal(false);
+        setSelectedTemplate(null);
         setDeleting(true);
-        router.delete(`/admin/templates/${selectedTemplate.id}`, {
+        router.delete(`/admin/templates/${template.id}`, {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Template deleted successfully!');
-                setShowDeleteModal(false);
-                setSelectedTemplate(null);
-            },
-            onError:  () => toast.error('Failed to delete template.'),
-            onFinish: () => setDeleting(false),
+            onSuccess: () => toast.success('Template deleted successfully!'),
+            onError:   () => toast.error('Failed to delete template.'),
+            onFinish:  () => setDeleting(false),
         });
     };
 

@@ -109,7 +109,7 @@ class TemplateController extends Controller
     {
         $template->delete();
 
-        return redirect()->route('admin.templates.index')
+        return redirect()->back()
             ->with('success', 'Template deleted successfully.');
     }
 

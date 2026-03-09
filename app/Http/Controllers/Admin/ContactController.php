@@ -225,7 +225,7 @@ class ContactController extends Controller
             $this->recalculateListCounts($listIds);
         }
 
-        return redirect()->route('admin.contacts.index')
+        return redirect()->back()
             ->with('success', 'Contact deleted successfully.');
     }
 

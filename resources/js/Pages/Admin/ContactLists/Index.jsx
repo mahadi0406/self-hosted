@@ -83,17 +83,16 @@ const Index = ({ lists, stats, filters }) => {
 
     const confirmDelete = () => {
         if (!selectedList) return;
+        const list = selectedList;
+        setShowDeleteModal(false);
+        setSelectedList(null);
         setDeleting(true);
-        router.delete(`/admin/contact-lists/${selectedList.id}`, {
+        router.delete(`/admin/contact-lists/${list.id}`, {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Contact list deleted successfully!');
-                setShowDeleteModal(false);
-                setSelectedList(null);
-            },
-            onError:  () => toast.error('Failed to delete contact list.'),
-            onFinish: () => setDeleting(false),
+            onSuccess: () => toast.success('Contact list deleted successfully!'),
+            onError:   () => toast.error('Failed to delete contact list.'),
+            onFinish:  () => setDeleting(false),
         });
     };
 

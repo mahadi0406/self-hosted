@@ -131,17 +131,16 @@ const Index = ({ campaigns, stats, channels, filters }) => {
 
     const confirmDelete = () => {
         if (!deleteTarget) return;
+        const target = deleteTarget;
+        setShowDeleteModal(false);
+        setDeleteTarget(null);
         setDeleting(true);
-        router.delete(`/admin/campaigns/${deleteTarget.id}`, {
+        router.delete(`/admin/campaigns/${target.id}`, {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Campaign deleted successfully!');
-                setShowDeleteModal(false);
-                setDeleteTarget(null);
-            },
-            onError:  () => toast.error('Failed to delete campaign.'),
-            onFinish: () => setDeleting(false),
+            onSuccess: () => toast.success('Campaign deleted successfully!'),
+            onError:   () => toast.error('Failed to delete campaign.'),
+            onFinish:  () => setDeleting(false),
         });
     };
 

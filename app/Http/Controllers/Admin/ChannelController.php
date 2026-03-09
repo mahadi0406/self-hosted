@@ -215,6 +215,6 @@ class ChannelController extends Controller
     public function destroy(Channel $channel): RedirectResponse
     {
         $channel->delete();
-        return redirect()->route('admin.channels.index')->with('success', 'Channel deleted successfully.');
+        return redirect()->back()->with('success', 'Channel deleted successfully.');
     }
 }

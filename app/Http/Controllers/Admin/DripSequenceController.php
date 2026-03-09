@@ -183,7 +183,7 @@ class DripSequenceController extends Controller
     {
         $dripSequence->delete();
 
-        return redirect()->route('admin.drip-sequences.index')
+        return redirect()->back()
             ->with('success', 'Drip sequence deleted successfully.');
     }
 }

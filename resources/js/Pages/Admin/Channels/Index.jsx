@@ -153,17 +153,16 @@ const Index = ({ channels, stats, filters }) => {
 
     const confirmDelete = () => {
         if (!selectedChannel) return;
+        const channel = selectedChannel;
+        setShowDeleteModal(false);
+        setSelectedChannel(null);
         setDeleting(true);
-        router.delete(`/admin/channels/${selectedChannel.id}`, {
+        router.delete(`/admin/channels/${channel.id}`, {
             preserveState: true,
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Channel deleted successfully!');
-                setShowDeleteModal(false);
-                setSelectedChannel(null);
-            },
-            onError: () => toast.error('Failed to delete channel.'),
-            onFinish: () => setDeleting(false),
+            onSuccess: () => toast.success('Channel deleted successfully!'),
+            onError:   () => toast.error('Failed to delete channel.'),
+            onFinish:  () => setDeleting(false),
         });
     };
 
@@ -174,12 +173,13 @@ const Index = ({ channels, stats, filters }) => {
 
     const confirmDisconnect = async () => {
         if (!selectedChannel) return;
+        const channel = selectedChannel;
+        setShowDisconnectModal(false);
+        setSelectedChannel(null);
         setDisconnecting(true);
         try {
-            const res = await axios.post(`/admin/channels/${selectedChannel.id}/disconnect`);
+            const res = await axios.post(`/admin/channels/${channel.id}/disconnect`);
             toast.success(res.data.message ?? 'Channel disconnected.');
-            setShowDisconnectModal(false);
-            setSelectedChannel(null);
             router.reload({ only: ['channels', 'stats'] });
         } catch (_) {
             toast.error('Failed to disconnect channel.');

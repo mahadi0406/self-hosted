@@ -137,6 +137,6 @@ class CampaignController extends Controller
     public function destroy(Campaign $campaign): RedirectResponse
     {
         $campaign->delete();
-        return redirect()->route('admin.campaigns.index')->with('success', 'Campaign deleted successfully.');
+        return redirect()->back()->with('success', 'Campaign deleted successfully.');
     }
 }

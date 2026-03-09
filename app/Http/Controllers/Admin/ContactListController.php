@@ -65,7 +65,7 @@ class ContactListController extends Controller
     {
         $contactList->delete();
 
-        return redirect()->route('admin.contact-lists.index')
+        return redirect()->back()
             ->with('success', 'Contact list deleted successfully.');
     }
 }
