@@ -39,7 +39,6 @@ Route::middleware(['auth', 'role:admin', 'throttle:200,1', 'xss', 'security.head
 
     // ── Contacts ─────────────────────────────────────────────────────────────
     Route::get('/contacts',                 [ContactController::class, 'index'])->name('contacts.index');
-    Route::get('/contacts/export',          [ContactController::class, 'export'])->name('contacts.export');
     Route::get('/contacts/create',          [ContactController::class, 'create']);
     Route::post('/contacts',                [ContactController::class, 'store']);
     Route::get('/contacts/import',          [ContactController::class, 'importView']);

@@ -2,17 +2,19 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Concerns\UploadedFile;
 use App\Http\Controllers\Controller;
+use App\Jobs\ImportContactsJob;
 use App\Models\Contact;
 use App\Models\ContactList;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Illuminate\Http\RedirectResponse;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ContactController extends Controller
 {
+    use UploadedFile;
     public function index(Request $request): Response
     {
         $query = Contact::query();
@@ -188,43 +190,6 @@ class ContactController extends Controller
         });
     }
 
-    public function export(): StreamedResponse
-    {
-        $headers = [
-            'Content-Type'        => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="contacts_' . date('Y-m-d') . '.csv"',
-            'Pragma'              => 'no-cache',
-            'Cache-Control'       => 'must-revalidate, post-check=0, pre-check=0',
-            'Expires'             => '0',
-        ];
-
-        return response()->stream(function () {
-            $handle = fopen('php://output', 'w');
-
-            fputcsv($handle, ['name', 'phone', 'telegram_id', 'email', 'country', 'language', 'tags', 'status', 'ai_engagement_label', 'last_messaged_at', 'created_at']);
-
-            Contact::query()->orderBy('id')->chunk(500, function ($contacts) use ($handle) {
-                foreach ($contacts as $c) {
-                    fputcsv($handle, [
-                        $c->name,
-                        $c->phone         ?? '',
-                        $c->telegram_id   ?? '',
-                        $c->email         ?? '',
-                        $c->country       ?? '',
-                        $c->language      ?? '',
-                        is_array($c->tags) ? implode(';', $c->tags) : ($c->tags ?? ''),
-                        $c->status,
-                        $c->ai_engagement_label ?? '',
-                        $c->last_messaged_at?->format('Y-m-d H:i') ?? '',
-                        $c->created_at->format('Y-m-d H:i'),
-                    ]);
-                }
-            });
-
-            fclose($handle);
-        }, 200, $headers);
-    }
-
     public function importView(): Response
     {
         $lists = ContactList::select('id', 'name')->get();
@@ -237,56 +202,17 @@ class ContactController extends Controller
     public function import(Request $request): RedirectResponse
     {
         $request->validate([
-            'file'       => 'required|file|mimes:csv,txt|max:10240',
+            'file'       => 'required|file|mimes:csv,txt|max:102400', // 100 MB
             'list_ids'   => 'nullable|array',
             'list_ids.*' => 'exists:contact_lists,id',
         ]);
 
-        $file  = $request->file('file');
-        $rows  = array_map('str_getcsv', file($file->getRealPath()));
-        $header = array_map('strtolower', array_map('trim', array_shift($rows)));
+        $filename = $this->move($request->file('file'));
 
-        $imported = 0;
-        $skipped  = 0;
-
-        foreach ($rows as $row) {
-            if (count($row) !== count($header)) continue;
-            $data = array_combine($header, $row);
-
-            $phone      = !empty($data['phone'])       ? trim($data['phone'])       : null;
-            $telegramId = !empty($data['telegram_id']) ? trim($data['telegram_id']) : null;
-
-            if (!$phone && !$telegramId) { $skipped++; continue; }
-
-            $exists = Contact::where(function ($q) use ($phone, $telegramId) {
-                if ($phone)      $q->orWhere('phone', $phone);
-                if ($telegramId) $q->orWhere('telegram_id', $telegramId);
-            })->exists();
-
-            if ($exists) { $skipped++; continue; }
-
-            $contact = Contact::create([
-                'name'        => trim($data['name']     ?? 'Unknown'),
-                'phone'       => $phone,
-                'telegram_id' => $telegramId,
-                'email'       => !empty($data['email'])   ? trim($data['email'])   : null,
-                'country'     => !empty($data['country']) ? trim($data['country']) : null,
-                'language'    => !empty($data['language'])? trim($data['language']): 'en',
-            ]);
-
-            if ($request->filled('list_ids')) {
-                $contact->lists()->sync($request->list_ids);
-            }
-
-            $imported++;
-        }
-
-        if ($request->filled('list_ids')) {
-            $this->recalculateListCounts($request->list_ids);
-        }
+        ImportContactsJob::dispatch($filename, $request->input('list_ids', []));
 
         return redirect()->route('admin.contacts.index')
-            ->with('success', "Import complete. {$imported} imported, {$skipped} skipped.");
+            ->with('success', 'Import queued. Contacts will be added in the background.');
     }
 
     public function destroy(Contact $contact): RedirectResponse
