@@ -175,7 +175,7 @@ class DripSequenceController extends Controller
             $enrolled++;
         }
 
-        return redirect()->route('admin.drip-sequences.index')
+        return redirect()->back()
             ->with('success', "{$enrolled} contact(s) enrolled into \"{$dripSequence->name}\".");
     }
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -106,9 +107,11 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
         if (!enrollTarget || selectedLists.length === 0) return;
         const target = enrollTarget;
         const lists  = selectedLists;
-        setShowEnrollModal(false);
-        setEnrollTarget(null);
-        setSelectedLists([]);
+        flushSync(() => {
+            setShowEnrollModal(false);
+            setEnrollTarget(null);
+            setSelectedLists([]);
+        });
         setEnrolling(true);
         router.post(
             `/admin/drip-sequences/${target.id}/enroll`,
@@ -149,8 +152,10 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
     const confirmDelete = () => {
         if (!deleteTarget) return;
         const target = deleteTarget;
-        setShowDeleteModal(false);
-        setDeleteTarget(null);
+        flushSync(() => {
+            setShowDeleteModal(false);
+            setDeleteTarget(null);
+        });
         setDeleting(true);
         router.delete(`/admin/drip-sequences/${target.id}`, {
             preserveState: true,

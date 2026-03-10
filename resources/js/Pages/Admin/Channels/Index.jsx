@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router } from '@inertiajs/react';
 import { Link } from "@inertiajs/react";
@@ -154,8 +155,10 @@ const Index = ({ channels, stats, filters }) => {
     const confirmDelete = () => {
         if (!selectedChannel) return;
         const channel = selectedChannel;
-        setShowDeleteModal(false);
-        setSelectedChannel(null);
+        flushSync(() => {
+            setShowDeleteModal(false);
+            setSelectedChannel(null);
+        });
         setDeleting(true);
         router.delete(`/admin/channels/${channel.id}`, {
             preserveState: true,
@@ -174,8 +177,10 @@ const Index = ({ channels, stats, filters }) => {
     const confirmDisconnect = async () => {
         if (!selectedChannel) return;
         const channel = selectedChannel;
-        setShowDisconnectModal(false);
-        setSelectedChannel(null);
+        flushSync(() => {
+            setShowDisconnectModal(false);
+            setSelectedChannel(null);
+        });
         setDisconnecting(true);
         try {
             const res = await axios.post(`/admin/channels/${channel.id}/disconnect`);

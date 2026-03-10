@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -132,8 +133,10 @@ const Index = ({ campaigns, stats, channels, filters }) => {
     const confirmDelete = () => {
         if (!deleteTarget) return;
         const target = deleteTarget;
-        setShowDeleteModal(false);
-        setDeleteTarget(null);
+        flushSync(() => {
+            setShowDeleteModal(false);
+            setDeleteTarget(null);
+        });
         setDeleting(true);
         router.delete(`/admin/campaigns/${target.id}`, {
             preserveState: true,

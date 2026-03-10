@@ -109,8 +109,7 @@ class TemplateController extends Controller
     {
         $template->delete();
 
-        return redirect()->back()
-            ->with('success', 'Template deleted successfully.');
+        return redirect()->back();
     }
 
     public function submit(Request $request, Template $template): JsonResponse
