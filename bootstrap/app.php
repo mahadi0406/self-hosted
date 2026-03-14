@@ -22,10 +22,11 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleInertiaRequests::class,
         ]);
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
-            'xss' => \App\Http\Middleware\XSSProtection::class,
+            'role'          => \App\Http\Middleware\RoleMiddleware::class,
+            'xss'           => \App\Http\Middleware\XSSProtection::class,
             'security.headers' => \App\Http\Middleware\SecurityHeaders::class,
-            'setlocale' => \App\Http\Middleware\SetLocale::class,
+            'setlocale'     => \App\Http\Middleware\SetLocale::class,
+            'app.ready'     => \App\Http\Middleware\CheckLicense::class,
         ]);
 
         $middleware->redirectGuestsTo('/');

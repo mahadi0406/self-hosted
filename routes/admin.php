@@ -16,7 +16,7 @@ use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TemplateController;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth', 'role:admin', 'throttle:200,1', 'xss', 'security.headers'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin', 'app.ready', 'throttle:200,1', 'xss', 'security.headers'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
     // ── Channels ─────────────────────────────────────────────────────────────

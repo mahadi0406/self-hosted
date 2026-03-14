@@ -221,7 +221,7 @@ class LaravelInstaller {
             return;
         }
 
-        $licenseVerification = $this->verifyLicense($purchaseCode, $buyerEmail, 'PeerSwap');
+        $licenseVerification = $this->verifyLicense($purchaseCode, $buyerEmail, 'BlastBot');
         if (!$licenseVerification['success']) {
             $this->errors[] = $licenseVerification['message'];
             return;
@@ -232,7 +232,7 @@ class LaravelInstaller {
         }
 
         try {
-            $this->createEnvFile($appName, $appUrl, $purchaseCode);
+            $this->createEnvFile($appName, $appUrl, $purchaseCode, $this->cleanDomain($appUrl));
 
             $_SESSION['admin_config'] = [
                 'email' => $adminEmail,
@@ -240,7 +240,8 @@ class LaravelInstaller {
             ];
 
             $_SESSION['license_verified'] = true;
-            $_SESSION['purchase_code'] = $purchaseCode;
+            $_SESSION['purchase_code']    = $purchaseCode;
+            $_SESSION['licensed_domain']  = $this->cleanDomain($appUrl);
 
             header('Location: install.php?step=4');
             exit;
@@ -327,7 +328,7 @@ class LaravelInstaller {
         }
     }
 
-    private function createEnvFile($appName, $appUrl): void
+    private function createEnvFile($appName, $appUrl, $purchaseCode, $licensedDomain): void
     {
         $dbConfig = $_SESSION['db_config'];
         $appKey = 'base64:' . base64_encode(random_bytes(32));
@@ -360,6 +361,10 @@ QUEUE_CONNECTION=database
 SESSION_DRIVER=file
 SESSION_LIFETIME=120
 APP_CURRENT_VERSION=1.0.0
+
+PURCHASE_CODE={$purchaseCode}
+LICENSED_DOMAIN={$licensedDomain}
+LICENSE_PRODUCT=BlastBot
 
 MEMCACHED_HOST=127.0.0.1
 REDIS_HOST=127.0.0.1
@@ -425,7 +430,10 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
             }
 
             chdir($currentDir);
-            $this->createAdminUser();
+            $this->createAdminUser(
+                $_SESSION['purchase_code'] ?? '',
+                $_SESSION['licensed_domain'] ?? ''
+            );
             file_put_contents($this->laravelRoot . '/storage/installed', date('Y-m-d H:i:s'));
             header('Location: install.php?step=5');
             exit;
@@ -441,7 +449,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
         $this->renderTemplate('installation', compact('errors'));
     }
 
-    private function createAdminUser(): void
+    private function createAdminUser(string $purchaseCode = '', string $licensedDomain = ''): void
     {
         $adminConfig = $_SESSION['admin_config'];
 
@@ -507,8 +515,36 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
 
             echo "Admin user created successfully with UID: " . $uid;
 
+            // Write application integrity signature
+            $this->writeAppSignature($pdo, $purchaseCode, $licensedDomain);
+
         } catch(Exception $e) {
             throw new Exception("Failed to create admin user: " . $e->getMessage());
+        }
+    }
+
+    private function writeAppSignature(\PDO $pdo, string $purchaseCode, string $licensedDomain): void
+    {
+        try {
+            $secret  = 'kli_7f3c9a1b2d4e8f0a5c6b9d2e1f4a7c8b';
+            $payload = implode('|', [
+                $purchaseCode,
+                strtolower(trim($licensedDomain)),
+                gethostname(),
+                $secret,
+            ]);
+            $sig  = hash_hmac('sha256', $payload, $secret);
+            $now  = date('Y-m-d H:i:s');
+
+            $stmt = $pdo->prepare("
+                INSERT INTO settings (`key`, `value`, `type`, `group`, `label`, `description`, `created_at`, `updated_at`)
+                VALUES (?, ?, 'text', 'system', 'App Integrity', 'Core application configuration hash', ?, ?)
+                ON DUPLICATE KEY UPDATE `value` = VALUES(`value`), `updated_at` = VALUES(`updated_at`)
+            ");
+            $stmt->execute(['app_integrity_hash', $sig, $now, $now]);
+        } catch (\Exception $e) {
+            // Non-fatal — log and continue
+            error_log('Could not write app signature: ' . $e->getMessage());
         }
     }
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerSwap Installer - Environment Setup</title>
+    <title>BlastBot Installer - Environment Setup</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -193,7 +193,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>PeerSwap Installer</h1>
+        <h1>BlastBot Installer</h1>
         <p>Configure your application settings</p>
     </div>
 
@@ -257,7 +257,7 @@
             <div class="form-group">
                 <label for="app_name">Application Name</label>
                 <input type="text" id="app_name" name="app_name"
-                       value="<?php echo htmlspecialchars($_POST['app_name'] ?? 'PeerSwap'); ?>"
+                       value="<?php echo htmlspecialchars($_POST['app_name'] ?? 'BlastBot'); ?>"
                        placeholder="My Laravel App" required>
                 <small>The name of your application</small>
             </div>

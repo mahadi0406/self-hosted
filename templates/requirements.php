@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PeerSwap Installer - Requirements</title>
+    <title>BlastBot Installer - Requirements</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -146,8 +146,8 @@
 <body>
 <div class="container">
     <div class="header">
-        <h1>PeerSwap Installer</h1>
-        <p>Welcome to the PeerSwap installation wizard</p>
+        <h1>BlastBot Installer</h1>
+        <p>Welcome to the BlastBot installation wizard</p>
     </div>
 
     <div class="steps">
