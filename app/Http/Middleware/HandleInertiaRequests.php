@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Concerns\UploadedFile;
 use App\Models\Setting;
+use App\Services\DefaultImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -19,8 +20,8 @@ class HandleInertiaRequests extends Middleware
     {
         $user = $request->user();
         $this->loadSettings();
-
-        $siteLogo = $this->getSetting('site_logo');
+        $logo    = $this->getSetting('site_logo', '');
+        $favicon = $this->getSetting('site_favicon', '');
 
         $loginFeatures = $this->getSetting('login_features');
         $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
@@ -44,6 +45,9 @@ class HandleInertiaRequests extends Middleware
                     'avatar_url' => $user->avatar ? asset('assets/files/'.$user->avatar) : null,
                 ] : null,
             ],
+
+            'logoUrl'        => $logo    ? $this->fullPath($logo)    : DefaultImageService::getImageUrl(null, 'logo',    200, 80),
+            'faviconUrl'     => $favicon ? $this->fullPath($favicon) : DefaultImageService::getImageUrl(null, 'favicon', 16,  16),
 
             'currencySymbol' => $this->getSetting('currency_symbol', '$'),
             'currencyName' => $this->getSetting('default_currency', 'USD'),
