@@ -11,15 +11,15 @@ class DatabaseSeeder extends Seeder
         $this->call([
             SettingsSeeder::class,
             AdminSeeder::class,
-            ChannelSeeder::class,
-            ContactListSeeder::class,
-            ContactSeeder::class,
-            TemplateSeeder::class,
-            CampaignSeeder::class,
-            DripSequenceSeeder::class,
-            InboxMessageSeeder::class,
-            CampaignAnalyticSeeder::class,
-            AiLogSeeder::class,
+//            ChannelSeeder::class,
+//            ContactListSeeder::class,
+//            ContactSeeder::class,
+//            TemplateSeeder::class,
+//            CampaignSeeder::class,
+//            DripSequenceSeeder::class,
+//            InboxMessageSeeder::class,
+//            CampaignAnalyticSeeder::class,
+//            AiLogSeeder::class,
         ]);
     }
 }

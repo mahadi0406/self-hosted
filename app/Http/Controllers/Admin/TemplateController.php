@@ -75,7 +75,6 @@ class TemplateController extends Controller
     {
         return Inertia::render('Admin/Templates/Create');
     }
-
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -98,11 +97,10 @@ class TemplateController extends Controller
             'footer'   => $request->footer,
             'buttons'  => $request->buttons ?? [],
             'source'   => 'manual',
-            'status'   => 'draft',
+            'status'   => $request->channel === 'telegram' ? 'approved' : 'draft',
         ]);
 
-        return redirect()->route('admin.templates.index')
-            ->with('success', 'Template created successfully.');
+        return redirect()->route('admin.templates.index')->with('success', 'Template created successfully.');
     }
 
     public function destroy(Template $template): RedirectResponse
