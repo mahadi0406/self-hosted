@@ -49,15 +49,22 @@ const TextField = ({ setting, value, onChange }) => (
     </FieldWrapper>
 );
 
-const TextareaField = ({ setting, value, onChange }) => (
+const TextareaField = ({ setting, value, onChange, rows = 3 }) => (
     <FieldWrapper setting={setting}>
         <textarea
             value={value ?? ''}
             onChange={e => onChange(setting.key, e.target.value)}
-            rows={3}
-            className={inputCls}
+            rows={rows}
+            className={`${inputCls} resize-y`}
         />
     </FieldWrapper>
+);
+
+const SectionHeader = ({ title, description }) => (
+    <div className="pt-5 pb-3 -mx-5 px-5 border-t border-zinc-100 dark:border-zinc-800">
+        <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-300 uppercase tracking-wider">{title}</p>
+        {description && <p className="text-xs text-zinc-400 mt-0.5">{description}</p>}
+    </div>
 );
 
 const NumberField = ({ setting, value, onChange }) => (
@@ -233,12 +240,21 @@ const renderField = (setting, values, onChange, onFileChange) => {
         case 'password': return <PasswordField key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'number':   return <NumberField   key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'file':     return <FileField     key={setting.key} setting={setting} value={value} onChange={onChange} onFileChange={onFileChange} />;
-        case 'textarea': return <TextareaField key={setting.key} setting={setting} value={value} onChange={onChange} />;
+        case 'textarea': return <TextareaField key={setting.key} setting={setting} value={value} onChange={onChange} rows={setting.key === 'ai_auto_reply_context' ? 5 : 3} />;
         case 'json':     return <JsonFeaturesField key={setting.key} setting={setting} value={value} onChange={onChange} />;
         default:         return <TextField     key={setting.key} setting={setting} value={value} onChange={onChange} />;
     }
 };
 
+
+const SECTION_BREAKS = {
+    ai: {
+        ai_auto_reply_enabled: {
+            title: 'AI Auto-Reply',
+            description: 'Automatically respond to inbound messages using AI',
+        },
+    },
+};
 
 const TabPanel = ({ group, groupSettings }) => {
     const [values, setValues]   = useState({});
@@ -309,9 +325,14 @@ const TabPanel = ({ group, groupSettings }) => {
                     </h2>
                 </div>
                 <div className="px-5">
-                    {settingsArray.map(setting =>
-                        renderField(setting, values, onChange, onFileChange)
-                    )}
+                    {settingsArray.map(setting => (
+                        <React.Fragment key={setting.key}>
+                            {SECTION_BREAKS[group]?.[setting.key] && (
+                                <SectionHeader {...SECTION_BREAKS[group][setting.key]} />
+                            )}
+                            {renderField(setting, values, onChange, onFileChange)}
+                        </React.Fragment>
+                    ))}
                 </div>
                 <div className="px-5 py-4 border-t border-zinc-100 dark:border-zinc-800 flex justify-end">
                     <button

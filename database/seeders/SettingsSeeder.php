@@ -33,10 +33,12 @@ class SettingsSeeder extends Seeder
         ];
 
         $aiSettings = [
-            ['key' => 'ai_provider',   'value' => 'claude',                      'type' => 'text',     'group' => 'ai', 'label' => 'AI Provider',    'description' => 'AI provider: claude or openai'],
-            ['key' => 'ai_api_key',    'value' => '',                            'type' => 'password', 'group' => 'ai', 'label' => 'AI API Key',     'description' => 'Your Claude / OpenAI API key'],
-            ['key' => 'ai_model',      'value' => 'claude-sonnet-4-20250514',    'type' => 'text',     'group' => 'ai', 'label' => 'AI Model',       'description' => 'AI model to use for all features'],
-            ['key' => 'ai_enabled',    'value' => '1',                           'type' => 'boolean',  'group' => 'ai', 'label' => 'Enable AI',      'description' => 'Enable or disable all AI features'],
+            ['key' => 'ai_provider',            'value' => 'claude',                      'type' => 'text',     'group' => 'ai', 'label' => 'AI Provider',            'description' => 'AI provider: claude or openai'],
+            ['key' => 'ai_api_key',             'value' => '',                            'type' => 'password', 'group' => 'ai', 'label' => 'AI API Key',             'description' => 'Your Claude / OpenAI API key'],
+            ['key' => 'ai_model',               'value' => 'claude-sonnet-4-20250514',    'type' => 'text',     'group' => 'ai', 'label' => 'AI Model',               'description' => 'AI model to use for all features'],
+            ['key' => 'ai_enabled',             'value' => '1',                           'type' => 'boolean',  'group' => 'ai', 'label' => 'Enable AI',              'description' => 'Enable or disable all AI features'],
+            ['key' => 'ai_auto_reply_enabled',  'value' => '0',                           'type' => 'boolean',  'group' => 'ai', 'label' => 'Enable AI Auto-Reply',   'description' => 'Automatically reply to inbound messages using AI'],
+            ['key' => 'ai_auto_reply_context',  'value' => '',                            'type' => 'textarea', 'group' => 'ai', 'label' => 'AI Auto-Reply Context',  'description' => 'Business context for AI auto-replies (e.g. what your business does, tone, instructions)'],
         ];
 
         $whatsappSettings = [
