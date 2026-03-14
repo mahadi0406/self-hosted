@@ -40,7 +40,6 @@ class AppServiceProvider extends ServiceProvider
      */
     private function validateCoreConfiguration(): void
     {
-        // Skip during installation, testing, or when running migrations
         if (App::runningInConsole() || App::environment('testing')) {
             return;
         }
@@ -55,7 +54,6 @@ class AppServiceProvider extends ServiceProvider
                 abort(402, 'Application configuration is invalid. Please contact support.');
             }
         } catch (\Exception) {
-            // DB not ready or other boot-time exception — allow through
         }
     }
 }
