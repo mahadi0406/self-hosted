@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -105,25 +104,51 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
 
     const confirmEnroll = () => {
         if (!enrollTarget || selectedLists.length === 0) return;
-        const target = enrollTarget;
-        const lists  = selectedLists;
-        flushSync(() => {
-            setShowEnrollModal(false);
-            setEnrollTarget(null);
-            setSelectedLists([]);
-        });
+
+        const targetId = enrollTarget.id;
+        const targetName = enrollTarget.name;
+        const lists = [...selectedLists];
+
         setEnrolling(true);
+
         router.post(
-            `/admin/drip-sequences/${target.id}/enroll`,
+            `/admin/drip-sequences/${targetId}/enroll`,
             { list_ids: lists },
             {
-                preserveState:  true,
                 preserveScroll: true,
-                onSuccess: () => toast.success('Contacts enrolled successfully!'),
-                onError:   () => toast.error('Failed to enroll contacts.'),
-                onFinish:  () => setEnrolling(false),
+                onSuccess: () => {
+                    toast.success(`Contacts enrolled into "${targetName}"!`);
+                },
+                onError: () => toast.error('Failed to enroll contacts.'),
+                onFinish: () => {
+                    setEnrolling(false);
+                    setShowEnrollModal(false);
+                    setEnrollTarget(null);
+                    setSelectedLists([]);
+                },
             }
         );
+    };
+
+    const confirmDelete = () => {
+        if (!deleteTarget) return;
+
+        const targetId = deleteTarget.id;
+        const targetName = deleteTarget.name;
+
+        setDeleting(true);
+        router.delete(`/admin/drip-sequences/${targetId}`, {
+            preserveScroll: true,
+            onSuccess: () => {
+                toast.success('Drip sequence deleted!');
+            },
+            onError: () => toast.error('Failed to delete drip sequence.'),
+            onFinish: () => {
+                setDeleting(false);
+                setShowDeleteModal(false);
+                setDeleteTarget(null);
+            },
+        });
     };
 
     const enrolledIds    = enrollTarget?.enrolled_list_ids ?? [];
@@ -147,23 +172,6 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
     const openDeleteModal = (seq) => {
         setDeleteTarget(seq);
         setShowDeleteModal(true);
-    };
-
-    const confirmDelete = () => {
-        if (!deleteTarget) return;
-        const target = deleteTarget;
-        flushSync(() => {
-            setShowDeleteModal(false);
-            setDeleteTarget(null);
-        });
-        setDeleting(true);
-        router.delete(`/admin/drip-sequences/${target.id}`, {
-            preserveState: true,
-            preserveScroll: true,
-            onSuccess: () => toast.success('Drip sequence deleted!'),
-            onError:   () => toast.error('Failed to delete drip sequence.'),
-            onFinish:  () => setDeleting(false),
-        });
     };
 
     return (

@@ -148,10 +148,10 @@ class DripSequenceController extends Controller
 
         $listIds = array_map('intval', (array) $request->list_ids);
         $contactIds = Contact::whereIn('id', function ($q) use ($listIds) {
-                $q->select('contact_id')
-                  ->from('contact_list_contact')
-                  ->whereIn('contact_list_id', $listIds);
-            })
+            $q->select('contact_id')
+                ->from('contact_list_contact')
+                ->whereIn('contact_list_id', $listIds);
+        })
             ->where('status', 'active')
             ->pluck('id');
 
@@ -175,7 +175,7 @@ class DripSequenceController extends Controller
             $enrolled++;
         }
 
-        return redirect()->back()
+        return redirect()->route('admin.drip-sequences.index')
             ->with('success', "{$enrolled} contact(s) enrolled into \"{$dripSequence->name}\".");
     }
 
