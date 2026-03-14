@@ -72,8 +72,8 @@ class DashboardController extends Controller
             ->map(fn($c) => [
                 'id'               => $c->id,
                 'name'             => $c->name,
-                'channel_name'     => $c->channel->name,
-                'channel_type'     => $c->channel->type,
+                'channel_name'     => $c->channel?->name ?? '—',
+                'channel_type'     => $c->channel?->type ?? 'unknown',
                 'status'           => $c->status,
                 'total_recipients' => $c->total_recipients,
                 'created_at'       => $c->created_at->format('Y-m-d H:i'),
@@ -86,8 +86,8 @@ class DashboardController extends Controller
             ->get()
             ->map(fn($m) => [
                 'id'           => $m->id,
-                'contact_name' => $m->contact->name,
-                'channel_type' => $m->channel->type,
+                'contact_name' => $m->contact?->name ?? '—',
+                'channel_type' => $m->channel?->type ?? 'unknown',
                 'body'         => $m->body,
                 'ai_intent'    => $m->ai_intent,
                 'is_read'      => $m->is_read,
