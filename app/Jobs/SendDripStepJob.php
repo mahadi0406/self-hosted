@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Models\DripStep;
 use App\Models\DripSequence;
 use App\Models\Contact;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -18,14 +19,16 @@ class SendDripStepJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries   = 3;
+    public int $tries;
     public int $timeout = 60;
 
     public function __construct(
         public DripStep     $step,
         public Contact      $contact,
         public DripSequence $sequence,
-    ) {}
+    ) {
+        $this->tries = (int) Setting::get('campaign_retry_limit', 3);
+    }
 
     public function handle(): void
     {
@@ -63,8 +66,9 @@ class SendDripStepJob implements ShouldQueue
         if (!$token || !$phoneId) return false;
 
         $phone    = preg_replace('/[^0-9]/', '', $contact->phone);
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($token)->timeout(10)
-            ->post("https://graph.facebook.com/v19.0/{$phoneId}/messages", [
+            ->post("https://graph.facebook.com/{$apiVersion}/{$phoneId}/messages", [
                 'messaging_product' => 'whatsapp',
                 'recipient_type'    => 'individual',
                 'to'                => $phone,

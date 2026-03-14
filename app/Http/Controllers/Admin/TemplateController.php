@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Channel;
 use App\Models\DripStep;
+use App\Models\Setting;
 use App\Models\Template;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
@@ -202,8 +203,9 @@ class TemplateController extends Controller
 
         Log::info('Template payload: ' . json_encode($payload));
 
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($token)
-            ->post("https://graph.facebook.com/v19.0/{$wabaId}/message_templates", $payload);
+            ->post("https://graph.facebook.com/{$apiVersion}/{$wabaId}/message_templates", $payload);
 
         Log::info('Template submit response: ' . $response->body());
 
@@ -263,8 +265,9 @@ class TemplateController extends Controller
 
         $templateName = strtolower(str_replace([' ', '-'], '_', $template->name));
 
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($token)
-            ->get("https://graph.facebook.com/v19.0/{$wabaId}/message_templates", [
+            ->get("https://graph.facebook.com/{$apiVersion}/{$wabaId}/message_templates", [
                 'name'   => $templateName,
                 'fields' => 'id,status,rejection_reason',
             ]);

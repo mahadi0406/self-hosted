@@ -29,6 +29,10 @@ class WhatsappWebhookController extends Controller
 
     public function receive(Request $request): Response
     {
+        if (! Setting::get('whatsapp_enabled', true)) {
+            return response('OK', 200);
+        }
+
         $payload = $request->all();
 
         foreach ($payload['entry'] ?? [] as $entry) {

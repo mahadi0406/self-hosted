@@ -9,6 +9,7 @@ use App\Models\CampaignMessage;
 use App\Models\Channel;
 use App\Models\DripEnrollment;
 use App\Models\DripStep;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
@@ -145,8 +146,9 @@ class ChannelController extends Controller
             return response()->json(['success' => false, 'message' => 'Missing credentials.'], 422);
         }
 
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($accessToken)
-            ->get("https://graph.facebook.com/v19.0/{$phoneId}");
+            ->get("https://graph.facebook.com/{$apiVersion}/{$phoneId}");
 
         if ($response->successful()) {
             $data = $response->json();

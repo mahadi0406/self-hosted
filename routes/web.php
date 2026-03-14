@@ -6,6 +6,14 @@ use App\Http\Controllers\Webhook\WhatsappWebhookController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
+Route::middleware(['security.headers'])->group(function () {
+    Route::get('/default-image/{type?}/{width?}/{height?}', function($type = 'default', $width = 400, $height = 400) {
+        return App\Services\DefaultImageService::generate($type, $width, $height);
+    })->name('default.image');
+});
+
+
+
 Route::get('/', function () {
     return Auth::check()
         ? redirect('/admin/dashboard')

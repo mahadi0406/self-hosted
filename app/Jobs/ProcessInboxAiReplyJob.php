@@ -232,7 +232,7 @@ PROMPT;
 
         $response = Http::withToken($token)
             ->timeout(10)
-            ->post("https://graph.facebook.com/v19.0/{$phoneId}/messages", [
+            ->post("https://graph.facebook.com/" . Setting::get('whatsapp_api_version', 'v19.0') . "/{$phoneId}/messages", [
                 'messaging_product' => 'whatsapp',
                 'recipient_type'    => 'individual',
                 'to'                => $phone,

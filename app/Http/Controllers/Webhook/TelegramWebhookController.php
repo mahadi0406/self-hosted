@@ -7,6 +7,7 @@ use App\Jobs\ProcessInboxAiReplyJob;
 use App\Models\Channel;
 use App\Models\Contact;
 use App\Models\InboxMessage;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -14,6 +15,10 @@ class TelegramWebhookController extends Controller
 {
     public function receive(Request $request, Channel $channel): Response
     {
+        if (! Setting::get('telegram_enabled', true)) {
+            return response('OK', 200);
+        }
+
         $payload = $request->all();
         $message = $payload['message'] ?? null;
         if (!$message) return response('OK', 200);

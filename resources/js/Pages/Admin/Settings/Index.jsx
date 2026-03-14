@@ -254,6 +254,28 @@ const SECTION_BREAKS = {
             description: 'Automatically respond to inbound messages using AI',
         },
     },
+    whatsapp: {
+        whatsapp_verify_token: {
+            title: 'Webhook',
+            description: 'Configure your WhatsApp webhook verification',
+        },
+    },
+    telegram: {
+        telegram_webhook_mode: {
+            title: 'Webhook',
+            description: 'Configure how Telegram delivers incoming messages',
+        },
+    },
+    login_page: {
+        login_features: {
+            title: 'Feature Cards',
+            description: 'Highlight cards shown on the login page',
+        },
+        login_demo_enabled: {
+            title: 'Demo Credentials',
+            description: 'Show a demo login box for easy onboarding',
+        },
+    },
 };
 
 const TabPanel = ({ group, groupSettings }) => {

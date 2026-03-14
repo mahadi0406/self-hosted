@@ -48,11 +48,9 @@ class HandleInertiaRequests extends Middleware
 
             'logoUrl'        => $logo    ? $this->fullPath($logo)    : DefaultImageService::getImageUrl(null, 'logo',    200, 80),
             'faviconUrl'     => $favicon ? $this->fullPath($favicon) : DefaultImageService::getImageUrl(null, 'favicon', 16,  16),
-
             'currencySymbol' => $this->getSetting('currency_symbol', '$'),
             'currencyName' => $this->getSetting('default_currency', 'USD'),
             'appName' => $this->getSetting('site_name', 'BlastBot'),
-            'siteLogo' => $siteLogo ? asset('assets/files/' . $siteLogo) : null,
             'primaryColor' => $this->getSetting('primary_color', '#1f2937'),
 
             'loginPage' => [

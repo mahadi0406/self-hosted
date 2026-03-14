@@ -42,20 +42,20 @@ class SettingsSeeder extends Seeder
         ];
 
         $whatsappSettings = [
-            ['key' => 'whatsapp_api_version', 'value' => 'v19.0', 'type' => 'text',     'group' => 'whatsapp', 'label' => 'WhatsApp API Version', 'description' => 'Meta Cloud API version'],
-            ['key' => 'whatsapp_verify_token','value' => '',       'type' => 'text',     'group' => 'whatsapp', 'label' => 'Webhook Verify Token',  'description' => 'Token used to verify WhatsApp webhook'],
             ['key' => 'whatsapp_enabled',     'value' => '1',      'type' => 'boolean',  'group' => 'whatsapp', 'label' => 'Enable WhatsApp',       'description' => 'Enable WhatsApp channel'],
+            ['key' => 'whatsapp_api_version', 'value' => 'v19.0',  'type' => 'text',     'group' => 'whatsapp', 'label' => 'API Version',           'description' => 'Meta Cloud API version (e.g. v19.0)'],
+            ['key' => 'whatsapp_verify_token','value' => '',        'type' => 'password', 'group' => 'whatsapp', 'label' => 'Webhook Verify Token',  'description' => 'Secret token used to verify your WhatsApp webhook'],
         ];
 
         $telegramSettings = [
-            ['key' => 'telegram_enabled',      'value' => '1',  'type' => 'boolean', 'group' => 'telegram', 'label' => 'Enable Telegram',       'description' => 'Enable Telegram channel'],
-            ['key' => 'telegram_webhook_mode', 'value' => '1',  'type' => 'boolean', 'group' => 'telegram', 'label' => 'Webhook Mode',          'description' => 'Use webhook instead of polling'],
+            ['key' => 'telegram_enabled',      'value' => '1',  'type' => 'boolean', 'group' => 'telegram', 'label' => 'Enable Telegram',  'description' => 'Enable Telegram channel'],
+            ['key' => 'telegram_webhook_mode', 'value' => '1',  'type' => 'boolean', 'group' => 'telegram', 'label' => 'Webhook Mode',     'description' => 'Use webhook instead of polling for incoming messages'],
         ];
 
         $campaignSettings = [
-            ['key' => 'campaign_batch_size',    'value' => '100', 'type' => 'number',  'group' => 'campaign', 'label' => 'Batch Size',          'description' => 'Messages sent per queue batch'],
-            ['key' => 'campaign_delay_seconds', 'value' => '1',   'type' => 'number',  'group' => 'campaign', 'label' => 'Delay Between Messages (s)', 'description' => 'Seconds delay between each message send'],
-            ['key' => 'campaign_retry_limit',   'value' => '3',   'type' => 'number',  'group' => 'campaign', 'label' => 'Retry Limit',         'description' => 'Max retries for failed messages'],
+            ['key' => 'campaign_batch_size',    'value' => '100', 'type' => 'number', 'group' => 'campaign', 'label' => 'Batch Size',                  'description' => 'Number of messages sent per queue batch'],
+            ['key' => 'campaign_delay_seconds', 'value' => '1',   'type' => 'number', 'group' => 'campaign', 'label' => 'Delay Between Messages (sec)', 'description' => 'Seconds to wait between each message send'],
+            ['key' => 'campaign_retry_limit',   'value' => '3',   'type' => 'number', 'group' => 'campaign', 'label' => 'Retry Limit',                  'description' => 'Max retries for failed message sends'],
         ];
 
         $allSettings = array_merge(

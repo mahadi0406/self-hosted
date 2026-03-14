@@ -18,10 +18,13 @@ class SendCampaignJob implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries   = 3;
+    public int $tries;
     public int $timeout = 3600;
 
-    public function __construct(public Campaign $campaign) {}
+    public function __construct(public Campaign $campaign)
+    {
+        $this->tries = (int) Setting::get('campaign_retry_limit', 3);
+    }
 
     public function handle(): void
     {
@@ -153,9 +156,10 @@ class SendCampaignJob implements ShouldQueue
             ],
         ];
 
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($token)
             ->timeout(10)
-            ->post("https://graph.facebook.com/v19.0/{$phoneId}/messages", $payload);
+            ->post("https://graph.facebook.com/{$apiVersion}/{$phoneId}/messages", $payload);
 
         Log::info("WhatsApp template to {$phone} → Status: {$response->status()} | Body: {$response->body()}");
 
@@ -175,9 +179,10 @@ class SendCampaignJob implements ShouldQueue
 
         $phone = preg_replace('/[^0-9]/', '', $contact->phone);
 
+        $apiVersion = Setting::get('whatsapp_api_version', 'v19.0');
         $response = Http::withToken($token)
             ->timeout(10)
-            ->post("https://graph.facebook.com/v19.0/{$phoneId}/messages", [
+            ->post("https://graph.facebook.com/{$apiVersion}/{$phoneId}/messages", [
                 'messaging_product' => 'whatsapp',
                 'recipient_type'    => 'individual',
                 'to'                => $phone,
