@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -132,18 +131,16 @@ const Index = ({ campaigns, stats, channels, filters }) => {
 
     const confirmDelete = () => {
         if (!deleteTarget) return;
-        const target = deleteTarget;
-        flushSync(() => {
-            setShowDeleteModal(false);
-            setDeleteTarget(null);
-        });
+        const targetId = deleteTarget.id;
+        const targetName = deleteTarget.name;
+        setShowDeleteModal(false);
+        setDeleteTarget(null);
         setDeleting(true);
-        router.delete(`/admin/campaigns/${target.id}`, {
-            preserveState: true,
+        router.delete(`/admin/campaigns/${targetId}`, {
             preserveScroll: true,
-            onSuccess: () => toast.success('Campaign deleted successfully!'),
-            onError:   () => toast.error('Failed to delete campaign.'),
-            onFinish:  () => setDeleting(false),
+            onSuccess: () => toast.success(`"${targetName}" deleted successfully!`),
+            onError: () => toast.error('Failed to delete campaign.'),
+            onFinish: () => setDeleting(false),
         });
     };
 

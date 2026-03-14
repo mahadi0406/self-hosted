@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router } from '@inertiajs/react';
 import { Link } from "@inertiajs/react";
@@ -154,18 +153,16 @@ const Index = ({ channels, stats, filters }) => {
 
     const confirmDelete = () => {
         if (!selectedChannel) return;
-        const channel = selectedChannel;
-        flushSync(() => {
-            setShowDeleteModal(false);
-            setSelectedChannel(null);
-        });
+        const channelId = selectedChannel.id;
+        const channelName = selectedChannel.name;
+        setShowDeleteModal(false);
+        setSelectedChannel(null);
         setDeleting(true);
-        router.delete(`/admin/channels/${channel.id}`, {
-            preserveState: true,
+        router.delete(`/admin/channels/${channelId}`, {
             preserveScroll: true,
-            onSuccess: () => toast.success('Channel deleted successfully!'),
-            onError:   () => toast.error('Failed to delete channel.'),
-            onFinish:  () => setDeleting(false),
+            onSuccess: () => toast.success(`"${channelName}" deleted successfully!`),
+            onError: () => toast.error('Failed to delete channel.'),
+            onFinish: () => setDeleting(false),
         });
     };
 
@@ -176,15 +173,14 @@ const Index = ({ channels, stats, filters }) => {
 
     const confirmDisconnect = async () => {
         if (!selectedChannel) return;
-        const channel = selectedChannel;
-        flushSync(() => {
-            setShowDisconnectModal(false);
-            setSelectedChannel(null);
-        });
+        const channelId = selectedChannel.id;
+        const channelName = selectedChannel.name;
+        setShowDisconnectModal(false);
+        setSelectedChannel(null);
         setDisconnecting(true);
         try {
-            const res = await axios.post(`/admin/channels/${channel.id}/disconnect`);
-            toast.success(res.data.message ?? 'Channel disconnected.');
+            const res = await axios.post(`/admin/channels/${channelId}/disconnect`);
+            toast.success(res.data.message ?? `"${channelName}" disconnected.`);
             router.reload({ only: ['channels', 'stats'] });
         } catch (_) {
             toast.error('Failed to disconnect channel.');

@@ -104,50 +104,37 @@ const Index = ({ sequences, stats, channels, lists, filters }) => {
 
     const confirmEnroll = () => {
         if (!enrollTarget || selectedLists.length === 0) return;
-
         const targetId = enrollTarget.id;
         const targetName = enrollTarget.name;
         const lists = [...selectedLists];
-
+        setShowEnrollModal(false);
+        setEnrollTarget(null);
+        setSelectedLists([]);
         setEnrolling(true);
-
         router.post(
             `/admin/drip-sequences/${targetId}/enroll`,
             { list_ids: lists },
             {
                 preserveScroll: true,
-                onSuccess: () => {
-                    toast.success(`Contacts enrolled into "${targetName}"!`);
-                },
-                onError: () => toast.error('Failed to enroll contacts.'),
-                onFinish: () => {
-                    setEnrolling(false);
-                    setShowEnrollModal(false);
-                    setEnrollTarget(null);
-                    setSelectedLists([]);
-                },
+                onSuccess: () => { toast.success(`Contacts enrolled into "${targetName}"!`); },
+                onError: () => { toast.error('Failed to enroll contacts.'); },
+                onFinish: () => { setEnrolling(false); },
             }
         );
     };
 
     const confirmDelete = () => {
         if (!deleteTarget) return;
-
         const targetId = deleteTarget.id;
         const targetName = deleteTarget.name;
-
+        setShowDeleteModal(false);
+        setDeleteTarget(null);
         setDeleting(true);
         router.delete(`/admin/drip-sequences/${targetId}`, {
             preserveScroll: true,
-            onSuccess: () => {
-                toast.success('Drip sequence deleted!');
-            },
-            onError: () => toast.error('Failed to delete drip sequence.'),
-            onFinish: () => {
-                setDeleting(false);
-                setShowDeleteModal(false);
-                setDeleteTarget(null);
-            },
+            onSuccess: () => { toast.success(`"${targetName}" deleted!`); },
+            onError: () => { toast.error('Failed to delete drip sequence.'); },
+            onFinish: () => { setDeleting(false); },
         });
     };
 

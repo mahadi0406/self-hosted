@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -128,18 +127,16 @@ const Index = ({ templates, stats, filters }) => {
 
     const confirmDelete = () => {
         if (!selectedTemplate) return;
-        const template = selectedTemplate;
-        flushSync(() => {
-            setShowDeleteModal(false);
-            setSelectedTemplate(null);
-        });
+        const templateId = selectedTemplate.id;
+        const templateName = selectedTemplate.name;
+        setShowDeleteModal(false);
+        setSelectedTemplate(null);
         setDeleting(true);
-        router.delete(`/admin/templates/${template.id}`, {
-            preserveState: true,
+        router.delete(`/admin/templates/${templateId}`, {
             preserveScroll: true,
-            onSuccess: () => toast.success('Template deleted successfully!'),
-            onError:   () => toast.error('Failed to delete template.'),
-            onFinish:  () => setDeleting(false),
+            onSuccess: () => toast.success(`"${templateName}" deleted successfully!`),
+            onError: () => toast.error('Failed to delete template.'),
+            onFinish: () => setDeleting(false),
         });
     };
 

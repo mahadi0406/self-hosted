@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { flushSync } from 'react-dom';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router, Link } from '@inertiajs/react';
 import { toast } from 'sonner';
@@ -119,18 +118,16 @@ const Index = ({ contacts, stats, filters, lists }) => {
 
     const confirmDelete = () => {
         if (!selectedContact) return;
-        const contact = selectedContact;
-        flushSync(() => {
-            setShowDeleteModal(false);
-            setSelectedContact(null);
-        });
+        const contactId = selectedContact.id;
+        const contactName = selectedContact.name;
+        setShowDeleteModal(false);
+        setSelectedContact(null);
         setDeleting(true);
-        router.delete(`/admin/contacts/${contact.id}`, {
-            preserveState: true,
+        router.delete(`/admin/contacts/${contactId}`, {
             preserveScroll: true,
-            onSuccess: () => toast.success('Contact deleted successfully!'),
-            onError:   () => toast.error('Failed to delete contact.'),
-            onFinish:  () => setDeleting(false),
+            onSuccess: () => toast.success(`"${contactName}" deleted successfully!`),
+            onError: () => toast.error('Failed to delete contact.'),
+            onFinish: () => setDeleting(false),
         });
     };
 
