@@ -1,6 +1,6 @@
 import React from 'react';
 import {Button} from '@/Components/UI/button';
-import {ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight} from 'lucide-react';
+import {ChevronLeft, ChevronRight} from 'lucide-react';
 
 export const Pagination = ({data, onPageChange, className = ''}) => {
     if (!data || data.last_page <= 1) {
@@ -43,6 +43,9 @@ export const Pagination = ({data, onPageChange, className = ''}) => {
         return pages;
     };
 
+    const isFirstPage = data.current_page === 1;
+    const isLastPage = data.current_page === data.last_page;
+
     return (
         <div className={`flex items-center justify-between px-5 py-4 border-t border-border/50 ${className}`}>
             <div className="text-sm text-muted-foreground">
@@ -55,18 +58,8 @@ export const Pagination = ({data, onPageChange, className = ''}) => {
                 <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => handlePageChange(data.first_page_url)}
-                    disabled={!data.prev_page_url}
-                    className="h-8 w-8"
-                >
-                    <ChevronsLeft className="h-4 w-4"/>
-                </Button>
-
-                <Button
-                    variant="outline"
-                    size="icon"
                     onClick={() => handlePageChange(data.prev_page_url)}
-                    disabled={!data.prev_page_url}
+                    disabled={isFirstPage}
                     className="h-8 w-8"
                 >
                     <ChevronLeft className="h-4 w-4"/>
@@ -107,20 +100,10 @@ export const Pagination = ({data, onPageChange, className = ''}) => {
                     variant="outline"
                     size="icon"
                     onClick={() => handlePageChange(data.next_page_url)}
-                    disabled={!data.next_page_url}
+                    disabled={isLastPage}
                     className="h-8 w-8"
                 >
                     <ChevronRight className="h-4 w-4"/>
-                </Button>
-
-                <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handlePageChange(data.last_page_url)}
-                    disabled={!data.next_page_url}
-                    className="h-8 w-8"
-                >
-                    <ChevronsRight className="h-4 w-4"/>
                 </Button>
             </div>
         </div>

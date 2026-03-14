@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import {
     Users, Plus, Trash2, Eye, Search,
     Smartphone, Send, Upload, User, Pencil,
-    Loader2, AlertTriangle,
+    Loader2, AlertTriangle, List,
 } from "lucide-react";
 import {
     Dialog,
@@ -34,11 +34,19 @@ const aiLabelColor = (label) => {
     return map[label] ?? 'text-zinc-600 bg-zinc-100 dark:bg-zinc-800';
 };
 
+const listColor = () => 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20';
+
 const Badge = ({ value, colorFn }) => value ? (
     <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium capitalize ${colorFn(value)}`}>
         {value.replace('_', ' ')}
     </span>
 ) : <span className="text-xs text-zinc-400">—</span>;
+
+const ListBadge = ({ list }) => (
+    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${listColor()}`}>
+        {list.name}
+    </span>
+);
 
 const getUserInitials = (name) =>
     name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) ?? '?';
@@ -80,10 +88,11 @@ const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description,
     </Dialog>
 );
 
-const Index = ({ contacts, stats, filters }) => {
+const Index = ({ contacts, stats, filters, lists }) => {
     const [search, setSearch]                     = useState(filters?.search || '');
     const [status, setStatus]                     = useState(filters?.status || 'all');
     const [aiLabel, setAiLabel]                   = useState(filters?.ai_label || 'all');
+    const [listId, setListId]                     = useState(filters?.list_id || 'all');
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal]   = useState(false);
     const [selectedContact, setSelectedContact]   = useState(null);
@@ -91,14 +100,15 @@ const Index = ({ contacts, stats, filters }) => {
 
     const handleSearch = () => {
         const params = {};
-        if (search)           params.search   = search;
-        if (status !== 'all') params.status   = status;
+        if (search)            params.search   = search;
+        if (status !== 'all')  params.status   = status;
         if (aiLabel !== 'all') params.ai_label = aiLabel;
+        if (listId !== 'all')  params.list_id  = listId;
         router.get('/admin/contacts', params, { preserveState: true, preserveScroll: true });
     };
 
     const handleReset = () => {
-        setSearch(''); setStatus('all'); setAiLabel('all');
+        setSearch(''); setStatus('all'); setAiLabel('all'); setListId('all');
         router.get('/admin/contacts', {}, { preserveState: true, preserveScroll: true });
     };
 
@@ -161,7 +171,7 @@ const Index = ({ contacts, stats, filters }) => {
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                         <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
                                 <input
@@ -197,6 +207,19 @@ const Index = ({ contacts, stats, filters }) => {
                                     <option value="hot">🔥 Hot</option>
                                     <option value="warm">🌡️ Warm</option>
                                     <option value="cold">❄️ Cold</option>
+                                </select>
+                            </div>
+                            <div className="space-y-1.5">
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">List</label>
+                                <select
+                                    value={listId}
+                                    onChange={e => setListId(e.target.value)}
+                                    className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
+                                >
+                                    <option value="all">All Lists</option>
+                                    {lists?.map(list => (
+                                        <option key={list.id} value={list.id}>{list.name}</option>
+                                    ))}
                                 </select>
                             </div>
                             <div className="flex items-end gap-2">
@@ -237,10 +260,10 @@ const Index = ({ contacts, stats, filters }) => {
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
                         <div className="overflow-x-auto">
-                            <table className="min-w-[800px] w-full text-sm">
+                            <table className="min-w-[900px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Contact', 'Phone', 'Telegram', 'Status', 'AI Label', 'Last Messaged', 'Actions'].map((h, i) => (
+                                    {['Contact', 'Phone', 'Telegram', 'Lists', 'Status', 'AI Label', 'Last Messaged', 'Actions'].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -262,15 +285,24 @@ const Index = ({ contacts, stats, filters }) => {
                                         <td className="px-4 py-3">
                                             {c.phone ? (
                                                 <span className="inline-flex items-center gap-1 text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
-                                                        <Smartphone className="w-3 h-3" /> {c.phone}
-                                                    </span>
+                                                    <Smartphone className="w-3 h-3" /> {c.phone}
+                                                </span>
                                             ) : <span className="text-xs text-zinc-400">—</span>}
                                         </td>
                                         <td className="px-4 py-3">
                                             {c.telegram_id ? (
                                                 <span className="inline-flex items-center gap-1 text-xs font-mono text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">
-                                                        <Send className="w-3 h-3" /> {c.telegram_id}
-                                                    </span>
+                                                    <Send className="w-3 h-3" /> {c.telegram_id}
+                                                </span>
+                                            ) : <span className="text-xs text-zinc-400">—</span>}
+                                        </td>
+                                        <td className="px-4 py-3">
+                                            {c.lists?.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1">
+                                                    {c.lists.map(list => (
+                                                        <ListBadge key={list.id} list={list} />
+                                                    ))}
+                                                </div>
                                             ) : <span className="text-xs text-zinc-400">—</span>}
                                         </td>
                                         <td className="px-4 py-3">
@@ -310,7 +342,7 @@ const Index = ({ contacts, stats, filters }) => {
                                     </tr>
                                 )) : (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-12 text-zinc-400 text-sm">
+                                        <td colSpan={8} className="text-center py-12 text-zinc-400 text-sm">
                                             <User className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
                                             No contacts found
                                         </td>
@@ -365,6 +397,17 @@ const Index = ({ contacts, stats, filters }) => {
                                     </div>
                                 ))}
                             </div>
+                            {/* Lists Section */}
+                            {selectedContact.lists?.length > 0 && (
+                                <div className="space-y-1">
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Lists</p>
+                                    <div className="flex flex-wrap gap-1">
+                                        {selectedContact.lists.map(list => (
+                                            <ListBadge key={list.id} list={list} />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
                             {selectedContact.tags?.length > 0 && (
                                 <div className="space-y-1">
                                     <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Tags</p>

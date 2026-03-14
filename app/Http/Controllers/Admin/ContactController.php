@@ -17,7 +17,7 @@ class ContactController extends Controller
     use UploadedFile;
     public function index(Request $request): Response
     {
-        $query = Contact::query();
+        $query = Contact::with('lists:id,name');
 
         if ($request->filled('search')) {
             $query->where(function ($q) use ($request) {
@@ -36,6 +36,12 @@ class ContactController extends Controller
             $query->where('ai_engagement_label', $request->ai_label);
         }
 
+        if ($request->filled('list_id') && $request->list_id !== 'all') {
+            $query->whereHas('lists', function ($q) use ($request) {
+                $q->where('contact_lists.id', $request->list_id);
+            });
+        }
+
         $contacts = $query->latest()->paginate(15)->withQueryString()
             ->through(fn($c) => [
                 'id'                  => $c->id,
@@ -50,6 +56,10 @@ class ContactController extends Controller
                 'ai_engagement_label' => $c->ai_engagement_label,
                 'last_messaged_at'    => $c->last_messaged_at?->format('Y-m-d H:i'),
                 'created_at'          => $c->created_at->format('Y-m-d H:i'),
+                'lists'               => $c->lists->map(fn($list) => [
+                    'id'   => $list->id,
+                    'name' => $list->name,
+                ])->toArray(),
             ]);
 
         $stats = [
@@ -65,7 +75,7 @@ class ContactController extends Controller
             'contacts' => $contacts,
             'stats'    => $stats,
             'lists'    => $lists,
-            'filters'  => $request->only(['search', 'status', 'ai_label']),
+            'filters'  => $request->only(['search', 'status', 'ai_label', 'list_id']),
         ]);
     }
 
