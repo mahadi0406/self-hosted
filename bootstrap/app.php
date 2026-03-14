@@ -30,7 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->redirectGuestsTo('/');
         $middleware->validateCsrfTokens(except: [
-            'webhook/*',
+            'webhooks/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
