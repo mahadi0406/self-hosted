@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Webhook;
 
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ProcessInboxAiReplyJob;
 use App\Models\Channel;
 use App\Models\Contact;
 use App\Models\InboxMessage;
@@ -48,7 +49,7 @@ class WhatsappWebhookController extends Controller
                         ['name'  => $value['contacts'][0]['profile']['name'] ?? 'Unknown', 'status' => 'active']
                     );
 
-                    InboxMessage::create([
+                    $inboxMessage = InboxMessage::create([
                         'contact_id'  => $contact->id,
                         'channel_id'  => $channel->id,
                         'direction'   => 'inbound',
@@ -57,6 +58,8 @@ class WhatsappWebhookController extends Controller
                         'is_read'     => false,
                         'received_at' => now(),
                     ]);
+
+                    ProcessInboxAiReplyJob::dispatch($inboxMessage);
                 }
             }
         }
