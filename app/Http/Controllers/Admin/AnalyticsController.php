@@ -40,9 +40,9 @@ class AnalyticsController extends Controller
             ->through(fn($a) => [
                 'id'               => $a->id,
                 'campaign_id'      => $a->campaign_id,
-                'campaign_name'    => $a->campaign->name,
-                'channel_type'     => $a->campaign->channel->type,
-                'channel_name'     => $a->campaign->channel->name,
+                'campaign_name'    => $a->campaign?->name,
+                'channel_type'     => $a->campaign?->channel?->type,
+                'channel_name'     => $a->campaign?->channel?->name,
                 'sent'             => $a->sent,
                 'delivered'        => $a->delivered,
                 'read'             => $a->read,
