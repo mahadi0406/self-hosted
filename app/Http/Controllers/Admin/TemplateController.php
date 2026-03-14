@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Channel;
+use App\Models\DripStep;
 use App\Models\Template;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\JsonResponse;
@@ -105,6 +106,10 @@ class TemplateController extends Controller
 
     public function destroy(Template $template): RedirectResponse
     {
+        // Null out template references — both columns are nullable in schema
+        $template->campaigns()->update(['template_id' => null]);
+        DripStep::where('template_id', $template->id)->update(['template_id' => null]);
+
         $template->delete();
 
         return redirect()->back();

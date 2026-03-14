@@ -3,7 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Campaign;
+use App\Models\CampaignAnalytic;
+use App\Models\CampaignMessage;
 use App\Models\Channel;
+use App\Models\DripEnrollment;
+use App\Models\DripStep;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Http;
@@ -214,6 +219,25 @@ class ChannelController extends Controller
 
     public function destroy(Channel $channel): RedirectResponse
     {
+        // Delete inbox messages (no SoftDeletes on InboxMessage)
+        $channel->inboxMessages()->delete();
+
+        // Delete campaign messages/analytics, then soft-delete campaigns
+        $campaignIds = $channel->campaigns()->pluck('id');
+        if ($campaignIds->isNotEmpty()) {
+            CampaignMessage::whereIn('campaign_id', $campaignIds)->delete();
+            CampaignAnalytic::whereIn('campaign_id', $campaignIds)->delete();
+            Campaign::whereIn('id', $campaignIds)->delete();
+        }
+
+        // Delete drip enrollments/steps, then soft-delete sequences
+        $seqIds = $channel->dripSequences()->pluck('id');
+        if ($seqIds->isNotEmpty()) {
+            DripEnrollment::whereIn('drip_sequence_id', $seqIds)->delete();
+            DripStep::whereIn('drip_sequence_id', $seqIds)->delete();
+            $channel->dripSequences()->delete();
+        }
+
         $channel->delete();
         return redirect()->back()->with('success', 'Channel deleted successfully.');
     }

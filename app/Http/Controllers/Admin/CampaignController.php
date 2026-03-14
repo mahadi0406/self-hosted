@@ -40,8 +40,8 @@ class CampaignController extends Controller
             ->through(fn($c) => [
                 'id'               => $c->id,
                 'name'             => $c->name,
-                'channel_name'     => $c->channel->name,
-                'channel_type'     => $c->channel->type,
+                'channel_name'     => $c->channel?->name ?? '—',
+                'channel_type'     => $c->channel?->type ?? 'unknown',
                 'type'             => $c->type,
                 'status'           => $c->status,
                 'total_recipients' => $c->total_recipients,
@@ -136,6 +136,8 @@ class CampaignController extends Controller
 
     public function destroy(Campaign $campaign): RedirectResponse
     {
+        $campaign->messages()->delete();
+        $campaign->analytics()->delete();
         $campaign->delete();
         return redirect()->back();
     }

@@ -63,6 +63,9 @@ class ContactListController extends Controller
 
     public function destroy(ContactList $contactList): RedirectResponse
     {
+        // Detach all contacts from pivot table (contacts themselves are kept)
+        $contactList->contacts()->detach();
+
         $contactList->delete();
 
         return redirect()->back()

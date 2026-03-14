@@ -53,8 +53,8 @@ class DripSequenceController extends Controller
             'id'                 => $s->id,
             'name'               => $s->name,
             'description'        => $s->description,
-            'channel_name'       => $s->channel->name,
-            'channel_type'       => $s->channel->type,
+            'channel_name'       => $s->channel?->name ?? '—',
+            'channel_type'       => $s->channel?->type ?? 'unknown',
             'status'             => $s->status,
             'total_steps'        => $s->total_steps,
             'enrollments_count'  => $s->enrollments_count,
@@ -181,6 +181,8 @@ class DripSequenceController extends Controller
 
     public function destroy(DripSequence $dripSequence): RedirectResponse
     {
+        $dripSequence->enrollments()->delete();
+        $dripSequence->steps()->delete();
         $dripSequence->delete();
 
         return redirect()->back()

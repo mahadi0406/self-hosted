@@ -229,6 +229,10 @@ class ContactController extends Controller
     {
         $listIds = $contact->lists()->pluck('contact_lists.id')->toArray();
 
+        // Clean up relationships before soft-delete
+        $contact->lists()->detach();
+        $contact->dripEnrollments()->delete();
+
         $contact->delete();
 
         if (!empty($listIds)) {
