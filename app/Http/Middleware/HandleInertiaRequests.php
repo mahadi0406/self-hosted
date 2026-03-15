@@ -24,7 +24,9 @@ class HandleInertiaRequests extends Middleware
         $favicon = $this->getSetting('site_favicon', '');
 
         $loginFeatures = $this->getSetting('login_features');
-        $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
+        $features = is_array($loginFeatures)
+            ? $loginFeatures
+            : (is_string($loginFeatures) && $loginFeatures ? json_decode($loginFeatures, true) ?? [] : []);
 
         $langData = $this->loadLanguageData($request);
 
