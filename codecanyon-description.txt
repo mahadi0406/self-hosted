@@ -1,16 +1,12 @@
-<blockquote>
-<strong>Alert:</strong> We are not responsible for any issues caused by using nulled versions of this software. Such versions may contain malicious code, backdoors, or spam links, risking fund loss, security breaches, and lack of updates or bug fixes. Always use the official version to ensure safety and reliability.
-</blockquote>
-
 <p><strong>Platform Core Features:</strong></p>
 
-<p>📲 <strong>WhatsApp Broadcasting</strong> — Send bulk campaigns via the official WhatsApp Business API with approved message templates and real-time delivery tracking.</p>
+<p><strong>WhatsApp Broadcasting</strong> — Send bulk campaigns via the official WhatsApp Business API with approved message templates and real-time delivery tracking.</p>
 
-<p>✈️ <strong>Telegram Broadcasting</strong> — Broadcast messages to unlimited Telegram contacts through your own bot with Markdown formatting support.</p>
+<p><strong>Telegram Broadcasting</strong> — Broadcast messages to unlimited Telegram contacts through your own bot with Markdown formatting support.</p>
 
-<p>🔁 <strong>Drip Sequences</strong> — Automate multi-step message sequences with custom day and hour delays to nurture leads on autopilot.</p>
+<p><strong>Drip Sequences</strong> — Automate multi-step message sequences with custom day and hour delays to nurture leads on autopilot.</p>
 
-<p>🤖 <strong>AI Message Tools</strong> — Generate high-converting message variants and full campaign plans using Claude AI (Anthropic) in seconds.</p>
+<p><strong>AI Message Tools</strong> — Generate high-converting message variants and full campaign plans using Claude AI (Anthropic) in seconds.</p>
 
 <p><strong>Current Version: 1.0.0</strong></p>
 

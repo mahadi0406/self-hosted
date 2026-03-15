@@ -6,7 +6,7 @@ OPTION A (Recommended):
 BlastBot – WhatsApp & Telegram Broadcast Platform with AI Writer, Drip Sequences & Smart Inbox
 
 OPTION B:
-BlastBot – AI-Powered WhatsApp & Telegram Bulk Messaging Platform with Drip Automation & Inbox
+BlastBot – AI-Powered Telegram & WhatsApp Bulk Messaging Platform with Drip Automation & Inbox
 
 OPTION C (shorter):
 BlastBot – WhatsApp & Telegram Marketing Platform with AI, Drip Sequences & Unified Inbox

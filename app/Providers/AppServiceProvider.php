@@ -44,7 +44,7 @@ class AppServiceProvider extends ServiceProvider
             return;
         }
 
-        if (! file_exists(storage_path('installed'))) {
+        if (!file_exists(storage_path('installed'))) {
             return;
         }
 
