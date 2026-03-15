@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\ContactListController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\DripSequenceController;
 use App\Http\Controllers\Admin\InboxController;
+use App\Http\Controllers\Admin\LanguageController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\Admin\TemplateController;
@@ -93,4 +94,12 @@ Route::middleware(['auth', 'role:admin', 'app.ready', 'throttle:200,1', 'xss', '
     Route::get('/profile',              [ProfileController::class, 'show'])->name('profile');
     Route::put('/profile',              [ProfileController::class, 'update'])->name('profile.update');
     Route::put('/profile/password',     [ProfileController::class, 'updatePassword']);
+
+    // ── Languages & Translations ──────────────────────────────────────────────
+    Route::get('/languages',                                        [LanguageController::class, 'index'])->name('languages.index');
+    Route::post('/languages',                                       [LanguageController::class, 'store']);
+    Route::put('/languages/{language}',                             [LanguageController::class, 'update']);
+    Route::delete('/languages/{language}',                          [LanguageController::class, 'destroy']);
+    Route::get('/languages/{language}/translations',                [LanguageController::class, 'translations'])->name('languages.translations');
+    Route::post('/languages/{language}/translations',               [LanguageController::class, 'bulkUpdateTranslations']);
 });

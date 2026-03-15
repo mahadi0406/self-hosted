@@ -16,6 +16,7 @@ import {
     DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const statusColor = (status) => {
     const map = {
@@ -62,44 +63,48 @@ const TypeBadge = ({ type }) => (
     </span>
 );
 
-const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {title || 'Delete Confirmation'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            {t('common.delete')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        {title || 'Delete Confirmation'}
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const Index = ({ campaigns, stats, channels, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]             = useState(filters?.search     || '');
     const [status, setStatus]             = useState(filters?.status     || 'all');
     const [channelId, setChannelId]       = useState(filters?.channel_id || 'all');
@@ -154,10 +159,10 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total',     value: stats.total,     icon: Send },
-                            { label: 'Running',   value: stats.running,   icon: Play,        accent: 'text-blue-600' },
-                            { label: 'Completed', value: stats.completed, icon: CheckCircle, accent: 'text-emerald-600' },
-                            { label: 'Scheduled', value: stats.scheduled, icon: Calendar,    accent: 'text-amber-600' },
+                            { label: t('campaigns.total'),     value: stats.total,     icon: Send },
+                            { label: t('campaigns.running'),   value: stats.running,   icon: Play,        accent: 'text-blue-600' },
+                            { label: t('campaigns.completed'), value: stats.completed, icon: CheckCircle, accent: 'text-emerald-600' },
+                            { label: t('campaigns.scheduled'), value: stats.scheduled, icon: Calendar,    accent: 'text-amber-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -175,10 +180,10 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Search by campaign name..."
@@ -189,18 +194,18 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Channel</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('dashboard.channel')}</label>
                                 <select value={channelId} onChange={e => setChannelId(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Channels</option>
+                                    <option value="all">{t('common.all_channels')}</option>
                                     {channels.map(c => (
                                         <option key={c.id} value={c.id}>{c.name}</option>
                                     ))}
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.status')}</label>
                                 <select value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Status</option>
+                                    <option value="all">{t('common.all_status')}</option>
                                     <option value="draft">Draft</option>
                                     <option value="scheduled">Scheduled</option>
                                     <option value="running">Running</option>
@@ -209,9 +214,9 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Type</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.type')}</label>
                                 <select value={type} onChange={e => setType(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Types</option>
+                                    <option value="all">{t('common.all_types')}</option>
                                     <option value="instant">Instant</option>
                                     <option value="scheduled">Scheduled</option>
                                 </select>
@@ -219,10 +224,10 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                         </div>
                         <div className="flex gap-2 mt-4">
                             <button onClick={handleSearch} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                <Search className="w-4 h-4" /> Search
+                                <Search className="w-4 h-4" /> {t('common.search')}
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Reset
+                                {t('common.reset')}
                             </button>
                         </div>
                     </div>
@@ -231,7 +236,7 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                 {/* Action */}
                 <div className="flex flex-wrap gap-2">
                     <Link href="/admin/campaigns/create" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 text-white dark:text-zinc-900 text-sm font-medium transition-colors">
-                        <Plus className="w-4 h-4" /> Create Campaign
+                        <Plus className="w-4 h-4" /> {t('campaigns.create_campaign')}
                     </Link>
                 </div>
 
@@ -242,7 +247,7 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                             <table className="min-w-[900px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Campaign', 'Channel', 'Type', 'Recipients', 'Scheduled', 'Status', 'Actions'].map((h, i) => (
+                                    {[t('dashboard.campaign'), t('dashboard.channel'), t('common.type'), t('campaigns.recipients'), t('campaigns.scheduled'), t('common.status'), t('common.actions')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -308,7 +313,7 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                                     <tr>
                                         <td colSpan={7} className="text-center py-12 text-zinc-400 text-sm">
                                             <Send className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No campaigns found
+                                            {t('campaigns.no_campaigns_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -338,21 +343,21 @@ const Index = ({ campaigns, stats, channels, filters }) => {
             <Dialog open={showModal} onOpenChange={setShowModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Campaign Details</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('campaigns.campaign_details')}</DialogTitle>
                     </DialogHeader>
                     {selected && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Name',       value: selected.name },
-                                    { label: 'Channel',    custom: <ChannelBadge type={selected.channel_type} /> },
-                                    { label: 'Type',       custom: <TypeBadge type={selected.type} /> },
-                                    { label: 'Status',     custom: <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(selected.status)}`}><StatusIcon status={selected.status} />{selected.status}</span> },
-                                    { label: 'Recipients', value: selected.total_recipients?.toLocaleString() },
-                                    { label: 'Scheduled',  value: selected.scheduled_at ?? '—' },
-                                    { label: 'Started',    value: selected.started_at   ?? '—' },
-                                    { label: 'Completed',  value: selected.completed_at ?? '—' },
-                                    { label: 'Created',    value: selected.created_at },
+                                    { label: t('common.name'),         value: selected.name },
+                                    { label: t('dashboard.channel'),   custom: <ChannelBadge type={selected.channel_type} /> },
+                                    { label: t('common.type'),         custom: <TypeBadge type={selected.type} /> },
+                                    { label: t('common.status'),       custom: <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(selected.status)}`}><StatusIcon status={selected.status} />{selected.status}</span> },
+                                    { label: t('campaigns.recipients'), value: selected.total_recipients?.toLocaleString() },
+                                    { label: t('campaigns.scheduled'), value: selected.scheduled_at ?? '—' },
+                                    { label: t('campaigns.started'),   value: selected.started_at   ?? '—' },
+                                    { label: t('campaigns.completed'), value: selected.completed_at ?? '—' },
+                                    { label: t('common.created'),      value: selected.created_at },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -362,13 +367,13 @@ const Index = ({ campaigns, stats, channels, filters }) => {
                             </div>
                             {selected.ai_goal && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">AI Goal</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('campaigns.ai_goal')}</p>
                                     <p className="text-sm text-zinc-700 dark:text-zinc-300 bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 p-2.5 rounded-lg">{selected.ai_goal}</p>
                                 </div>
                             )}
                             <div className="flex justify-end pt-1">
                                 <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                    Close
+                                    {t('common.close')}
                                 </button>
                             </div>
                         </div>

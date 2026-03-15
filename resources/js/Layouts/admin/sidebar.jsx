@@ -29,6 +29,7 @@ import {
     Bot,
     History,
     Terminal,
+    Globe,
     ChevronDown, LogOut
 } from 'lucide-react';
 
@@ -162,6 +163,7 @@ const Sidebar = ({
             items: [
                 { title: 'Settings',     icon: Settings,  route: '/admin/settings' },
                 { title: 'Automations',  icon: Terminal,  route: '/admin/automations' },
+                { title: 'Languages',    icon: Globe,     route: '/admin/languages' },
             ]
         },
     ];

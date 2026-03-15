@@ -3,8 +3,10 @@ import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, usePage } from '@inertiajs/react';
 import { toast } from 'sonner';
 import { User, Lock, Save, Loader2 } from 'lucide-react';
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Profile = () => {
+    const { t } = useTranslation();
     const { auth } = usePage().props;
 
     const profileForm = useForm({
@@ -56,13 +58,13 @@ const Profile = () => {
                             <User className="w-4 h-4 text-zinc-500" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Personal Information</h2>
-                            <p className="text-xs text-zinc-400">Update your name and email address</p>
+                            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('profile.personal_info')}</h2>
+                            <p className="text-xs text-zinc-400">{t('profile.personal_info_desc')}</p>
                         </div>
                     </div>
                     <form onSubmit={handleProfileSubmit} className="p-6 space-y-4">
                         <div>
-                            <label className={labelClass}>Name</label>
+                            <label className={labelClass}>{t('profile.name')}</label>
                             <input
                                 type="text"
                                 value={profileForm.data.name}
@@ -75,7 +77,7 @@ const Profile = () => {
                             )}
                         </div>
                         <div>
-                            <label className={labelClass}>Email Address</label>
+                            <label className={labelClass}>{t('profile.email_address')}</label>
                             <input
                                 type="email"
                                 value={profileForm.data.email}
@@ -91,12 +93,12 @@ const Profile = () => {
                             {profileForm.processing ? (
                                 <button type="button" disabled className={buttonClass}>
                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                    <span>Saving...</span>
+                                    <span>{t('common.save_changes')}</span>
                                 </button>
                             ) : (
                                 <button type="submit" className={buttonClass}>
                                     <Save className="w-4 h-4" />
-                                    <span>Save Changes</span>
+                                    <span>{t('common.save_changes')}</span>
                                 </button>
                             )}
                         </div>
@@ -110,8 +112,8 @@ const Profile = () => {
                             <Lock className="w-4 h-4 text-zinc-500" />
                         </div>
                         <div>
-                            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Change Password</h2>
-                            <p className="text-xs text-zinc-400">Update your account password</p>
+                            <h2 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{t('profile.change_password')}</h2>
+                            <p className="text-xs text-zinc-400">{t('profile.change_password_desc')}</p>
                         </div>
                     </div>
                     <form onSubmit={handlePasswordSubmit} className="p-6 space-y-4">

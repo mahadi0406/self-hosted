@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Concerns\UploadedFile;
+use App\Models\Language;
 use App\Models\Setting;
 use App\Services\DefaultImageService;
 use Illuminate\Http\Request;
@@ -26,8 +27,14 @@ class HandleInertiaRequests extends Middleware
         $loginFeatures = $this->getSetting('login_features');
         $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
 
+        // Language / translations
+        $langData     = $this->loadLanguageData($request);
+
         return array_merge(parent::share($request), [
-            'csrf_token' => csrf_token(),
+            'csrf_token'      => csrf_token(),
+            'currentLanguage' => $langData['currentLanguage'],
+            'languages'       => $langData['languages'],
+            'translations'    => $langData['translations'],
             'flash' => [
                 'success' => $request->session()->get('success'),
                 'error' => $request->session()->get('error'),
@@ -66,6 +73,50 @@ class HandleInertiaRequests extends Middleware
                 ],
             ],
         ]);
+    }
+
+    private function loadLanguageData(Request $request): array
+    {
+        try {
+            $code = $request->session()->get('app_language', 'en');
+
+            $currentLanguage = Cache::remember("lang_{$code}", 3600, function () use ($code) {
+                return Language::where('code', $code)->where('is_active', true)->first()
+                    ?? Language::where('is_default', true)->first()
+                    ?? Language::first();
+            });
+
+            $translations = [];
+            if ($currentLanguage) {
+                $translations = Cache::remember("translations_{$currentLanguage->code}", 3600, function () use ($currentLanguage) {
+                    return $currentLanguage->translations()->pluck('value', 'key')->toArray();
+                });
+            }
+
+            $languages = Cache::remember('languages_active', 3600, function () {
+                return Language::where('is_active', true)
+                    ->get(['id', 'code', 'name', 'native_name', 'flag', 'is_default'])
+                    ->toArray();
+            });
+
+            return [
+                'currentLanguage' => $currentLanguage ? [
+                    'code'        => $currentLanguage->code,
+                    'name'        => $currentLanguage->name,
+                    'native_name' => $currentLanguage->native_name,
+                    'flag'        => $currentLanguage->flag,
+                ] : ['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'flag' => '🇬🇧'],
+                'languages'       => $languages,
+                'translations'    => $translations,
+            ];
+        } catch (\Exception) {
+            // DB not ready or languages table doesn't exist yet
+            return [
+                'currentLanguage' => ['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'flag' => '🇬🇧'],
+                'languages'       => [['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'flag' => '🇬🇧', 'is_default' => true]],
+                'translations'    => [],
+            ];
+        }
     }
 
     private function loadSettings(): void

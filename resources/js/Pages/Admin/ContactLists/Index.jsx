@@ -20,45 +20,50 @@ import {
     DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
-const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {title || 'Delete Confirmation'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            {t('common.delete')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        {title || 'Delete Confirmation'}
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const Index = ({ lists, stats, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]                     = useState(filters?.search || '');
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal]   = useState(false);
@@ -111,8 +116,8 @@ const Index = ({ lists, stats, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Lists',    value: stats.total,    icon: List },
-                            { label: 'Total Contacts', value: stats.contacts, icon: Users },
+                            { label: t('contact_lists.total_lists'), value: stats.total,    icon: List },
+                            { label: t('contact_lists.contacts'),    value: stats.contacts, icon: Users },
                         ].map(({ label, value, icon: Icon }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -130,10 +135,10 @@ const Index = ({ lists, stats, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Search by name or description..."
@@ -148,19 +153,19 @@ const Index = ({ lists, stats, filters }) => {
                                     onClick={handleSearch}
                                     className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
                                 >
-                                    <Search className="w-4 h-4" /> Search
+                                    <Search className="w-4 h-4" /> {t('common.search')}
                                 </button>
                                 <button
                                     onClick={handleReset}
                                     className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
-                                    Reset
+                                    {t('common.reset')}
                                 </button>
                                 <Link
                                     href="/admin/contact-lists/create"
                                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                                 >
-                                    <Plus className="w-4 h-4" /> Create List
+                                    <Plus className="w-4 h-4" /> {t('contact_lists.create_list')}
                                 </Link>
                             </div>
                         </div>
@@ -174,7 +179,7 @@ const Index = ({ lists, stats, filters }) => {
                             <table className="min-w-[600px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Name', 'Description', 'Contacts', 'Created', 'Actions'].map((h, i) => (
+                                    {[t('common.name'), t('common.description'), t('contact_lists.contacts'), t('common.created'), t('common.actions')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -227,7 +232,7 @@ const Index = ({ lists, stats, filters }) => {
                                     <tr>
                                         <td colSpan={5} className="text-center py-12 text-zinc-400 text-sm">
                                             <List className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No contact lists found
+                                            {t('contact_lists.no_lists_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -258,16 +263,16 @@ const Index = ({ lists, stats, filters }) => {
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
                         <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-                            Contact List Details
+                            {t('contact_lists.contact_list_details')}
                         </DialogTitle>
                     </DialogHeader>
                     {selectedList && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Name',     value: selectedList.name },
-                                    { label: 'Contacts', value: selectedList.contacts_count.toLocaleString() },
-                                    { label: 'Created',  value: selectedList.created_at },
+                                    { label: t('common.name'),            value: selectedList.name },
+                                    { label: t('contact_lists.contacts'), value: selectedList.contacts_count.toLocaleString() },
+                                    { label: t('common.created'),         value: selectedList.created_at },
                                 ].map(({ label, value }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -277,7 +282,7 @@ const Index = ({ lists, stats, filters }) => {
                             </div>
                             {selectedList.description && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Description</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('common.description')}</p>
                                     <p className="text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 p-2.5 rounded-lg">
                                         {selectedList.description}
                                     </p>
@@ -288,7 +293,7 @@ const Index = ({ lists, stats, filters }) => {
                                     onClick={() => setShowDetailsModal(false)}
                                     className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
-                                    Close
+                                    {t('common.close')}
                                 </button>
                             </div>
                         </div>

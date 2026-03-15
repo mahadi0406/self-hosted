@@ -16,6 +16,7 @@ import {
     DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const statusColor = (status) => {
     const map = {
@@ -57,44 +58,48 @@ const ComplianceScore = ({ score }) => {
     return <span className={`text-xs font-semibold ${color}`}>{score}%</span>;
 };
 
-const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {title || 'Delete Confirmation'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            {t('common.delete')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        {title || 'Delete Confirmation'}
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const Index = ({ templates, stats, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]                     = useState(filters?.search  || '');
     const [channel, setChannel]                   = useState(filters?.channel || 'all');
     const [status, setStatus]                     = useState(filters?.status  || 'all');
@@ -186,10 +191,10 @@ const Index = ({ templates, stats, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Templates', value: stats.total,        icon: FileText },
-                            { label: 'Approved',        value: stats.approved,     icon: CheckCircle, accent: 'text-emerald-600' },
-                            { label: 'Drafts',          value: stats.draft,        icon: Clock,       accent: 'text-amber-600' },
-                            { label: 'AI Generated',    value: stats.ai_generated, icon: Sparkles,    accent: 'text-purple-600' },
+                            { label: t('templates.total_templates'), value: stats.total,        icon: FileText },
+                            { label: t('templates.approved'),        value: stats.approved,     icon: CheckCircle, accent: 'text-emerald-600' },
+                            { label: t('templates.drafts'),          value: stats.draft,        icon: Clock,       accent: 'text-amber-600' },
+                            { label: t('templates.ai_generated'),    value: stats.ai_generated, icon: Sparkles,    accent: 'text-purple-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -207,10 +212,10 @@ const Index = ({ templates, stats, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Search by name or body..."
@@ -221,17 +226,17 @@ const Index = ({ templates, stats, filters }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Channel</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('dashboard.channel')}</label>
                                 <select value={channel} onChange={e => setChannel(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Channels</option>
+                                    <option value="all">{t('common.all_channels')}</option>
                                     <option value="whatsapp">WhatsApp</option>
                                     <option value="telegram">Telegram</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.status')}</label>
                                 <select value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Status</option>
+                                    <option value="all">{t('common.all_status')}</option>
                                     <option value="approved">Approved</option>
                                     <option value="pending">Pending Review</option>
                                     <option value="draft">Draft</option>
@@ -239,20 +244,20 @@ const Index = ({ templates, stats, filters }) => {
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Source</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.source')}</label>
                                 <select value={source} onChange={e => setSource(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Sources</option>
-                                    <option value="manual">Manual</option>
-                                    <option value="ai_generated">AI Generated</option>
+                                    <option value="all">{t('templates.all_sources')}</option>
+                                    <option value="manual">{t('common.manual')}</option>
+                                    <option value="ai_generated">{t('common.ai_generated')}</option>
                                 </select>
                             </div>
                         </div>
                         <div className="flex gap-2 mt-4">
                             <button onClick={handleSearch} className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                <Search className="w-4 h-4" /> Search
+                                <Search className="w-4 h-4" /> {t('common.search')}
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Reset
+                                {t('common.reset')}
                             </button>
                         </div>
                     </div>
@@ -264,7 +269,7 @@ const Index = ({ templates, stats, filters }) => {
                         href="/admin/templates/create"
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                     >
-                        <Plus className="w-4 h-4" /> Create Template
+                        <Plus className="w-4 h-4" /> {t('templates.create_template')}
                     </Link>
                 </div>
 
@@ -275,53 +280,53 @@ const Index = ({ templates, stats, filters }) => {
                             <table className="min-w-[900px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Name', 'Channel', 'Body', 'Source', 'AI Score', 'Usage', 'Status', 'Actions'].map((h, i) => (
+                                    {[t('common.name'), t('dashboard.channel'), t('templates.body'), t('common.source'), t('templates.ai_score'), t('templates.usage'), t('common.status'), t('common.actions')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {templates.data?.length > 0 ? templates.data.map((t) => (
-                                    <tr key={t.id} className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
+                                {templates.data?.length > 0 ? templates.data.map((t_item) => (
+                                    <tr key={t_item.id} className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
                                         <td className="px-4 py-3">
-                                            <div className="font-medium text-zinc-800 dark:text-zinc-200">{t.name}</div>
-                                            <div className="text-xs text-zinc-400">{t.language?.toUpperCase()}</div>
+                                            <div className="font-medium text-zinc-800 dark:text-zinc-200">{t_item.name}</div>
+                                            <div className="text-xs text-zinc-400">{t_item.language?.toUpperCase()}</div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <ChannelBadge channel={t.channel} />
+                                            <ChannelBadge channel={t_item.channel} />
                                         </td>
                                         <td className="px-4 py-3">
-                                            <p className="text-xs text-zinc-500 line-clamp-2 max-w-[200px]">{t.body}</p>
+                                            <p className="text-xs text-zinc-500 line-clamp-2 max-w-[200px]">{t_item.body}</p>
                                         </td>
                                         <td className="px-4 py-3">
-                                            {t.source === 'ai_generated' ? (
+                                            {t_item.source === 'ai_generated' ? (
                                                 <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium text-purple-600 bg-purple-50 dark:bg-purple-900/20">
-                                                    <Sparkles className="w-3 h-3" /> AI
+                                                    <Sparkles className="w-3 h-3" /> {t('common.ai')}
                                                 </span>
                                             ) : (
-                                                <span className="text-xs text-zinc-500">Manual</span>
+                                                <span className="text-xs text-zinc-500">{t('common.manual')}</span>
                                             )}
                                         </td>
                                         <td className="px-4 py-3">
-                                            <ComplianceScore score={t.ai_compliance_score} />
+                                            <ComplianceScore score={t_item.ai_compliance_score} />
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className="inline-flex items-center gap-1 text-xs text-zinc-500">
                                                 <Star className="w-3 h-3 text-zinc-300" />
-                                                {t.usage_count}
+                                                {t_item.usage_count}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(t.status)}`}>
-                                                <StatusIcon status={t.status} />
-                                                {t.status}
+                                            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(t_item.status)}`}>
+                                                <StatusIcon status={t_item.status} />
+                                                {t_item.status}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-1.5">
                                                 {/* View */}
                                                 <button
-                                                    onClick={() => openDetails(t)}
+                                                    onClick={() => openDetails(t_item)}
                                                     title="View details"
                                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                                                 >
@@ -329,14 +334,14 @@ const Index = ({ templates, stats, filters }) => {
                                                 </button>
 
                                                 {/* Submit / Resubmit — draft or rejected whatsapp */}
-                                                {t.channel === 'whatsapp' && (t.status === 'draft' || t.status === 'rejected') && (
+                                                {t_item.channel === 'whatsapp' && (t_item.status === 'draft' || t_item.status === 'rejected') && (
                                                     <button
-                                                        onClick={() => handleSubmit(t)}
-                                                        disabled={submitting[t.id]}
-                                                        title={t.status === 'rejected' ? 'Resubmit to WhatsApp' : 'Submit to WhatsApp'}
+                                                        onClick={() => handleSubmit(t_item)}
+                                                        disabled={submitting[t_item.id]}
+                                                        title={t_item.status === 'rejected' ? 'Resubmit to WhatsApp' : 'Submit to WhatsApp'}
                                                         className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-900/20 hover:border-emerald-200 disabled:opacity-50 transition-colors"
                                                     >
-                                                        {submitting[t.id]
+                                                        {submitting[t_item.id]
                                                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                             : <Send className="w-3.5 h-3.5" />
                                                         }
@@ -344,14 +349,14 @@ const Index = ({ templates, stats, filters }) => {
                                                 )}
 
                                                 {/* Sync status — pending/approved whatsapp templates */}
-                                                {t.channel === 'whatsapp' && (t.status === 'pending' || t.status === 'approved') && (
+                                                {t_item.channel === 'whatsapp' && (t_item.status === 'pending' || t_item.status === 'approved') && (
                                                     <button
-                                                        onClick={() => handleSyncStatus(t)}
-                                                        disabled={syncing[t.id]}
+                                                        onClick={() => handleSyncStatus(t_item)}
+                                                        disabled={syncing[t_item.id]}
                                                         title="Check status from WhatsApp"
                                                         className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:border-blue-200 disabled:opacity-50 transition-colors"
                                                     >
-                                                        {syncing[t.id]
+                                                        {syncing[t_item.id]
                                                             ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                             : <Clock className="w-3.5 h-3.5" />
                                                         }
@@ -360,7 +365,7 @@ const Index = ({ templates, stats, filters }) => {
 
                                                 {/* Delete */}
                                                 <button
-                                                    onClick={() => openDeleteModal(t)}
+                                                    onClick={() => openDeleteModal(t_item)}
                                                     title="Delete"
                                                     className="p-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-400 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 hover:border-red-200 transition-colors"
                                                 >
@@ -373,7 +378,7 @@ const Index = ({ templates, stats, filters }) => {
                                     <tr>
                                         <td colSpan={8} className="text-center py-12 text-zinc-400 text-sm">
                                             <FileText className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No templates found
+                                            {t('templates.no_templates_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -403,20 +408,20 @@ const Index = ({ templates, stats, filters }) => {
             <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Template Details</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('templates.template_details')}</DialogTitle>
                     </DialogHeader>
                     {selectedTemplate && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Name',     value: selectedTemplate.name },
-                                    { label: 'Language', value: selectedTemplate.language?.toUpperCase() },
-                                    { label: 'Channel',  custom: <ChannelBadge channel={selectedTemplate.channel} /> },
-                                    { label: 'Status',   custom: <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(selectedTemplate.status)}`}><StatusIcon status={selectedTemplate.status} />{selectedTemplate.status}</span> },
-                                    { label: 'Source',   value: selectedTemplate.source?.replace('_', ' ') },
-                                    { label: 'AI Score', custom: <ComplianceScore score={selectedTemplate.ai_compliance_score} /> },
-                                    { label: 'Usage',    value: `${selectedTemplate.usage_count} times` },
-                                    { label: 'Created',  value: selectedTemplate.created_at },
+                                    { label: t('common.name'),      value: selectedTemplate.name },
+                                    { label: t('templates.language'), value: selectedTemplate.language?.toUpperCase() },
+                                    { label: t('dashboard.channel'), custom: <ChannelBadge channel={selectedTemplate.channel} /> },
+                                    { label: t('common.status'),    custom: <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium capitalize ${statusColor(selectedTemplate.status)}`}><StatusIcon status={selectedTemplate.status} />{selectedTemplate.status}</span> },
+                                    { label: t('common.source'),    value: selectedTemplate.source?.replace('_', ' ') },
+                                    { label: t('templates.ai_score'), custom: <ComplianceScore score={selectedTemplate.ai_compliance_score} /> },
+                                    { label: t('templates.usage'),  value: `${selectedTemplate.usage_count} times` },
+                                    { label: t('common.created'),   value: selectedTemplate.created_at },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -427,23 +432,23 @@ const Index = ({ templates, stats, filters }) => {
 
                             {selectedTemplate.header && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Header</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('templates.header')}</p>
                                     <p className="text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 p-2.5 rounded-lg">{selectedTemplate.header}</p>
                                 </div>
                             )}
                             <div className="space-y-1">
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Body</p>
+                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('templates.body')}</p>
                                 <p className="text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 p-2.5 rounded-lg whitespace-pre-wrap">{selectedTemplate.body}</p>
                             </div>
                             {selectedTemplate.footer && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Footer</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('templates.footer')}</p>
                                     <p className="text-sm text-zinc-700 dark:text-zinc-300 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 p-2.5 rounded-lg">{selectedTemplate.footer}</p>
                                 </div>
                             )}
                             {selectedTemplate.rejection_reason && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Rejection Reason</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('templates.rejection_reason')}</p>
                                     <p className="text-xs text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-2.5 rounded-lg">{selectedTemplate.rejection_reason}</p>
                                 </div>
                             )}
@@ -461,7 +466,7 @@ const Index = ({ templates, stats, filters }) => {
                                                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                 : <Send className="w-3.5 h-3.5" />
                                             }
-                                            {selectedTemplate.status === 'rejected' ? 'Resubmit to WhatsApp' : 'Submit to WhatsApp'}
+                                            {selectedTemplate.status === 'rejected' ? t('templates.resubmit_to_whatsapp') : t('templates.submit_to_whatsapp')}
                                         </button>
                                     )}
                                     {selectedTemplate.channel === 'whatsapp' && (selectedTemplate.status === 'pending' || selectedTemplate.status === 'approved') && (
@@ -474,7 +479,7 @@ const Index = ({ templates, stats, filters }) => {
                                                 ? <Loader2 className="w-3.5 h-3.5 animate-spin" />
                                                 : <Clock className="w-3.5 h-3.5" />
                                             }
-                                            Check Status
+                                            {t('templates.check_status')}
                                         </button>
                                     )}
                                 </div>
@@ -482,7 +487,7 @@ const Index = ({ templates, stats, filters }) => {
                                     onClick={() => setShowDetailsModal(false)}
                                     className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
-                                    Close
+                                    {t('common.close')}
                                 </button>
                             </div>
                         </div>

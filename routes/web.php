@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Auth\AdminAuthController;
+use App\Http\Controllers\LanguageSwitchController;
 use App\Http\Controllers\Webhook\TelegramWebhookController;
 use App\Http\Controllers\Webhook\WhatsappWebhookController;
 use Illuminate\Support\Facades\Auth;
@@ -33,3 +34,8 @@ Route::middleware(['guest', 'throttle:10,1', 'xss'])->group(function () {
 
 Route::get('/logout', [AdminAuthController::class, 'logout'])->name('logout')->middleware('auth');
 Route::post('/logout', [AdminAuthController::class, 'logout'])->middleware('auth');
+
+// Language switch (auth required, throttled)
+Route::post('/language/change', [LanguageSwitchController::class, 'change'])
+    ->middleware(['auth', 'throttle:20,1'])
+    ->name('language.change');

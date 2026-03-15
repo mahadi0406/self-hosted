@@ -16,6 +16,7 @@ import {
     DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const intentConfig = {
     inquiry:     { label: 'Inquiry',     color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/20',       icon: HelpCircle },
@@ -53,6 +54,7 @@ const getUserInitials = (name) =>
     name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 
 const Index = ({ messages, stats, channels, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]     = useState(filters?.search     || '');
     const [channelId, setChannelId] = useState(filters?.channel_id || 'all');
     const [aiIntent, setAiIntent] = useState(filters?.ai_intent  || 'all');
@@ -109,10 +111,10 @@ const Index = ({ messages, stats, channels, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Inbound',  value: stats.total_inbound,  icon: Inbox },
-                            { label: 'Unread',         value: stats.unread,         icon: Circle,    accent: stats.unread > 0 ? 'text-red-600' : undefined },
-                            { label: 'Today',          value: stats.today,          icon: Clock,     accent: 'text-blue-600' },
-                            { label: 'AI Classified',  value: stats.ai_classified,  icon: Sparkles,  accent: 'text-purple-600' },
+                            { label: t('inbox.total_inbound'),  value: stats.total_inbound,  icon: Inbox },
+                            { label: t('inbox.unread'),         value: stats.unread,         icon: Circle,    accent: stats.unread > 0 ? 'text-red-600' : undefined },
+                            { label: t('inbox.today'),          value: stats.today,          icon: Clock,     accent: 'text-blue-600' },
+                            { label: t('inbox.ai_classified'),  value: stats.ai_classified,  icon: Sparkles,  accent: 'text-purple-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -130,10 +132,10 @@ const Index = ({ messages, stats, channels, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Search by contact or message..."
@@ -144,16 +146,16 @@ const Index = ({ messages, stats, channels, filters }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Channel</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('inbox.channel')}</label>
                                 <select value={channelId} onChange={e => setChannelId(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Channels</option>
+                                    <option value="all">{t('common.all_channels')}</option>
                                     {channels.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">AI Intent</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('inbox.ai_intent')}</label>
                                 <select value={aiIntent} onChange={e => setAiIntent(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Intents</option>
+                                    <option value="all">{t('inbox.all_intents')}</option>
                                     <option value="inquiry">Inquiry</option>
                                     <option value="complaint">Complaint</option>
                                     <option value="purchase">Purchase</option>
@@ -163,20 +165,20 @@ const Index = ({ messages, stats, channels, filters }) => {
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Read Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('inbox.read_status')}</label>
                                 <select value={isRead} onChange={e => setIsRead(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Messages</option>
+                                    <option value="all">{t('inbox.all_messages')}</option>
                                     <option value="unread">Unread</option>
-                                    <option value="read">Read</option>
+                                    <option value="read">{t('inbox.read')}</option>
                                 </select>
                             </div>
                         </div>
                         <div className="flex flex-wrap gap-2 mt-4">
                             <button onClick={handleSearch} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                <Search className="w-4 h-4" /> Search
+                                <Search className="w-4 h-4" /> {t('common.search')}
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Reset
+                                {t('common.reset')}
                             </button>
                             {stats.unread > 0 && (
                                 <button
@@ -185,7 +187,7 @@ const Index = ({ messages, stats, channels, filters }) => {
                                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-50 transition-colors ml-auto"
                                 >
                                     <CheckCheck className="w-4 h-4" />
-                                    {markingRead ? 'Marking...' : `Mark all read (${stats.unread})`}
+                                    {markingRead ? t('inbox.marking') : t('inbox.mark_all_read', { count: stats.unread })}
                                 </button>
                             )}
                         </div>
@@ -199,7 +201,7 @@ const Index = ({ messages, stats, channels, filters }) => {
                             <table className="min-w-[800px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['', 'Contact', 'Message', 'Channel', 'AI Intent', 'AI Reply', 'Time', 'Action'].map((h, i) => (
+                                    {['', t('inbox.contact'), t('inbox.message'), t('inbox.channel'), t('inbox.ai_intent'), t('inbox.ai_reply'), t('inbox.time'), t('inbox.action')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -259,7 +261,7 @@ const Index = ({ messages, stats, channels, filters }) => {
                                         <td className="px-4 py-3">
                                             {m.ai_suggested_reply ? (
                                                 <span className="inline-flex items-center gap-1 text-xs text-purple-600 bg-purple-50 dark:bg-purple-900/20 px-2 py-0.5 rounded">
-                                                        <Sparkles className="w-3 h-3" /> Ready
+                                                        <Sparkles className="w-3 h-3" /> {t('inbox.ready')}
                                                     </span>
                                             ) : <span className="text-xs text-zinc-400">—</span>}
                                         </td>
@@ -283,7 +285,7 @@ const Index = ({ messages, stats, channels, filters }) => {
                                     <tr>
                                         <td colSpan={8} className="text-center py-12 text-zinc-400 text-sm">
                                             <Inbox className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No messages found
+                                            {t('inbox.no_messages_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -304,19 +306,19 @@ const Index = ({ messages, stats, channels, filters }) => {
             <Dialog open={showModal} onOpenChange={setShowModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Message Details</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('inbox.message_details')}</DialogTitle>
                     </DialogHeader>
                     {selected && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Contact',  value: selected.contact_name },
-                                    { label: 'Phone',    value: selected.contact_phone || '—' },
-                                    { label: 'Channel',  custom: <ChannelBadge type={selected.channel_type} /> },
-                                    { label: 'AI Intent',custom: <IntentBadge intent={selected.ai_intent} /> },
-                                    { label: 'Type',     value: selected.type },
-                                    { label: 'Read',     value: selected.is_read ? 'Yes' : 'No' },
-                                    { label: 'Received', value: selected.received_at },
+                                    { label: t('inbox.contact'),   value: selected.contact_name },
+                                    { label: t('inbox.phone'),     value: selected.contact_phone || '—' },
+                                    { label: t('inbox.channel'),   custom: <ChannelBadge type={selected.channel_type} /> },
+                                    { label: t('inbox.ai_intent'), custom: <IntentBadge intent={selected.ai_intent} /> },
+                                    { label: t('inbox.type'),      value: selected.type },
+                                    { label: t('inbox.is_read'),   value: selected.is_read ? 'Yes' : 'No' },
+                                    { label: t('inbox.received'),  value: selected.received_at },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -327,7 +329,7 @@ const Index = ({ messages, stats, channels, filters }) => {
 
                             {/* Message Body */}
                             <div className="space-y-1">
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Message</p>
+                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('inbox.message')}</p>
                                 <div className="bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 rounded-lg p-3">
                                     <p className="text-sm text-zinc-800 dark:text-zinc-200 whitespace-pre-wrap">{selected.body || `[${selected.type} message]`}</p>
                                 </div>
@@ -337,7 +339,7 @@ const Index = ({ messages, stats, channels, filters }) => {
                             {selected.ai_suggested_reply && (
                                 <div className="space-y-1">
                                     <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-                                        <Sparkles className="w-3 h-3 text-purple-500" /> AI Suggested Reply
+                                        <Sparkles className="w-3 h-3 text-purple-500" /> {t('inbox.ai_suggested_reply')}
                                     </p>
                                     <div className="bg-purple-50 dark:bg-purple-900/20 border border-purple-100 dark:border-purple-800 rounded-lg p-3">
                                         <p className="text-sm text-purple-800 dark:text-purple-200 whitespace-pre-wrap">{selected.ai_suggested_reply}</p>
@@ -347,7 +349,7 @@ const Index = ({ messages, stats, channels, filters }) => {
 
                             <div className="flex justify-end pt-1">
                                 <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                    Close
+                                    {t('common.close')}
                                 </button>
                             </div>
                         </div>

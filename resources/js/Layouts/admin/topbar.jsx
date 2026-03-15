@@ -9,7 +9,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/Components/UI/dropdown-menu";
-import {Menu, ChevronRight, User, Settings, LogOut, Moon, Plus} from "lucide-react";
+import {Menu, ChevronRight, User, Settings, LogOut, Moon, Globe, Check, Loader2} from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Topbar = ({
                     darkMode = false,
@@ -25,6 +26,8 @@ const Topbar = ({
                         avatar: null
                     }
                 }) => {
+    const { t, currentLanguage, languages, changeLanguage, isChanging } = useTranslation();
+
     const getUserInitials = () => {
         try {
             return (currentUser.name || 'User')
@@ -64,7 +67,47 @@ const Topbar = ({
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2">
+                    {/* Language Switcher */}
+                    {languages.length > 1 && (
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <button
+                                    disabled={isChanging}
+                                    className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground disabled:opacity-50"
+                                    title={t('nav.languages')}
+                                >
+                                    {isChanging
+                                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                                        : <span className="text-base leading-none">{currentLanguage?.flag || '🌐'}</span>
+                                    }
+                                    <span className="hidden sm:block text-xs font-medium uppercase">
+                                        {currentLanguage?.code || 'en'}
+                                    </span>
+                                </button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="w-44">
+                                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                                    {t('nav.languages')}
+                                </DropdownMenuLabel>
+                                <DropdownMenuSeparator />
+                                {languages.map(lang => (
+                                    <DropdownMenuItem
+                                        key={lang.code}
+                                        onClick={() => changeLanguage(lang.code)}
+                                        className="flex items-center gap-2 cursor-pointer"
+                                    >
+                                        <span className="text-base">{lang.flag || '🌐'}</span>
+                                        <span className="flex-1 text-sm">{lang.native_name || lang.name}</span>
+                                        {currentLanguage?.code === lang.code && (
+                                            <Check className="w-3.5 h-3.5 text-emerald-500" />
+                                        )}
+                                    </DropdownMenuItem>
+                                ))}
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    )}
+
                     <button
                         onClick={onToggleDarkMode}
                         className="w-9 h-9 flex items-center justify-center rounded-lg hover:bg-muted transition-colors"
@@ -95,19 +138,19 @@ const Topbar = ({
                             <DropdownMenuItem asChild>
                                 <Link href="/admin/profile" className="flex items-center gap-2">
                                     <User className="w-4 h-4"/>
-                                    Profile
+                                    {t('nav.profile')}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuItem asChild>
                                 <Link href="/admin/settings" className="flex items-center gap-2">
                                     <Settings className="w-4 h-4"/>
-                                    Settings
+                                    {t('nav.settings')}
                                 </Link>
                             </DropdownMenuItem>
                             <DropdownMenuSeparator/>
                             <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                                 <LogOut className="w-4 h-4 mr-2"/>
-                                Logout
+                                {t('nav.logout')}
                             </DropdownMenuItem>
                         </DropdownMenuContent>
                     </DropdownMenu>

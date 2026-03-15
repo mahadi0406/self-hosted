@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, usePage } from '@inertiajs/react';
 import { Copy, Check, Terminal, Clock } from 'lucide-react';
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const CodeBlock = ({ code }) => {
     const [copied, setCopied] = useState(false);
@@ -43,10 +44,11 @@ const Label = ({ children }) => (
 );
 
 const Automations = ({ basePath }) => {
+    const { t } = useTranslation();
     const appPath = basePath || '/var/www/your-project';
 
     return (
-        <Layout pageTitle="Automations" pageSection="Settings">
+        <Layout pageTitle={t('automations.title')} pageSection="Settings">
             <Head title="Automations" />
 
             <div className="max-w-3xl space-y-6">

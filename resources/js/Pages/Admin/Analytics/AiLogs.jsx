@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, router } from '@inertiajs/react';
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 import {
     History, Search, Eye, CheckCircle, XCircle,
     Sparkles, Bot, Cpu, Hash, ChevronDown, ChevronUp,
@@ -28,6 +29,7 @@ const FeatureBadge = ({ feature }) => {
 };
 
 const AiLogs = ({ logs, stats, feature_counts, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]   = useState(filters?.search    || '');
     const [feature, setFeature] = useState(filters?.feature   || 'all');
     const [status, setStatus]   = useState(filters?.status    || 'all');
@@ -71,10 +73,10 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Calls',    value: stats.total_calls?.toLocaleString(),   icon: Hash },
-                            { label: 'Successful',     value: stats.successful?.toLocaleString(),    icon: CheckCircle, accent: 'text-emerald-600' },
-                            { label: 'Total Tokens',   value: stats.total_tokens?.toLocaleString(),  icon: Cpu,         accent: 'text-blue-600' },
-                            { label: 'Success Rate',   value: `${successRate}%`,                     icon: Sparkles,    accent: successRate >= 90 ? 'text-emerald-600' : 'text-amber-600' },
+                            { label: t('ai_logs.total_calls'),   value: stats.total_calls?.toLocaleString(),   icon: Hash },
+                            { label: t('ai_logs.successful'),    value: stats.successful?.toLocaleString(),    icon: CheckCircle, accent: 'text-emerald-600' },
+                            { label: t('ai_logs.total_tokens'),  value: stats.total_tokens?.toLocaleString(),  icon: Cpu,         accent: 'text-blue-600' },
+                            { label: t('ai_logs.success_rate'),  value: `${successRate}%`,                     icon: Sparkles,    accent: successRate >= 90 ? 'text-emerald-600' : 'text-amber-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -91,7 +93,7 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                 {Object.keys(feature_counts).length > 0 && (
                     <section>
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Usage by Feature</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('ai_logs.usage_by_feature')}</h2>
                             <div className="flex flex-wrap gap-3">
                                 {Object.entries(feature_counts).map(([feat, count]) => {
                                     const cfg  = featureConfig[feat] ?? { label: feat, icon: Sparkles, color: 'text-zinc-600 bg-zinc-100 dark:bg-zinc-800' };
@@ -117,10 +119,10 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="space-y-1.5 sm:col-span-2 lg:col-span-1">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search Prompt</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Search prompt content..."
@@ -131,36 +133,36 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Feature</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('ai_logs.feature')}</label>
                                 <select value={feature} onChange={e => setFeature(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Features</option>
+                                    <option value="all">{t('ai_logs.all_features')}</option>
                                     <option value="message_writer">Message Writer</option>
                                     <option value="campaign_planner">Campaign Planner</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.status')}</label>
                                 <select value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Status</option>
+                                    <option value="all">{t('common.all_status')}</option>
                                     <option value="success">Success</option>
                                     <option value="failed">Failed</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Date From</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('ai_logs.date_from')}</label>
                                 <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Date To</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('ai_logs.date_to')}</label>
                                 <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600" />
                             </div>
                         </div>
                         <div className="flex gap-2 mt-4">
                             <button onClick={handleSearch} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                <Search className="w-4 h-4" /> Search
+                                <Search className="w-4 h-4" /> {t('common.search')}
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Reset
+                                {t('common.reset')}
                             </button>
                         </div>
                     </div>
@@ -173,7 +175,7 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                             <table className="min-w-[800px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Status', 'Feature', 'Model', 'Prompt', 'Tokens In', 'Tokens Out', 'Total', 'Date', 'View'].map((h, i) => (
+                                    {[t('common.status'), t('ai_logs.feature'), t('ai_logs.model'), 'Prompt', t('ai_logs.tokens_in'), t('ai_logs.tokens_out'), t('ai_logs.total'), t('ai_logs.date'), ''].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -217,7 +219,7 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
                                     <tr>
                                         <td colSpan={9} className="text-center py-12 text-zinc-400 text-sm">
                                             <History className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No AI logs found
+                                            {t('ai_logs.no_logs_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -235,21 +237,21 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
             <Dialog open={showModal} onOpenChange={setShowModal}>
                 <DialogContent className="max-w-2xl">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">AI Log Detail</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('ai_logs.log_detail')}</DialogTitle>
                     </DialogHeader>
                     {selected && (
                         <div className="space-y-4 pt-1 max-h-[70vh] overflow-y-auto pr-1">
                             <div className="grid grid-cols-3 gap-3">
                                 {[
-                                    { label: 'Feature',     custom: <FeatureBadge feature={selected.feature} /> },
-                                    { label: 'Status',      custom: selected.success
+                                    { label: t('ai_logs.feature'),      custom: <FeatureBadge feature={selected.feature} /> },
+                                    { label: t('common.status'),        custom: selected.success
                                             ? <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600"><CheckCircle className="w-3 h-3" /> Success</span>
                                             : <span className="inline-flex items-center gap-1 text-xs font-medium text-red-500"><XCircle className="w-3 h-3" /> Failed</span>
                                     },
-                                    { label: 'Date',        value: selected.created_at },
-                                    { label: 'Model',       value: selected.model },
-                                    { label: 'Input Tokens',value: selected.input_tokens?.toLocaleString() },
-                                    { label: 'Output Tokens',value: selected.output_tokens?.toLocaleString() },
+                                    { label: t('ai_logs.date'),         value: selected.created_at },
+                                    { label: t('ai_logs.model'),        value: selected.model },
+                                    { label: t('ai_logs.input_tokens'), value: selected.input_tokens?.toLocaleString() },
+                                    { label: t('ai_logs.output_tokens'),value: selected.output_tokens?.toLocaleString() },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -260,7 +262,7 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
 
                             {selected.error_message && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Error</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('ai_logs.error')}</p>
                                     <p className="text-xs text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-2.5 rounded-lg font-mono">{selected.error_message}</p>
                                 </div>
                             )}
@@ -279,13 +281,13 @@ const AiLogs = ({ logs, stats, feature_counts, filters }) => {
 
                             {selected.response && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Response</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('ai_logs.response')}</p>
                                     <pre className="text-xs text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 border border-zinc-100 dark:border-zinc-700 p-3 rounded-lg overflow-x-auto whitespace-pre-wrap font-mono max-h-48">{selected.response}</pre>
                                 </div>
                             )}
 
                             <div className="flex justify-end">
-                                <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">Close</button>
+                                <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">{t('common.close')}</button>
                             </div>
                         </div>
                     )}

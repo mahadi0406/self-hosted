@@ -4,6 +4,7 @@ import { Head, router } from '@inertiajs/react';
 import { Link } from "@inertiajs/react";
 import axios from 'axios';
 import { toast } from 'sonner';
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 import {
     Radio, Plus, Trash2, Eye, Search,
     CheckCircle, XCircle, AlertCircle,
@@ -15,80 +16,86 @@ import {
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
 
-const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {title || 'Delete Confirmation'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            {t('common.delete')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        {title || 'Delete Confirmation'}
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 // ── Disconnect Confirmation Modal Component ───────────────────────────────────
-const DisconnectConfirmModal = ({ open, onOpenChange, onConfirm, channelName, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4">
-                    <PowerOff className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+const DisconnectConfirmModal = ({ open, onOpenChange, onConfirm, channelName, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center mb-4">
+                        <PowerOff className="w-6 h-6 text-orange-600 dark:text-orange-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {t('channels.disconnect_channel')}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        Are you sure you want to disconnect <span className="font-medium text-zinc-700 dark:text-zinc-300">{channelName}</span>? You can reconnect it later by verifying.
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PowerOff className="w-4 h-4" />}
+                            {t('channels.disconnect')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        Disconnect Channel
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    Are you sure you want to disconnect <span className="font-medium text-zinc-700 dark:text-zinc-300">{channelName}</span>? You can reconnect it later by verifying.
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-orange-500 hover:bg-orange-600 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <PowerOff className="w-4 h-4" />}
-                        Disconnect
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const statusColor = (status) => ({
     connected:    'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20',
@@ -120,6 +127,7 @@ const ChannelType = ({ type }) => (
 );
 
 const Index = ({ channels, stats, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch] = useState(filters?.search || '');
     const [type, setType]     = useState(filters?.type   || 'all');
     const [status, setStatus] = useState(filters?.status || 'all');
@@ -218,10 +226,10 @@ const Index = ({ channels, stats, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Channels', value: stats.total,     icon: Radio },
-                            { label: 'Connected',      value: stats.connected, icon: CheckCircle, accent: 'text-emerald-600' },
-                            { label: 'WhatsApp',       value: stats.whatsapp,  icon: Smartphone },
-                            { label: 'Telegram',       value: stats.telegram,  icon: Send },
+                            { label: t('channels.total_channels'), value: stats.total,     icon: Radio },
+                            { label: t('channels.connected'),      value: stats.connected, icon: CheckCircle, accent: 'text-emerald-600' },
+                            { label: t('channels.whatsapp'),       value: stats.whatsapp,  icon: Smartphone },
+                            { label: t('channels.telegram'),       value: stats.telegram,  icon: Send },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -239,24 +247,24 @@ const Index = ({ channels, stats, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input type="text" placeholder="Search by name, phone..." value={search} onChange={e => setSearch(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleSearch()} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Type</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.type')}</label>
                                 <select value={type} onChange={e => setType(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Types</option>
+                                    <option value="all">{t('common.all_types')}</option>
                                     <option value="whatsapp">WhatsApp</option>
                                     <option value="telegram">Telegram</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.status')}</label>
                                 <select value={status} onChange={e => setStatus(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Status</option>
+                                    <option value="all">{t('common.all_status')}</option>
                                     <option value="connected">Connected</option>
                                     <option value="disconnected">Disconnected</option>
                                     <option value="error">Error</option>
@@ -264,10 +272,10 @@ const Index = ({ channels, stats, filters }) => {
                             </div>
                             <div className="flex items-end gap-2">
                                 <button onClick={handleSearch} className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                    <Search className="w-4 h-4" /> Search
+                                    <Search className="w-4 h-4" /> {t('common.search')}
                                 </button>
                                 <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                    Reset
+                                    {t('common.reset')}
                                 </button>
                             </div>
                         </div>
@@ -277,10 +285,10 @@ const Index = ({ channels, stats, filters }) => {
                 {/* Add Buttons */}
                 <div className="flex flex-wrap gap-2">
                     <Link href="/admin/channels/whatsapp/create" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium transition-colors">
-                        <Plus className="w-4 h-4" /> Add WhatsApp
+                        <Plus className="w-4 h-4" /> {t('channels.add_whatsapp')}
                     </Link>
                     <Link href="/admin/channels/telegram/create" className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium transition-colors">
-                        <Plus className="w-4 h-4" /> Add Telegram
+                        <Plus className="w-4 h-4" /> {t('channels.add_telegram')}
                     </Link>
                 </div>
 
@@ -291,7 +299,7 @@ const Index = ({ channels, stats, filters }) => {
                             <table className="min-w-[800px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Name', 'Type', 'Identifier', 'Status', 'Last Verified', 'Actions'].map((h, i) => (
+                                    {[t('common.name'), t('common.type'), t('channels.identifier'), t('common.status'), t('channels.last_verified'), t('common.actions')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -350,7 +358,7 @@ const Index = ({ channels, stats, filters }) => {
                                     <tr>
                                         <td colSpan={6} className="text-center py-12 text-zinc-400 text-sm">
                                             <Radio className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No channels found
+                                            {t('channels.no_channels_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -368,19 +376,19 @@ const Index = ({ channels, stats, filters }) => {
             <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Channel Details</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('channels.channel_details')}</DialogTitle>
                     </DialogHeader>
                     {selectedChannel && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Name',          value: selectedChannel.name },
-                                    { label: 'Type',          custom: <ChannelType type={selectedChannel.type} /> },
-                                    { label: 'Status',        custom: <Badge status={selectedChannel.status} /> },
-                                    { label: 'Phone Number',  value: selectedChannel.phone_number || '—' },
-                                    { label: 'Bot Username',  value: selectedChannel.bot_username ? `@${selectedChannel.bot_username}` : '—' },
-                                    { label: 'Last Verified', value: selectedChannel.last_verified_at || '—' },
-                                    { label: 'Created',       value: selectedChannel.created_at },
+                                    { label: t('common.name'),            value: selectedChannel.name },
+                                    { label: t('common.type'),            custom: <ChannelType type={selectedChannel.type} /> },
+                                    { label: t('common.status'),          custom: <Badge status={selectedChannel.status} /> },
+                                    { label: t('channels.phone_number'),  value: selectedChannel.phone_number || '—' },
+                                    { label: t('channels.bot_username'),  value: selectedChannel.bot_username ? `@${selectedChannel.bot_username}` : '—' },
+                                    { label: t('channels.last_verified'), value: selectedChannel.last_verified_at || '—' },
+                                    { label: t('common.created'),         value: selectedChannel.created_at },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -391,7 +399,7 @@ const Index = ({ channels, stats, filters }) => {
 
                             {selectedChannel.error_message && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Error Message</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('channels.error_message')}</p>
                                     <p className="text-xs break-all bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-800 p-2.5 rounded-lg text-red-600 dark:text-red-400">
                                         {selectedChannel.error_message}
                                     </p>

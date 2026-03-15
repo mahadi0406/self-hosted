@@ -8,17 +8,9 @@ import {
     Send, Zap, Save, Eye, EyeOff, Upload, X,
     LogIn, Plus, Trash2, GripVertical,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600 transition-colors";
-
-const tabs = [
-    { key: 'general',    label: 'General',    icon: Globe },
-    { key: 'login_page', label: 'Login Page', icon: LogIn },
-    { key: 'ai',         label: 'AI',         icon: Sparkles },
-    { key: 'whatsapp',   label: 'WhatsApp',   icon: Smartphone },
-    { key: 'telegram',   label: 'Telegram',   icon: Send },
-    { key: 'campaign',   label: 'Campaign',   icon: Zap },
-];
 
 const availableIcons = [
     'MessageSquare', 'Zap', 'Shield', 'BarChart3',
@@ -116,7 +108,7 @@ const BooleanField = ({ setting, value, onChange }) => (
     </FieldWrapper>
 );
 
-const FileField = ({ setting, value, onChange, onFileChange }) => {
+const FileField = ({ setting, value, onChange, onFileChange, t }) => {
     const previewUrl = value && !value.startsWith('blob:')
         ? `/assets/files/${value}`
         : value || null;
@@ -138,7 +130,7 @@ const FileField = ({ setting, value, onChange, onFileChange }) => {
                 )}
                 <label className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 cursor-pointer text-sm text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
                     <Upload className="w-4 h-4" />
-                    {value ? 'Change file' : 'Upload file'}
+                    {value ? t('settings.change_file') : t('settings.upload_file')}
                     <input
                         type="file"
                         accept="image/*"
@@ -151,7 +143,7 @@ const FileField = ({ setting, value, onChange, onFileChange }) => {
     );
 };
 
-const JsonFeaturesField = ({ setting, value, onChange }) => {
+const JsonFeaturesField = ({ setting, value, onChange, t }) => {
     // Parse JSON value
     let features = [];
     try {
@@ -200,7 +192,7 @@ const JsonFeaturesField = ({ setting, value, onChange }) => {
                                 type="text"
                                 value={feature.label}
                                 onChange={e => updateFeature(index, 'label', e.target.value)}
-                                placeholder="Label"
+                                placeholder={t('settings.label')}
                                 className={`${inputCls} text-xs`}
                             />
                             <input
@@ -226,22 +218,22 @@ const JsonFeaturesField = ({ setting, value, onChange }) => {
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-dashed border-zinc-300 dark:border-zinc-600 text-sm text-zinc-500 hover:border-zinc-400 hover:text-zinc-600 dark:hover:border-zinc-500 dark:hover:text-zinc-400 transition-colors"
                 >
                     <Plus className="w-4 h-4" />
-                    Add Feature
+                    {t('settings.add_feature')}
                 </button>
             </div>
         </FieldWrapper>
     );
 };
 
-const renderField = (setting, values, onChange, onFileChange) => {
+const renderField = (setting, values, onChange, onFileChange, t) => {
     const value = values[setting.key] ?? setting.value;
     switch (setting.type) {
         case 'boolean':  return <BooleanField  key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'password': return <PasswordField key={setting.key} setting={setting} value={value} onChange={onChange} />;
         case 'number':   return <NumberField   key={setting.key} setting={setting} value={value} onChange={onChange} />;
-        case 'file':     return <FileField     key={setting.key} setting={setting} value={value} onChange={onChange} onFileChange={onFileChange} />;
+        case 'file':     return <FileField     key={setting.key} setting={setting} value={value} onChange={onChange} onFileChange={onFileChange} t={t} />;
         case 'textarea': return <TextareaField key={setting.key} setting={setting} value={value} onChange={onChange} rows={setting.key === 'ai_auto_reply_context' ? 5 : 3} />;
-        case 'json':     return <JsonFeaturesField key={setting.key} setting={setting} value={value} onChange={onChange} />;
+        case 'json':     return <JsonFeaturesField key={setting.key} setting={setting} value={value} onChange={onChange} t={t} />;
         default:         return <TextField     key={setting.key} setting={setting} value={value} onChange={onChange} />;
     }
 };
@@ -279,6 +271,7 @@ const SECTION_BREAKS = {
 };
 
 const TabPanel = ({ group, groupSettings }) => {
+    const { t } = useTranslation();
     const [values, setValues]   = useState({});
     const [files, setFiles]     = useState({});
     const [saving, setSaving]   = useState(false);
@@ -336,7 +329,7 @@ const TabPanel = ({ group, groupSettings }) => {
     };
 
     const settingsArray = Object.values(groupSettings);
-    const tabLabel = tabs.find(t => t.key === group)?.label || group;
+    const tabLabel = group;
 
     return (
         <form onSubmit={handleSave}>
@@ -352,7 +345,7 @@ const TabPanel = ({ group, groupSettings }) => {
                             {SECTION_BREAKS[group]?.[setting.key] && (
                                 <SectionHeader {...SECTION_BREAKS[group][setting.key]} />
                             )}
-                            {renderField(setting, values, onChange, onFileChange)}
+                            {renderField(setting, values, onChange, onFileChange, t)}
                         </React.Fragment>
                     ))}
                 </div>
@@ -363,7 +356,7 @@ const TabPanel = ({ group, groupSettings }) => {
                         className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                     >
                         <Save className="w-4 h-4" />
-                        {saving ? 'Saving...' : 'Save Changes'}
+                        {saving ? t('common.saving') : t('common.save_changes')}
                     </button>
                 </div>
             </div>
@@ -373,7 +366,18 @@ const TabPanel = ({ group, groupSettings }) => {
 
 
 const Index = ({ settings }) => {
+    const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState('general');
+
+    const tabs = [
+        { key: 'general',    label: t('settings.general'),    icon: Globe },
+        { key: 'login_page', label: t('settings.login_page'), icon: LogIn },
+        { key: 'ai',         label: t('settings.ai'),         icon: Sparkles },
+        { key: 'whatsapp',   label: t('settings.whatsapp'),   icon: Smartphone },
+        { key: 'telegram',   label: t('settings.telegram'),   icon: Send },
+        { key: 'campaign',   label: t('settings.campaign'),   icon: Zap },
+    ];
+
     const availableTabs = tabs.filter(tab => settings[tab.key]);
 
     return (
@@ -388,7 +392,7 @@ const Index = ({ settings }) => {
                         <Settings className="w-5 h-5 text-zinc-500" />
                     </div>
                     <div>
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Settings</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('settings.title')}</h1>
                         <p className="text-xs text-zinc-400">Manage your platform configuration</p>
                     </div>
                 </div>

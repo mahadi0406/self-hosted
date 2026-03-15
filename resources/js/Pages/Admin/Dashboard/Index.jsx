@@ -3,6 +3,7 @@ import Layout from "@/Layouts/admin/layout.jsx";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Link } from "@inertiajs/react";
 import { Users, Send, Radio, Inbox, Sparkles, MessageSquare, CheckCircle, XCircle } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Stat = ({ label, value, icon: Icon, trend }) => (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
@@ -52,18 +53,18 @@ const ChannelIcon = ({ type }) => (
     </span>
 );
 
-const SectionHeader = ({ title, href }) => (
+const SectionHeader = ({ title, href, viewAllLabel }) => (
     <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{title}</h2>
         {href && (
             <Link href={href} className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors">
-                View all →
+                {viewAllLabel ?? 'View all →'}
             </Link>
         )}
     </div>
 );
 
-const Table = ({ heads, rows }) => (
+const Table = ({ heads, rows, noDataLabel }) => (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
         <table className="w-full text-sm">
             <thead>
@@ -76,7 +77,7 @@ const Table = ({ heads, rows }) => (
             <tbody>
             {rows.length === 0 ? (
                 <tr>
-                    <td colSpan={heads.length} className="px-4 py-6 text-center text-xs text-zinc-400">No data yet</td>
+                    <td colSpan={heads.length} className="px-4 py-6 text-center text-xs text-zinc-400">{noDataLabel}</td>
                 </tr>
             ) : rows.map((row, i) => (
                 <tr key={i} className="border-b border-zinc-50 dark:border-zinc-800/50 last:border-0 hover:bg-zinc-50 dark:hover:bg-zinc-800/30 transition-colors">
@@ -112,48 +113,49 @@ const Dashboard = ({
    recent_inbox,
    recent_contacts,
 }) => {
+    const { t } = useTranslation();
     return (
         <Layout pageTitle="Dashboard" pageSection="Home">
             <div className="space-y-8 max-w-7xl mx-auto">
 
                 {/* Overview */}
                 <section>
-                    <SectionHeader title="Overview" />
+                    <SectionHeader title={t('dashboard.overview')} viewAllLabel={t('common.view_all')} />
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
-                        <Stat label="Total Contacts"      value={statistics.total_contacts.toLocaleString()}     icon={Users} />
-                        <Stat label="Active Contacts"     value={statistics.active_contacts.toLocaleString()}    icon={Users} />
-                        <Stat label="Total Campaigns"     value={statistics.total_campaigns.toLocaleString()}    icon={Send} />
-                        <Stat label="Running Campaigns"   value={statistics.running_campaigns.toLocaleString()}  icon={Send} />
-                        <Stat label="Connected Channels"  value={statistics.connected_channels.toLocaleString()} icon={Radio} />
-                        <Stat label="Unread Inbox"        value={statistics.unread_inbox.toLocaleString()}        icon={Inbox} />
+                        <Stat label={t('dashboard.total_contacts')}     value={statistics.total_contacts.toLocaleString()}     icon={Users} />
+                        <Stat label={t('dashboard.active_contacts')}    value={statistics.active_contacts.toLocaleString()}    icon={Users} />
+                        <Stat label={t('dashboard.total_campaigns')}    value={statistics.total_campaigns.toLocaleString()}    icon={Send} />
+                        <Stat label={t('dashboard.running_campaigns')}  value={statistics.running_campaigns.toLocaleString()}  icon={Send} />
+                        <Stat label={t('dashboard.connected_channels')} value={statistics.connected_channels.toLocaleString()} icon={Radio} />
+                        <Stat label={t('dashboard.unread_inbox')}       value={statistics.unread_inbox.toLocaleString()}        icon={Inbox} />
                     </div>
                 </section>
 
                 {/* Message Stats */}
                 <section>
-                    <SectionHeader title="Message Delivery" />
+                    <SectionHeader title={t('dashboard.message_delivery')} />
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                        <Stat label="Sent"      value={message_stats.sent.toLocaleString()}      icon={Send} />
-                        <Stat label="Delivered" value={message_stats.delivered.toLocaleString()} icon={CheckCircle} />
-                        <Stat label="Read"      value={message_stats.read.toLocaleString()}      icon={MessageSquare} />
-                        <Stat label="Failed"    value={message_stats.failed.toLocaleString()}    icon={XCircle} />
+                        <Stat label={t('dashboard.sent')}      value={message_stats.sent.toLocaleString()}      icon={Send} />
+                        <Stat label={t('dashboard.delivered')} value={message_stats.delivered.toLocaleString()} icon={CheckCircle} />
+                        <Stat label={t('dashboard.read')}      value={message_stats.read.toLocaleString()}      icon={MessageSquare} />
+                        <Stat label={t('dashboard.failed')}    value={message_stats.failed.toLocaleString()}    icon={XCircle} />
                     </div>
                 </section>
 
                 {/* AI Stats */}
                 <section>
-                    <SectionHeader title="AI Usage" href="/admin/analytics/ai-logs" />
+                    <SectionHeader title={t('dashboard.ai_usage')} href="/admin/analytics/ai-logs" viewAllLabel={t('common.view_all')} />
                     <div className="grid grid-cols-3 gap-4">
-                        <Stat label="Total AI Calls"   value={ai_stats.total_calls.toLocaleString()}  icon={Sparkles} />
-                        <Stat label="Successful"       value={ai_stats.successful.toLocaleString()}   icon={Sparkles} />
-                        <Stat label="Tokens Used"      value={ai_stats.total_tokens.toLocaleString()} icon={Sparkles} />
+                        <Stat label={t('dashboard.total_ai_calls')} value={ai_stats.total_calls.toLocaleString()}  icon={Sparkles} />
+                        <Stat label={t('dashboard.successful')}     value={ai_stats.successful.toLocaleString()}   icon={Sparkles} />
+                        <Stat label={t('dashboard.tokens_used')}    value={ai_stats.total_tokens.toLocaleString()} icon={Sparkles} />
                     </div>
                 </section>
 
                 {/* Chart */}
                 {chart_data?.length > 0 && (
                     <section>
-                        <SectionHeader title="30-Day Overview" />
+                        <SectionHeader title={t('dashboard.30_day_overview')} />
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                             <ResponsiveContainer width="100%" height={260}>
                                 <LineChart data={chart_data}>
@@ -161,12 +163,12 @@ const Dashboard = ({
                                     <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#a1a1aa' }} axisLine={false} tickLine={false} />
                                     <YAxis tick={{ fontSize: 11, fill: '#a1a1aa' }} axisLine={false} tickLine={false} />
                                     <Tooltip content={<ChartTooltip />} />
-                                    <Line type="monotone" dataKey="sent"    name="Sent"    stroke="#10b981" strokeWidth={1.5} dot={false} />
-                                    <Line type="monotone" dataKey="inbound" name="Inbound" stroke="#3b82f6" strokeWidth={1.5} dot={false} />
+                                    <Line type="monotone" dataKey="sent"    name={t('dashboard.sent')}    stroke="#10b981" strokeWidth={1.5} dot={false} />
+                                    <Line type="monotone" dataKey="inbound" name={t('dashboard.inbound')} stroke="#3b82f6" strokeWidth={1.5} dot={false} />
                                 </LineChart>
                             </ResponsiveContainer>
                             <div className="flex gap-4 mt-3 justify-center">
-                                {[['Sent', '#10b981'], ['Inbound', '#3b82f6']].map(([name, color]) => (
+                                {[[t('dashboard.sent'), '#10b981'], [t('dashboard.inbound'), '#3b82f6']].map(([name, color]) => (
                                     <span key={name} className="flex items-center gap-1.5 text-xs text-zinc-500">
                                         <span className="w-3 h-0.5 rounded" style={{ backgroundColor: color }} />
                                         {name}
@@ -182,9 +184,10 @@ const Dashboard = ({
 
                     {/* Recent Campaigns */}
                     <section>
-                        <SectionHeader title="Recent Campaigns" href="/admin/campaigns" />
+                        <SectionHeader title={t('dashboard.recent_campaigns')} href="/admin/campaigns" viewAllLabel={t('common.view_all')} />
                         <Table
-                            heads={['Campaign', 'Channel', 'Recipients', 'Status']}
+                            heads={[t('dashboard.campaign'), t('dashboard.channel'), t('dashboard.recipients'), t('common.status')]}
+                            noDataLabel={t('common.no_data')}
                             rows={(recent_campaigns ?? []).map(c => [
                                 <div>
                                     <div className="font-medium text-zinc-800 dark:text-zinc-200">{c.name}</div>
@@ -199,9 +202,10 @@ const Dashboard = ({
 
                     {/* Recent Inbox */}
                     <section>
-                        <SectionHeader title="Recent Inbox" href="/admin/inbox" />
+                        <SectionHeader title={t('dashboard.recent_inbox')} href="/admin/inbox" viewAllLabel={t('common.view_all')} />
                         <Table
-                            heads={['Contact', 'Message', 'Intent', 'Channel']}
+                            heads={[t('dashboard.contact'), t('dashboard.message'), t('dashboard.intent'), t('dashboard.channel')]}
+                            noDataLabel={t('common.no_data')}
                             rows={(recent_inbox ?? []).map(m => [
                                 <div>
                                     <div className="font-medium text-zinc-800 dark:text-zinc-200">{m.contact_name}</div>
@@ -216,9 +220,10 @@ const Dashboard = ({
 
                     {/* Recent Contacts */}
                     <section>
-                        <SectionHeader title="Recent Contacts" href="/admin/contacts" />
+                        <SectionHeader title={t('dashboard.recent_contacts')} href="/admin/contacts" viewAllLabel={t('common.view_all')} />
                         <Table
-                            heads={['Contact', 'Phone', 'Status', 'AI Label']}
+                            heads={[t('dashboard.contact'), t('dashboard.phone'), t('common.status'), t('dashboard.ai_label')]}
+                            noDataLabel={t('common.no_data')}
                             rows={(recent_contacts ?? []).map(c => [
                                 <div>
                                     <div className="font-medium text-zinc-800 dark:text-zinc-200">{c.name}</div>
@@ -235,9 +240,10 @@ const Dashboard = ({
 
                     {/* Campaign Stats Summary */}
                     <section>
-                        <SectionHeader title="Campaign Stats Summary" href="/admin/campaigns" />
+                        <SectionHeader title={t('dashboard.campaign_stats_summary')} href="/admin/campaigns" viewAllLabel={t('common.view_all')} />
                         <Table
-                            heads={['Status', 'Count', 'Percentage']}
+                            heads={[t('common.status'), t('dashboard.count'), t('dashboard.percentage')]}
+                            noDataLabel={t('common.no_data')}
                             rows={[
                                 [
                                     <span className="font-medium text-zinc-800 dark:text-zinc-200">Total</span>,

@@ -14,6 +14,7 @@ import {
     DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const statusColor = (status) => {
     const map = {
@@ -50,44 +51,48 @@ const ListBadge = ({ list }) => (
 const getUserInitials = (name) =>
     name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) ?? '?';
 
-const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-        <DialogContent className="max-w-sm">
-            <div className="flex flex-col items-center text-center pt-2">
-                <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
-                    <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+const DeleteConfirmModal = ({ open, onOpenChange, onConfirm, title, description, loading }) => {
+    const { t } = useTranslation();
+    return (
+        <Dialog open={open} onOpenChange={onOpenChange}>
+            <DialogContent className="max-w-sm">
+                <div className="flex flex-col items-center text-center pt-2">
+                    <div className="w-12 h-12 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+                        <AlertTriangle className="w-6 h-6 text-red-600 dark:text-red-400" />
+                    </div>
+                    <DialogHeader>
+                        <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                            {title || 'Delete Confirmation'}
+                        </DialogTitle>
+                    </DialogHeader>
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
+                        {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
+                    </p>
+                    <div className="flex items-center gap-3 w-full">
+                        <button
+                            onClick={() => onOpenChange(false)}
+                            disabled={loading}
+                            className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
+                        >
+                            {t('common.cancel')}
+                        </button>
+                        <button
+                            onClick={onConfirm}
+                            disabled={loading}
+                            className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
+                        >
+                            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
+                            {t('common.delete')}
+                        </button>
+                    </div>
                 </div>
-                <DialogHeader>
-                    <DialogTitle className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                        {title || 'Delete Confirmation'}
-                    </DialogTitle>
-                </DialogHeader>
-                <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-2 mb-6">
-                    {description || 'Are you sure you want to delete this item? This action cannot be undone.'}
-                </p>
-                <div className="flex items-center gap-3 w-full">
-                    <button
-                        onClick={() => onOpenChange(false)}
-                        disabled={loading}
-                        className="flex-1 px-4 py-2.5 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors disabled:opacity-50"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={onConfirm}
-                        disabled={loading}
-                        className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-red-600 hover:bg-red-700 text-white transition-colors disabled:opacity-50"
-                    >
-                        {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />}
-                        Delete
-                    </button>
-                </div>
-            </div>
-        </DialogContent>
-    </Dialog>
-);
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 const Index = ({ contacts, stats, filters, lists }) => {
+    const { t } = useTranslation();
     const [search, setSearch]                     = useState(filters?.search || '');
     const [status, setStatus]                     = useState(filters?.status || 'all');
     const [aiLabel, setAiLabel]                   = useState(filters?.ai_label || 'all');
@@ -146,10 +151,10 @@ const Index = ({ contacts, stats, filters, lists }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Contacts', value: stats.total,     icon: Users },
-                            { label: 'Active',         value: stats.active,    icon: Users,  accent: 'text-emerald-600' },
-                            { label: 'Opted Out',      value: stats.opted_out, icon: Users },
-                            { label: 'Hot Leads 🔥',   value: stats.hot_leads, icon: Users,  accent: 'text-orange-600' },
+                            { label: t('contacts.total'),     value: stats.total,     icon: Users },
+                            { label: t('contacts.active'),    value: stats.active,    icon: Users,  accent: 'text-emerald-600' },
+                            { label: t('contacts.opted_out'), value: stats.opted_out, icon: Users },
+                            { label: t('contacts.hot_leads'), value: stats.hot_leads, icon: Users,  accent: 'text-orange-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -167,10 +172,10 @@ const Index = ({ contacts, stats, filters, lists }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
                                     placeholder="Name, phone, email..."
@@ -181,39 +186,39 @@ const Index = ({ contacts, stats, filters, lists }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Status</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.status')}</label>
                                 <select
                                     value={status}
                                     onChange={e => setStatus(e.target.value)}
                                     className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
                                 >
-                                    <option value="all">All Status</option>
+                                    <option value="all">{t('common.all_status')}</option>
                                     <option value="active">Active</option>
                                     <option value="opted_out">Opted Out</option>
                                     <option value="blocked">Blocked</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">AI Label</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('contacts.ai_label')}</label>
                                 <select
                                     value={aiLabel}
                                     onChange={e => setAiLabel(e.target.value)}
                                     className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
                                 >
-                                    <option value="all">All Labels</option>
+                                    <option value="all">{t('contacts.all_labels')}</option>
                                     <option value="hot">🔥 Hot</option>
                                     <option value="warm">🌡️ Warm</option>
                                     <option value="cold">❄️ Cold</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">List</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('contacts.lists')}</label>
                                 <select
                                     value={listId}
                                     onChange={e => setListId(e.target.value)}
                                     className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
                                 >
-                                    <option value="all">All Lists</option>
+                                    <option value="all">{t('contacts.all_lists')}</option>
                                     {lists?.map(list => (
                                         <option key={list.id} value={list.id}>{list.name}</option>
                                     ))}
@@ -224,13 +229,13 @@ const Index = ({ contacts, stats, filters, lists }) => {
                                     onClick={handleSearch}
                                     className="flex-1 inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors"
                                 >
-                                    <Search className="w-4 h-4" /> Search
+                                    <Search className="w-4 h-4" /> {t('common.search')}
                                 </button>
                                 <button
                                     onClick={handleReset}
                                     className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
-                                    Reset
+                                    {t('common.reset')}
                                 </button>
                             </div>
                         </div>
@@ -243,13 +248,13 @@ const Index = ({ contacts, stats, filters, lists }) => {
                         href="/admin/contacts/create"
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                     >
-                        <Plus className="w-4 h-4" /> Add Contact
+                        <Plus className="w-4 h-4" /> {t('contacts.add_contact')}
                     </Link>
                     <Link
                         href="/admin/contacts/import"
                         className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-sm font-medium transition-colors"
                     >
-                        <Upload className="w-4 h-4" /> Import CSV
+                        <Upload className="w-4 h-4" /> {t('contacts.import_csv')}
                     </Link>
                 </div>
 
@@ -260,7 +265,7 @@ const Index = ({ contacts, stats, filters, lists }) => {
                             <table className="min-w-[900px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Contact', 'Phone', 'Telegram', 'Lists', 'Status', 'AI Label', 'Last Messaged', 'Actions'].map((h, i) => (
+                                    {[t('dashboard.contact'), t('dashboard.phone'), t('contacts.telegram'), t('contacts.lists'), t('common.status'), t('contacts.ai_label'), t('contacts.last_messaged'), t('common.actions')].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -341,7 +346,7 @@ const Index = ({ contacts, stats, filters, lists }) => {
                                     <tr>
                                         <td colSpan={8} className="text-center py-12 text-zinc-400 text-sm">
                                             <User className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No contacts found
+                                            {t('contacts.no_contacts_found')}
                                         </td>
                                     </tr>
                                 )}
@@ -371,22 +376,22 @@ const Index = ({ contacts, stats, filters, lists }) => {
             <Dialog open={showDetailsModal} onOpenChange={setShowDetailsModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Contact Details</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('contacts.contact_details')}</DialogTitle>
                     </DialogHeader>
                     {selectedContact && (
                         <div className="space-y-4 pt-1">
                             <div className="grid grid-cols-2 gap-3">
                                 {[
-                                    { label: 'Name',     value: selectedContact.name },
-                                    { label: 'Email',    value: selectedContact.email    || '—' },
-                                    { label: 'Phone',    value: selectedContact.phone    || '—' },
-                                    { label: 'Telegram', value: selectedContact.telegram_id || '—' },
-                                    { label: 'Country',  value: selectedContact.country  || '—' },
-                                    { label: 'Language', value: selectedContact.language || '—' },
-                                    { label: 'Status',   custom: <Badge value={selectedContact.status} colorFn={statusColor} /> },
-                                    { label: 'AI Label', custom: <Badge value={selectedContact.ai_engagement_label} colorFn={aiLabelColor} /> },
-                                    { label: 'Last Messaged', value: selectedContact.last_messaged_at || '—' },
-                                    { label: 'Created',  value: selectedContact.created_at },
+                                    { label: t('common.name'),           value: selectedContact.name },
+                                    { label: t('contacts.email'),        value: selectedContact.email    || '—' },
+                                    { label: t('dashboard.phone'),       value: selectedContact.phone    || '—' },
+                                    { label: t('contacts.telegram'),     value: selectedContact.telegram_id || '—' },
+                                    { label: t('contacts.country'),      value: selectedContact.country  || '—' },
+                                    { label: t('contacts.language'),     value: selectedContact.language || '—' },
+                                    { label: t('common.status'),         custom: <Badge value={selectedContact.status} colorFn={statusColor} /> },
+                                    { label: t('contacts.ai_label'),     custom: <Badge value={selectedContact.ai_engagement_label} colorFn={aiLabelColor} /> },
+                                    { label: t('contacts.last_messaged'), value: selectedContact.last_messaged_at || '—' },
+                                    { label: t('common.created'),        value: selectedContact.created_at },
                                 ].map(({ label, value, custom }) => (
                                     <div key={label} className="space-y-1">
                                         <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{label}</p>
@@ -397,7 +402,7 @@ const Index = ({ contacts, stats, filters, lists }) => {
                             {/* Lists Section */}
                             {selectedContact.lists?.length > 0 && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Lists</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('contacts.lists')}</p>
                                     <div className="flex flex-wrap gap-1">
                                         {selectedContact.lists.map(list => (
                                             <ListBadge key={list.id} list={list} />
@@ -407,7 +412,7 @@ const Index = ({ contacts, stats, filters, lists }) => {
                             )}
                             {selectedContact.tags?.length > 0 && (
                                 <div className="space-y-1">
-                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Tags</p>
+                                    <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('contacts.tags')}</p>
                                     <div className="flex flex-wrap gap-1">
                                         {selectedContact.tags.map(tag => (
                                             <span key={tag} className="px-2 py-0.5 rounded text-xs bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">{tag}</span>
@@ -420,7 +425,7 @@ const Index = ({ contacts, stats, filters, lists }) => {
                                     onClick={() => setShowDetailsModal(false)}
                                     className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                                 >
-                                    Close
+                                    {t('common.close')}
                                 </button>
                             </div>
                         </div>
