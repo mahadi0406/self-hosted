@@ -190,7 +190,6 @@
 
     <div class="actions">
         <a href="/" class="btn btn-success">Visit Your Application</a>
-        <a href="<?php echo rtrim((isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http') . '://' . $_SERVER['HTTP_HOST'], '/'); ?>/admin" class="btn">Access Admin Panel</a>
     </div>
 
     <div style="text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.3); color: white;">
