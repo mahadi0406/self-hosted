@@ -471,7 +471,6 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
                 password,
                 role,
                 status,
-                kyc_status,
                 last_login_at,
                 avatar,
                 is_admin,
