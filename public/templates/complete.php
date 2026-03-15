@@ -178,10 +178,6 @@
                 <span><?php echo htmlspecialchars($_SESSION['db_config']['host'] ?? $_SERVER['HTTP_HOST'] ?? 'Your Domain'); ?></span>
             </div>
             <div class="info-item">
-                <strong>Admin Email</strong>
-                <span><?php echo htmlspecialchars($_SESSION['admin_config']['email'] ?? 'Admin Email'); ?></span>
-            </div>
-            <div class="info-item">
                 <strong>Framework</strong>
                 <span>Laravel</span>
             </div>

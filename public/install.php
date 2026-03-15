@@ -495,7 +495,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
                 1,
                 $rememberToken,
                 $currentTimestamp,
-                $currentTimestamp                       
+                $currentTimestamp
             ]);
 
             $this->writeAppSignature($pdo, $purchaseCode, $licensedDomain);
