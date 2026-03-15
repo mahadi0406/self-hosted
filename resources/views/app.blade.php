@@ -6,10 +6,11 @@
     <title>{{ e($page['props']['seo']['meta_title'] ?? $page['props']['appName'] ?? config('app.name', 'Mine Invest App')) }}</title>
 
     @php
-        $favicon = $page['props']['faviconUrl'] ?? asset('favicon.ico');
+        $favicon = $faviconUrl ?? $page['props']['faviconUrl'] ?? asset('favicon.ico');
+        $logo    = $logoUrl    ?? $page['props']['logoUrl']    ?? asset('images/default-logo.png');
     @endphp
-    <link rel="icon" href="{{ $favicon }}">
-    <link rel="shortcut icon" href="{{ $favicon }}">
+    <link rel="icon" type="image/x-icon" href="{{ $favicon }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ $favicon }}">
 
     @php
         $description = $page['props']['seo']['meta_description'] ?? '';

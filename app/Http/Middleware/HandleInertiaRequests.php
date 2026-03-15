@@ -5,7 +5,6 @@ namespace App\Http\Middleware;
 use App\Concerns\UploadedFile;
 use App\Models\Language;
 use App\Models\Setting;
-use App\Services\DefaultImageService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Inertia\Middleware;
@@ -27,8 +26,11 @@ class HandleInertiaRequests extends Middleware
         $loginFeatures = $this->getSetting('login_features');
         $features = $loginFeatures ? json_decode($loginFeatures, true) : [];
 
-        // Language / translations
-        $langData     = $this->loadLanguageData($request);
+        $langData = $this->loadLanguageData($request);
+
+        $logoUrl    = $logo    ? $this->fullPath($logo)    : asset('images/default-logo.png');
+        $faviconUrl = $favicon ? $this->fullPath($favicon) : asset('favicon.ico');
+        view()->share(compact('logoUrl', 'faviconUrl'));
 
         return array_merge(parent::share($request), [
             'csrf_token'      => csrf_token(),
@@ -53,8 +55,8 @@ class HandleInertiaRequests extends Middleware
                 ] : null,
             ],
 
-            'logoUrl'        => $logo    ? $this->fullPath($logo)    : DefaultImageService::getImageUrl(null, 'logo',    200, 80),
-            'faviconUrl'     => $favicon ? $this->fullPath($favicon) : DefaultImageService::getImageUrl(null, 'favicon', 16,  16),
+            'logoUrl'    => $logoUrl,
+            'faviconUrl' => $faviconUrl,
             'currencySymbol' => $this->getSetting('currency_symbol', '$'),
             'currencyName' => $this->getSetting('default_currency', 'USD'),
             'appName' => $this->getSetting('site_name', 'BlastBot'),
@@ -131,7 +133,6 @@ class HandleInertiaRequests extends Middleware
                 'translations'    => $translations,
             ];
         } catch (\Exception) {
-            // DB not ready or languages table doesn't exist yet
             return [
                 'currentLanguage' => ['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'flag' => '🇬🇧'],
                 'languages'       => [['code' => 'en', 'name' => 'English', 'native_name' => 'English', 'flag' => '🇬🇧', 'is_default' => true]],
