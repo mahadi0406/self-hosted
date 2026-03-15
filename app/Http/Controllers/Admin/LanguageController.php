@@ -105,9 +105,9 @@ class LanguageController extends Controller
         $translations = $query->paginate(50)->withQueryString();
 
         return Inertia::render('Admin/Languages/Translations', [
-            'language'     => $language,
-            'translations' => $translations,
-            'filters'      => ['search' => $search],
+            'language'         => $language,
+            'translationRows'  => $translations,
+            'filters'          => ['search' => $search],
         ]);
     }
 

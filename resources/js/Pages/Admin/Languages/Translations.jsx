@@ -16,7 +16,8 @@ import {
 import Pagination from "@/Components/UI/pagination.jsx";
 import { useTranslation } from "@/hooks/useTranslation.jsx";
 
-const Translations = ({ language, translations, filters }) => {
+const Translations = ({ language, translationRows, filters }) => {
+    const translations = translationRows;
     const { t } = useTranslation();
     const [search, setSearch]           = useState(filters?.search || '');
     const [edits, setEdits]             = useState({});

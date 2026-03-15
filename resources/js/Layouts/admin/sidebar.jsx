@@ -1,5 +1,6 @@
 import React, {useState, useEffect, useRef} from 'react';
 import {Link, usePage, router} from "@inertiajs/react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 import {cn} from "@/lib/utils";
 import {ScrollArea} from "@/Components/UI/scroll-area";
 import {Avatar, AvatarFallback} from "@/Components/UI/avatar";
@@ -45,6 +46,7 @@ const Sidebar = ({
     const floatingRef = useRef(null);
     const scrollViewportRef = useRef(null);
     const {url, props} = usePage();
+    const { t } = useTranslation();
 
     const appName = props.appName || 'Experts-Trade';
     const config = {
@@ -63,71 +65,71 @@ const Sidebar = ({
     const SCROLL_POSITION_KEY = 'sidebar-scroll-position';
     const menuGroups = [
         {
-            label: 'Dashboard',
+            label: t('nav.dashboard'),
             items: [
-                { title: 'Dashboard', icon: Home, route: '/admin/dashboard' },
+                { title: t('nav.dashboard'), icon: Home, route: '/admin/dashboard' },
             ]
         },
         {
-            label: 'Connections',
+            label: t('nav.connections'),
             items: [
                 {
-                    title: 'Channels',
+                    title: t('nav.channels'),
                     icon: Radio,
                     submenu: [
-                        { title: 'All Channels',       route: '/admin/channels' },
-                        { title: 'Add WhatsApp',        route: '/admin/channels/whatsapp/create' },
-                        { title: 'Add Telegram',        route: '/admin/channels/telegram/create' },
+                        { title: t('nav.all_channels'),  route: '/admin/channels' },
+                        { title: t('nav.add_whatsapp'),  route: '/admin/channels/whatsapp/create' },
+                        { title: t('nav.add_telegram'),  route: '/admin/channels/telegram/create' },
                     ]
                 },
                 {
-                    title: 'Contact Lists',
+                    title: t('nav.contact_lists'),
                     icon: List,
                     submenu: [
-                        { title: 'All Lists',    route: '/admin/contact-lists' },
-                        { title: 'Create List',  route: '/admin/contact-lists/create' },
+                        { title: t('nav.all_lists'),    route: '/admin/contact-lists' },
+                        { title: t('nav.create_list'),  route: '/admin/contact-lists/create' },
                     ]
                 },
                 {
-                    title: 'Contacts',
+                    title: t('nav.contacts'),
                     icon: Users,
                     submenu: [
-                        { title: 'All Contacts',   route: '/admin/contacts' },
-                        { title: 'Add Contact',    route: '/admin/contacts/create' },
-                        { title: 'Import CSV',     route: '/admin/contacts/import' },
+                        { title: t('nav.all_contacts'), route: '/admin/contacts' },
+                        { title: t('nav.add_contact'),  route: '/admin/contacts/create' },
+                        { title: t('nav.import_csv'),   route: '/admin/contacts/import' },
                     ]
                 },
             ]
         },
         {
-            label: 'Messaging',
+            label: t('nav.messaging'),
             items: [
                 {
-                    title: 'Templates',
+                    title: t('nav.templates'),
                     icon: FileText,
                     submenu: [
-                        { title: 'All Templates',    route: '/admin/templates' },
-                        { title: 'Create Template',  route: '/admin/templates/create' },
+                        { title: t('nav.all_templates'),   route: '/admin/templates' },
+                        { title: t('nav.create_template'), route: '/admin/templates/create' },
                     ]
                 },
                 {
-                    title: 'Campaigns',
+                    title: t('nav.campaigns'),
                     icon: Send,
                     submenu: [
-                        { title: 'All Campaigns',    route: '/admin/campaigns' },
-                        { title: 'Create Campaign',  route: '/admin/campaigns/create' },
+                        { title: t('nav.all_campaigns'),   route: '/admin/campaigns' },
+                        { title: t('nav.create_campaign'), route: '/admin/campaigns/create' },
                     ]
                 },
                 {
-                    title: 'Drip Sequences',
+                    title: t('nav.drip_sequences'),
                     icon: Zap,
                     submenu: [
-                        { title: 'All Sequences',   route: '/admin/drip-sequences' },
-                        { title: 'Create Sequence', route: '/admin/drip-sequences/create' },
+                        { title: t('nav.all_sequences'),   route: '/admin/drip-sequences' },
+                        { title: t('nav.create_sequence'), route: '/admin/drip-sequences/create' },
                     ]
                 },
                 {
-                    title: 'Inbox',
+                    title: t('nav.inbox'),
                     icon: Inbox,
                     route: '/admin/inbox',
                     badge: 'LIVE'
@@ -135,16 +137,16 @@ const Sidebar = ({
             ]
         },
         {
-            label: 'AI Features',
+            label: t('nav.ai_features'),
             items: [
                 {
-                    title: 'AI Message Writer',
+                    title: t('nav.ai_message_writer'),
                     icon: Sparkles,
                     route: '/admin/ai/message-writer',
                     badge: 'AI'
                 },
                 {
-                    title: 'AI Campaign Planner',
+                    title: t('nav.ai_campaign_planner'),
                     icon: Bot,
                     route: '/admin/ai/campaign-planner',
                     badge: 'AI'
@@ -152,18 +154,18 @@ const Sidebar = ({
             ]
         },
         {
-            label: 'Analytics',
+            label: t('nav.analytics'),
             items: [
-                { title: 'Campaign Analytics', icon: BarChart3, route: '/admin/analytics/campaigns' },
-                { title: 'AI Logs',            icon: History,   route: '/admin/analytics/ai-logs' },
+                { title: t('nav.campaign_analytics'), icon: BarChart3, route: '/admin/analytics/campaigns' },
+                { title: t('nav.ai_logs'),            icon: History,   route: '/admin/analytics/ai-logs' },
             ]
         },
         {
-            label: 'Settings',
+            label: t('nav.settings'),
             items: [
-                { title: 'Settings',     icon: Settings,  route: '/admin/settings' },
-                { title: 'Automations',  icon: Terminal,  route: '/admin/automations' },
-                { title: 'Languages',    icon: Globe,     route: '/admin/languages' },
+                { title: t('nav.settings'),   icon: Settings, route: '/admin/settings' },
+                { title: t('nav.automations'), icon: Terminal, route: '/admin/automations' },
+                { title: t('nav.languages'),   icon: Globe,    route: '/admin/languages' },
             ]
         },
     ];
@@ -473,12 +475,12 @@ const Sidebar = ({
                                 <TooltipTrigger asChild>
                                     <LogOut className="w-5 h-5" strokeWidth={1.5}/>
                                 </TooltipTrigger>
-                                <TooltipContent side="right">Logout</TooltipContent>
+                                <TooltipContent side="right">{t('nav.logout')}</TooltipContent>
                             </Tooltip>
                         ) : (
                             <>
                                 <LogOut className="w-5 h-5" strokeWidth={1.5}/>
-                                <span>Logout</span>
+                                <span>{t('nav.logout')}</span>
                             </>
                         )}
                     </button>

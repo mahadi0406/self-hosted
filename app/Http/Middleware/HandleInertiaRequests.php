@@ -86,11 +86,32 @@ class HandleInertiaRequests extends Middleware
                     ?? Language::first();
             });
 
-            $translations = [];
-            if ($currentLanguage) {
-                $translations = Cache::remember("translations_{$currentLanguage->code}", 3600, function () use ($currentLanguage) {
-                    return $currentLanguage->translations()->pluck('value', 'key')->toArray();
+            // Always load English (default) as the baseline fallback
+            $defaultTranslations = Cache::remember('translations_fallback_en', 3600, function () {
+                $jsonPath = resource_path('js/lang/en.json');
+                if (file_exists($jsonPath)) {
+                    return json_decode(file_get_contents($jsonPath), true) ?? [];
+                }
+                $default = Language::where('is_default', true)->first();
+                return $default ? $default->translations()->pluck('value', 'key')->toArray() : [];
+            });
+
+            $translations = $defaultTranslations;
+            if ($currentLanguage && $currentLanguage->code !== 'en') {
+                $langTranslations = Cache::remember("translations_{$currentLanguage->code}", 3600, function () use ($currentLanguage) {
+                    // Try DB first
+                    $db = $currentLanguage->translations()->pluck('value', 'key')->toArray();
+                    // If DB empty, try JSON file
+                    if (empty($db)) {
+                        $jsonPath = resource_path('js/lang/' . $currentLanguage->code . '.json');
+                        if (file_exists($jsonPath)) {
+                            return json_decode(file_get_contents($jsonPath), true) ?? [];
+                        }
+                    }
+                    return $db;
                 });
+                // Merge: English fills any missing keys; current language overrides
+                $translations = array_merge($defaultTranslations, $langTranslations);
             }
 
             $languages = Cache::remember('languages_active', 3600, function () {
