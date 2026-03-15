@@ -446,6 +446,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
                 $dbConfig['password']
             );
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
             $tableExists = $pdo->query("SHOW TABLES LIKE 'users'")->rowCount() > 0;
             if (!$tableExists) {
                 throw new Exception('Users table does not exist. Please ensure migrations have been run.');
@@ -462,6 +463,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
             $hashedPassword = password_hash($adminConfig['password'], PASSWORD_DEFAULT);
             $rememberToken = $this->generateRandomString(10);
             $currentTimestamp = date('Y-m-d H:i:s');
+
             $stmt = $pdo->prepare("
             INSERT INTO users (
                 uid,
@@ -477,7 +479,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
                 remember_token,
                 created_at,
                 updated_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
             $stmt->execute([
@@ -488,16 +490,13 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
                 $hashedPassword,
                 'admin',
                 1,
-                'approved',
                 $currentTimestamp,
                 null,
                 1,
                 $rememberToken,
                 $currentTimestamp,
-                $currentTimestamp
+                $currentTimestamp                       
             ]);
-
-            echo "Admin user created successfully with UID: " . $uid;
 
             $this->writeAppSignature($pdo, $purchaseCode, $licensedDomain);
 
