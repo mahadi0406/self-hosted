@@ -10,20 +10,24 @@ class LanguageSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create English as the default language
-        $english = Language::updateOrCreate(
-            ['code' => 'en'],
+        $this->seedLanguage('en', 'English', 'English', '🇬🇧', true);
+        $this->seedLanguage('es', 'Spanish', 'Español', '🇪🇸', false);
+    }
+
+    private function seedLanguage(string $code, string $name, string $nativeName, string $flag, bool $isDefault): void
+    {
+        $language = Language::updateOrCreate(
+            ['code' => $code],
             [
-                'name'        => 'English',
-                'native_name' => 'English',
-                'flag'        => '🇬🇧',
-                'is_default'  => true,
+                'name'        => $name,
+                'native_name' => $nativeName,
+                'flag'        => $flag,
+                'is_default'  => $isDefault,
                 'is_active'   => true,
             ]
         );
 
-        // Load translations from en.json
-        $jsonPath = resource_path('js/lang/en.json');
+        $jsonPath = resource_path("js/lang/{$code}.json");
 
         if (! file_exists($jsonPath)) {
             return;
@@ -33,7 +37,7 @@ class LanguageSeeder extends Seeder
 
         foreach ($translations as $key => $value) {
             Translation::updateOrCreate(
-                ['language_id' => $english->id, 'key' => $key],
+                ['language_id' => $language->id, 'key' => $key],
                 ['value'       => $value]
             );
         }
