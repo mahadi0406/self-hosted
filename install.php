@@ -23,7 +23,7 @@ class LaravelInstaller {
 
     public function __construct() {
         $this->step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
-        $this->laravelRoot = dirname(__DIR__);
+        $this->laravelRoot = __DIR__;
     }
 
     public function run(): void
@@ -214,8 +214,6 @@ class LaravelInstaller {
             $this->errors[] = 'Please enter a valid email address.';
             return;
         }
-
-
 
         try {
             $this->createEnvFile($appName, $appUrl, '', $this->cleanDomain($appUrl));
@@ -620,4 +618,3 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
 
 $installer = new LaravelInstaller();
 $installer->run();
-?>
