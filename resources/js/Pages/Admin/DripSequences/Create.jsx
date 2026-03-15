@@ -6,6 +6,7 @@ import {
     Smartphone, Send, ChevronDown, ChevronUp,
     Clock, FileText, Check,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600";
 
@@ -28,7 +29,7 @@ const defaultStep = () => ({
     open:        true,
 });
 
-const StepCard = ({ step, index, total, onChange, onRemove, onToggle, templates, errors }) => (
+const StepCard = ({ step, index, total, onChange, onRemove, onToggle, templates, errors, t }) => (
     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
         {/* Step Header */}
         <div
@@ -67,48 +68,48 @@ const StepCard = ({ step, index, total, onChange, onRemove, onToggle, templates,
         {step.open && (
             <div className="px-4 pb-4 pt-1 space-y-4 border-t border-zinc-100 dark:border-zinc-800">
 
-                <Field label="Step Name" error={errors?.[`steps.${index}.name`]}>
+                <Field label={t('drip_sequences.step_name')} error={errors?.[`steps.${index}.name`]}>
                     <input type="text" value={step.name} onChange={e => onChange('name', e.target.value)} placeholder={`e.g. Welcome Message`} className={inputCls} />
                 </Field>
 
                 {/* Delay */}
                 <div className="grid grid-cols-3 gap-3">
-                    <Field label="Delay Days" error={errors?.[`steps.${index}.delay_days`]}>
+                    <Field label={t('drip_sequences.delay_days')} error={errors?.[`steps.${index}.delay_days`]}>
                         <div className="relative">
                             <input type="number" min={0} value={step.delay_days} onChange={e => onChange('delay_days', parseInt(e.target.value) || 0)} className={inputCls} />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">days</span>
                         </div>
                     </Field>
-                    <Field label="Delay Hours" error={errors?.[`steps.${index}.delay_hours`]}>
+                    <Field label={t('drip_sequences.delay_hours')} error={errors?.[`steps.${index}.delay_hours`]}>
                         <div className="relative">
                             <input type="number" min={0} max={23} value={step.delay_hours} onChange={e => onChange('delay_hours', parseInt(e.target.value) || 0)} className={inputCls} />
                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-zinc-400">hrs</span>
                         </div>
                     </Field>
-                    <Field label="Send At Time" description="Optional">
+                    <Field label={t('drip_sequences.send_at_time_label')} description={t('common.optional')}>
                         <input type="time" value={step.send_at_time} onChange={e => onChange('send_at_time', e.target.value)} className={inputCls} />
                     </Field>
                 </div>
 
                 {/* Template picker */}
                 {templates.length > 0 && (
-                    <Field label="Use Template" description="Optional — prefills the message body">
+                    <Field label={t('drip_sequences.use_template')} description={t('drip_sequences.use_template_desc')}>
                         <select
                             value={step.template_id}
                             onChange={e => {
-                                const t = templates.find(t => t.id == e.target.value);
+                                const tpl = templates.find(tpl => tpl.id == e.target.value);
                                 onChange('template_id', e.target.value);
-                                if (t) onChange('body', t.body);
+                                if (tpl) onChange('body', tpl.body);
                             }}
                             className={inputCls}
                         >
-                            <option value="">— No template —</option>
-                            {templates.map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
+                            <option value="">{t('drip_sequences.no_template')}</option>
+                            {templates.map(tpl => <option key={tpl.id} value={tpl.id}>{tpl.name}</option>)}
                         </select>
                     </Field>
                 )}
 
-                <Field label="Message Body" description="Use {{name}} for personalization" error={errors?.[`steps.${index}.body`]}>
+                <Field label={t('drip_sequences.message_body')} description={t('drip_sequences.personalization_desc')} error={errors?.[`steps.${index}.body`]}>
                     <textarea
                         value={step.body}
                         onChange={e => onChange('body', e.target.value)}
@@ -124,6 +125,7 @@ const StepCard = ({ step, index, total, onChange, onRemove, onToggle, templates,
 );
 
 const Create = ({ channels, templates }) => {
+    const { t } = useTranslation();
     const [steps, setSteps] = useState([defaultStep()]);
 
     const { data, setData, post, processing, errors } = useForm({
@@ -153,9 +155,9 @@ const Create = ({ channels, templates }) => {
         syncSteps(updated);
     };
 
-    const filteredTemplates = templates.filter(t => {
+    const filteredTemplates = templates.filter(tpl => {
         const ch = channels.find(c => c.id == data.channel_id);
-        return !ch || t.channel === ch.type;
+        return !ch || tpl.channel === ch.type;
     });
 
     const totalDelay = steps.reduce((sum, s) => sum + (s.delay_days * 24) + s.delay_hours, 0);
@@ -166,8 +168,8 @@ const Create = ({ channels, templates }) => {
     };
 
     return (
-        <Layout pageTitle="Create Drip Sequence" pageSection="Messaging">
-            <Head title="Create Drip Sequence" />
+        <Layout pageTitle={t('drip_sequences.create_sequence')} pageSection={t('nav.messaging')}>
+            <Head title={t('drip_sequences.create_sequence')} />
 
             <div className="max-w-3xl mx-auto space-y-6">
 
@@ -178,7 +180,7 @@ const Create = ({ channels, templates }) => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Zap className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Create Drip Sequence</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('drip_sequences.create_sequence')}</h1>
                     </div>
                 </div>
 
@@ -186,17 +188,17 @@ const Create = ({ channels, templates }) => {
 
                     {/* Sequence Info */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Sequence Info</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('drip_sequences.sequence_info')}</h2>
 
-                        <Field label="Sequence Name" error={errors.name}>
+                        <Field label={t('drip_sequences.sequence_name')} error={errors.name}>
                             <input type="text" value={data.name} onChange={e => setData('name', e.target.value)} placeholder="e.g. New Customer Onboarding" className={inputCls} />
                         </Field>
 
-                        <Field label="Description" description="Optional notes about this sequence" error={errors.description}>
+                        <Field label={t('common.description')} description={t('drip_sequences.ai_goal_desc')} error={errors.description}>
                             <textarea value={data.description} onChange={e => setData('description', e.target.value)} placeholder="e.g. Sent to all new customers after signup..." rows={2} className={`${inputCls} resize-none`} />
                         </Field>
 
-                        <Field label="Channel" error={errors.channel_id}>
+                        <Field label={t('common.channel')} error={errors.channel_id}>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                                 {channels.length === 0 ? (
                                     <p className="text-sm text-zinc-400 col-span-2">No connected channels. <Link href="/admin/channels" className="underline text-zinc-600 dark:text-zinc-300">Add one first.</Link></p>
@@ -220,7 +222,7 @@ const Create = ({ channels, templates }) => {
                             </div>
                         </Field>
 
-                        <Field label="AI Goal" description="Optional — describe what this drip sequence should achieve">
+                        <Field label={t('drip_sequences.ai_goal')} description={t('drip_sequences.ai_goal_desc')}>
                             <input type="text" value={data.ai_goal} onChange={e => setData('ai_goal', e.target.value)} placeholder="e.g. Guide new users to make their first purchase within 7 days" className={inputCls} />
                         </Field>
                     </div>
@@ -229,10 +231,10 @@ const Create = ({ channels, templates }) => {
                     <div className="space-y-3">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Steps <span className="text-zinc-400 font-normal normal-case">({steps.length})</span></h2>
+                                <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('drip_sequences.steps')} <span className="text-zinc-400 font-normal normal-case">({steps.length})</span></h2>
                                 {totalDelay > 0 && (
                                     <p className="text-xs text-zinc-400 mt-0.5 flex items-center gap-1">
-                                        <Clock className="w-3 h-3" /> Total duration: {Math.floor(totalDelay / 24)}d {totalDelay % 24}h
+                                        <Clock className="w-3 h-3" /> {t('drip_sequences.total_duration')}: {Math.floor(totalDelay / 24)}d {totalDelay % 24}h
                                     </p>
                                 )}
                             </div>
@@ -255,6 +257,7 @@ const Create = ({ channels, templates }) => {
                                         onToggle={() => toggleStep(i)}
                                         templates={filteredTemplates}
                                         errors={errors}
+                                        t={t}
                                     />
                                 </div>
                             ))}
@@ -267,7 +270,7 @@ const Create = ({ channels, templates }) => {
                             onClick={addStep}
                             className="w-full py-2.5 rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-700 text-zinc-500 hover:border-zinc-400 dark:hover:border-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm font-medium transition-colors flex items-center justify-center gap-2"
                         >
-                            <Plus className="w-4 h-4" /> Add Step
+                            <Plus className="w-4 h-4" /> {t('drip_sequences.add_step')}
                         </button>
                     </div>
 
@@ -279,10 +282,10 @@ const Create = ({ channels, templates }) => {
                             className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                         >
                             <Zap className="w-4 h-4" />
-                            {processing ? 'Creating...' : 'Create Sequence'}
+                            {processing ? t('drip_sequences.creating') : t('drip_sequences.create_btn')}
                         </button>
                         <Link href="/admin/drip-sequences" className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                            Cancel
+                            {t('common.cancel')}
                         </Link>
                     </div>
 

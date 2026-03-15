@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, Users } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -20,6 +21,7 @@ const Input = ({ ...props }) => (
 );
 
 const Edit = ({ contact, lists }) => {
+    const { t } = useTranslation();
     const { data, setData, put, processing, errors } = useForm({
         name:        contact.name ?? '',
         phone:       contact.phone ?? '',
@@ -45,8 +47,8 @@ const Edit = ({ contact, lists }) => {
     };
 
     return (
-        <Layout pageTitle="Edit Contact" pageSection="Contacts">
-            <Head title="Edit Contact" />
+        <Layout pageTitle={t('contacts.edit_contact')} pageSection={t('nav.contacts')}>
+            <Head title={t('contacts.edit_contact')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -60,7 +62,7 @@ const Edit = ({ contact, lists }) => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Users className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Edit Contact</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('contacts.edit_contact')}</h1>
                     </div>
                 </div>
 
@@ -68,52 +70,52 @@ const Edit = ({ contact, lists }) => {
 
                     {/* Basic Info */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Basic Info</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.basic_info')}</h2>
 
-                        <Field label="Full Name" error={errors.name}>
+                        <Field label={t('contacts.full_name')} error={errors.name}>
                             <Input value={data.name} onChange={e => setData('name', e.target.value)} placeholder="John Doe" />
                         </Field>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field label="Phone Number" description="WhatsApp number with country code" error={errors.phone}>
+                            <Field label={t('contacts.phone_number')} description={t('contacts.phone_whatsapp_desc')} error={errors.phone}>
                                 <Input value={data.phone} onChange={e => setData('phone', e.target.value)} placeholder="+1234567890" />
                             </Field>
-                            <Field label="Telegram ID" description="Telegram user ID" error={errors.telegram_id}>
+                            <Field label={t('contacts.telegram_id')} description={t('contacts.telegram_id_desc')} error={errors.telegram_id}>
                                 <Input value={data.telegram_id} onChange={e => setData('telegram_id', e.target.value)} placeholder="123456789" />
                             </Field>
                         </div>
 
-                        <Field label="Email" error={errors.email}>
+                        <Field label={t('contacts.email')} error={errors.email}>
                             <Input type="email" value={data.email} onChange={e => setData('email', e.target.value)} placeholder="john@example.com" />
                         </Field>
                     </div>
 
                     {/* Extra Info */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Extra Info</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.extra_info')}</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field label="Country" description="ISO code e.g. US, GB, IN" error={errors.country}>
+                            <Field label={t('contacts.country')} description={t('contacts.country_desc')} error={errors.country}>
                                 <Input value={data.country} onChange={e => setData('country', e.target.value)} placeholder="US" />
                             </Field>
-                            <Field label="Language" description="Language code e.g. en, ar, hi" error={errors.language}>
+                            <Field label={t('contacts.language')} description={t('contacts.language_desc')} error={errors.language}>
                                 <Input value={data.language} onChange={e => setData('language', e.target.value)} placeholder="en" />
                             </Field>
                         </div>
 
-                        <Field label="Tags" description="Comma separated e.g. vip, lead, customer" error={errors.tags}>
+                        <Field label={t('contacts.tags')} description={t('contacts.tags_desc')} error={errors.tags}>
                             <Input value={data.tags} onChange={e => setData('tags', e.target.value)} placeholder="vip, customer, lead" />
                         </Field>
 
-                        <Field label="Status" error={errors.status}>
+                        <Field label={t('common.status')} error={errors.status}>
                             <select
                                 value={data.status}
                                 onChange={e => setData('status', e.target.value)}
                                 className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
                             >
-                                <option value="active">Active</option>
-                                <option value="opted_out">Opted Out</option>
-                                <option value="unsubscribed">Unsubscribed</option>
+                                <option value="active">{t('contacts.status_active')}</option>
+                                <option value="opted_out">{t('contacts.status_opted_out')}</option>
+                                <option value="unsubscribed">{t('contacts.status_unsubscribed')}</option>
                             </select>
                         </Field>
                     </div>
@@ -121,7 +123,7 @@ const Edit = ({ contact, lists }) => {
                     {/* Lists */}
                     {lists.length > 0 && (
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Contact Lists</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.contact_lists_section')}</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                 {lists.map(list => (
                                     <label
@@ -152,13 +154,13 @@ const Edit = ({ contact, lists }) => {
                             className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                         >
                             <Users className="w-4 h-4" />
-                            {processing ? 'Saving...' : 'Update Contact'}
+                            {processing ? t('common.saving') : t('contacts.update_contact')}
                         </button>
                         <Link
                             href="/admin/contacts"
                             className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>

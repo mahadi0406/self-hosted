@@ -206,9 +206,9 @@ const Index = ({ contacts, stats, filters, lists }) => {
                                     className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600"
                                 >
                                     <option value="all">{t('contacts.all_labels')}</option>
-                                    <option value="hot">🔥 Hot</option>
-                                    <option value="warm">🌡️ Warm</option>
-                                    <option value="cold">❄️ Cold</option>
+                                    <option value="hot">Hot</option>
+                                    <option value="warm">Warm</option>
+                                    <option value="cold">Cold</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">

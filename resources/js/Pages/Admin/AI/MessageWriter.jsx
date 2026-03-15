@@ -8,6 +8,7 @@ import {
     Check, RefreshCw, Loader2, Shield,
     ChevronDown, ChevronUp, History, AlertCircle,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600";
 const inputErrorCls = "w-full px-3 py-2 text-sm border border-red-500 dark:border-red-500 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-600";
@@ -30,7 +31,7 @@ function Field({ label, description = null, children, error = null }) {
     );
 }
 
-function ComplianceBar({ score }) {
+function ComplianceBar({ score, t }) {
     let color = 'bg-red-500';
     let label = 'Review needed';
 
@@ -52,7 +53,7 @@ function ComplianceBar({ score }) {
     return (
         <div className="space-y-1">
             <div className="flex justify-between text-xs">
-                <span className="text-zinc-400">Compliance</span>
+                <span className="text-zinc-400">{t('ai_writer.compliance')}</span>
                 <span className={textColor}>{score}% · {label}</span>
             </div>
             <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
@@ -65,7 +66,7 @@ function ComplianceBar({ score }) {
     );
 }
 
-function VariantCard({ variant, channel }) {
+function VariantCard({ variant, channel, t }) {
     const [copied, setCopied] = useState(false);
 
     const copy = useCallback(() => {
@@ -98,12 +99,12 @@ function VariantCard({ variant, channel }) {
                         {copied ? (
                             <>
                                 <Check className="w-3 h-3 text-emerald-500" />
-                                <span>Copied</span>
+                                <span>{t('common.copied')}</span>
                             </>
                         ) : (
                             <>
                                 <Copy className="w-3 h-3" />
-                                <span>Copy</span>
+                                <span>{t('common.copy')}</span>
                             </>
                         )}
                     </button>
@@ -115,7 +116,7 @@ function VariantCard({ variant, channel }) {
                     {variant.body}
                 </div>
                 <div className="mt-3">
-                    <ComplianceBar score={variant.compliance_score} />
+                    <ComplianceBar score={variant.compliance_score} t={t} />
                 </div>
             </div>
         </div>
@@ -142,7 +143,7 @@ function LoadingSkeleton() {
     );
 }
 
-function EmptyState() {
+function EmptyState({ t }) {
     const features = [
         { icon: Sparkles, label: '3 Variants', sub: 'Per generation' },
         { icon: Shield, label: 'Compliance', sub: 'Score per variant' },
@@ -154,9 +155,9 @@ function EmptyState() {
             <div className="w-14 h-14 rounded-2xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mb-4">
                 <Sparkles className="w-7 h-7 text-purple-400" />
             </div>
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Ready to write</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">{t('ai_writer.ready_to_write')}</p>
             <p className="text-xs text-zinc-400 max-w-xs">
-                Fill in your business type and goal, then click Generate to get 3 AI-crafted message variants.
+                {t('ai_writer.ready_description')}
             </p>
 
             <div className="mt-6 grid grid-cols-3 gap-3 w-full max-w-sm">
@@ -172,7 +173,7 @@ function EmptyState() {
     );
 }
 
-function VariantsList({ variants, channel, onRegenerate }) {
+function VariantsList({ variants, channel, onRegenerate, t }) {
     return (
         <div className="space-y-4">
             <div className="flex items-center justify-between">
@@ -185,17 +186,17 @@ function VariantsList({ variants, channel, onRegenerate }) {
                     className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 >
                     <RefreshCw className="w-3.5 h-3.5" />
-                    <span>Regenerate</span>
+                    <span>{t('ai_writer.regenerate')}</span>
                 </button>
             </div>
             {variants.map((v) => (
-                <VariantCard key={v.variant} variant={v} channel={channel} />
+                <VariantCard key={v.variant} variant={v} channel={channel} t={t} />
             ))}
         </div>
     );
 }
 
-function RecentHistory({ logs, showHistory, onToggle }) {
+function RecentHistory({ logs, showHistory, onToggle, t }) {
     if (!logs || logs.length === 0) {
         return null;
     }
@@ -209,7 +210,7 @@ function RecentHistory({ logs, showHistory, onToggle }) {
             >
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     <History className="w-4 h-4 text-zinc-400" />
-                    <span>Recent Generations ({logs.length})</span>
+                    <span>{t('ai_writer.recent_generations')} ({logs.length})</span>
                 </div>
                 {showHistory ? (
                     <ChevronUp className="w-4 h-4 text-zinc-400" />
@@ -267,6 +268,7 @@ const CHANNELS = [
 ];
 
 export default function MessageWriter({ recent_logs = [] }) {
+    const { t } = useTranslation();
     const [form, setForm] = useState({
         business_type: '',
         goal: '',
@@ -353,8 +355,8 @@ export default function MessageWriter({ recent_logs = [] }) {
     const hasVariants = variants.length > 0;
 
     return (
-        <Layout pageTitle="AI Message Writer" pageSection="AI Features">
-            <Head title="AI Message Writer" />
+        <Layout pageTitle={t('nav.ai_message_writer')} pageSection={t('nav.ai_features')}>
+            <Head title={t('nav.ai_message_writer')} />
 
             <div className="max-w-5xl mx-auto space-y-6">
                 {/* Page Header */}
@@ -363,12 +365,12 @@ export default function MessageWriter({ recent_logs = [] }) {
                         <Sparkles className="w-5 h-5 text-purple-600 dark:text-purple-400" />
                     </div>
                     <div>
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">AI Message Writer</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('nav.ai_message_writer')}</h1>
                         <p className="text-xs text-zinc-400">Generate 3 optimized message variants instantly using AI</p>
                     </div>
                     <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400">
                         <Sparkles className="w-3 h-3" />
-                        <span>AI</span>
+                        <span>{t('common.ai')}</span>
                     </span>
                 </div>
 
@@ -377,7 +379,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                     <div className="lg:col-span-2 space-y-5">
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
                             <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                                Message Settings
+                                {t('ai_writer.message_settings')}
                             </h2>
 
                             {/* API Error Alert */}
@@ -386,7 +388,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                                     <div className="flex items-start gap-2">
                                         <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                                         <div>
-                                            <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
+                                            <p className="text-sm font-medium text-red-800 dark:text-red-200">{t('common.error')}</p>
                                             <p className="text-xs text-red-600 dark:text-red-300 mt-0.5">{apiError}</p>
                                         </div>
                                     </div>
@@ -394,7 +396,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                             )}
 
                             {/* Channel Selection */}
-                            <Field label="Channel" error={errors.channel}>
+                            <Field label={t('common.channel')} error={errors.channel}>
                                 <div className="grid grid-cols-2 gap-2">
                                     {CHANNELS.map(({ value, label, Icon, color }) => {
                                         const isSelected = form.channel === value;
@@ -429,7 +431,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                             </Field>
 
                             {/* Business Type */}
-                            <Field label="Business Type" description="e.g. E-commerce, Restaurant, Gym" error={errors.business_type}>
+                            <Field label={t('ai_writer.business_type')} description={t('ai_writer.business_type_desc')} error={errors.business_type}>
                                 <input
                                     type="text"
                                     value={form.business_type}
@@ -446,7 +448,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                             </Field>
 
                             {/* Goal */}
-                            <Field label="Goal" description="What should this message achieve?" error={errors.goal}>
+                            <Field label={t('ai_writer.goal')} description={t('ai_writer.goal_desc')} error={errors.goal}>
                                 <textarea
                                     value={form.goal}
                                     onChange={(e) => updateField('goal', e.target.value)}
@@ -463,10 +465,10 @@ export default function MessageWriter({ recent_logs = [] }) {
                             </Field>
 
                             {/* Tone */}
-                            <Field label="Tone" error={errors.tone}>
+                            <Field label={t('ai_writer.tone')} error={errors.tone}>
                                 <div className="grid grid-cols-1 gap-1.5">
-                                    {TONES.map((t) => {
-                                        const isSelected = form.tone === t.value;
+                                    {TONES.map((tone) => {
+                                        const isSelected = form.tone === tone.value;
                                         const hasError = Boolean(errors.tone);
 
                                         let className = 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800';
@@ -478,18 +480,18 @@ export default function MessageWriter({ recent_logs = [] }) {
 
                                         return (
                                             <label
-                                                key={t.value}
+                                                key={tone.value}
                                                 className={`flex items-center gap-2 px-3 py-2 rounded-lg border cursor-pointer transition-colors text-sm ${className}`}
                                             >
                                                 <input
                                                     type="radio"
                                                     name="tone"
-                                                    value={t.value}
+                                                    value={tone.value}
                                                     checked={isSelected}
-                                                    onChange={() => updateField('tone', t.value)}
+                                                    onChange={() => updateField('tone', tone.value)}
                                                     className="sr-only"
                                                 />
-                                                <span>{t.label}</span>
+                                                <span>{tone.label}</span>
                                             </label>
                                         );
                                     })}
@@ -498,7 +500,7 @@ export default function MessageWriter({ recent_logs = [] }) {
 
                             {/* Language */}
                             <div className="grid grid-cols-2 gap-3">
-                                <Field label="Language" error={errors.language}>
+                                <Field label={t('ai_writer.language')} error={errors.language}>
                                     <select
                                         value={form.language}
                                         onChange={(e) => updateField('language', e.target.value)}
@@ -513,7 +515,7 @@ export default function MessageWriter({ recent_logs = [] }) {
 
                             {/* Options */}
                             <div className="space-y-2">
-                                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">Options</p>
+                                <p className="text-xs font-medium text-zinc-500 uppercase tracking-wider">{t('ai_writer.options')}</p>
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -521,7 +523,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                                         onChange={(e) => updateField('include_emoji', e.target.checked)}
                                         className="rounded"
                                     />
-                                    <span className="text-sm text-zinc-700 dark:text-zinc-300">Include emojis</span>
+                                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{t('ai_writer.include_emojis')}</span>
                                 </label>
                                 <label className="flex items-center gap-2 cursor-pointer">
                                     <input
@@ -530,7 +532,7 @@ export default function MessageWriter({ recent_logs = [] }) {
                                         onChange={(e) => updateField('include_cta', e.target.checked)}
                                         className="rounded"
                                     />
-                                    <span className="text-sm text-zinc-700 dark:text-zinc-300">Include call-to-action</span>
+                                    <span className="text-sm text-zinc-700 dark:text-zinc-300">{t('ai_writer.include_cta')}</span>
                                 </label>
                             </div>
 
@@ -544,12 +546,12 @@ export default function MessageWriter({ recent_logs = [] }) {
                                 {loading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Generating...</span>
+                                        <span>{t('ai_writer.generating')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Sparkles className="w-4 h-4" />
-                                        <span>Generate 3 Variants</span>
+                                        <span>{t('ai_writer.generate_variants')}</span>
                                     </>
                                 )}
                             </button>
@@ -565,15 +567,17 @@ export default function MessageWriter({ recent_logs = [] }) {
                                 variants={variants}
                                 channel={form.channel}
                                 onRegenerate={generate}
+                                t={t}
                             />
                         )}
 
-                        {!loading && !hasVariants && <EmptyState />}
+                        {!loading && !hasVariants && <EmptyState t={t} />}
 
                         <RecentHistory
                             logs={recent_logs}
                             showHistory={showHistory}
                             onToggle={toggleHistory}
+                            t={t}
                         />
                     </div>
                 </div>

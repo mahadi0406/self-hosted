@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, Smartphone, ExternalLink } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -21,6 +22,7 @@ const Input = ({ type = 'text', ...props }) => (
 );
 
 const WhatsappCreate = () => {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name:         '',
         phone_number: '',
@@ -39,8 +41,8 @@ const WhatsappCreate = () => {
     };
 
     return (
-        <Layout pageTitle="Add WhatsApp Channel" pageSection="Channels">
-            <Head title="Add WhatsApp Channel" />
+        <Layout pageTitle={t('channels.add_whatsapp')} pageSection={t('nav.channels')}>
+            <Head title={t('channels.add_whatsapp')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -54,7 +56,7 @@ const WhatsappCreate = () => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Smartphone className="w-5 h-5 text-emerald-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Connect WhatsApp</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('channels.connect_whatsapp')}</h1>
                     </div>
                 </div>
 
@@ -72,11 +74,11 @@ const WhatsappCreate = () => {
 
                 {/* Form */}
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">Channel Details</h2>
+                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">{t('channels.channel_details_section')}</h2>
                     <form onSubmit={submit} className="space-y-5">
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field label="Channel Name" description="A friendly label for this channel" error={errors.name}>
+                            <Field label={t('channels.channel_name')} description={t('channels.channel_name_wa_desc')} error={errors.name}>
                                 <Input
                                     value={data.name}
                                     onChange={e => setData('name', e.target.value)}
@@ -84,7 +86,7 @@ const WhatsappCreate = () => {
                                 />
                             </Field>
 
-                            <Field label="Phone Number" description="With country code e.g. +1234567890" error={errors.phone_number}>
+                            <Field label={t('channels.phone_number')} description={t('channels.phone_number_desc')} error={errors.phone_number}>
                                 <Input
                                     value={data.phone_number}
                                     onChange={e => setData('phone_number', e.target.value)}
@@ -94,10 +96,10 @@ const WhatsappCreate = () => {
                         </div>
 
                         <div className="border-t border-zinc-100 dark:border-zinc-800 pt-5">
-                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">Meta API Credentials</h3>
+                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">{t('channels.meta_credentials')}</h3>
                             <div className="space-y-5">
 
-                                <Field label="Access Token" description="Permanent access token from Meta Developer Portal" error={errors['credentials.access_token']}>
+                                <Field label={t('channels.access_token')} description={t('channels.access_token_desc')} error={errors['credentials.access_token']}>
                                     <Input
                                         type="password"
                                         value={data.credentials.access_token}
@@ -107,7 +109,7 @@ const WhatsappCreate = () => {
                                 </Field>
 
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                                    <Field label="WABA ID" description="WhatsApp Business Account ID" error={errors['credentials.waba_id']}>
+                                    <Field label={t('channels.waba_id')} description={t('channels.waba_id_desc')} error={errors['credentials.waba_id']}>
                                         <Input
                                             value={data.credentials.waba_id}
                                             onChange={e => set('waba_id', e.target.value)}
@@ -115,7 +117,7 @@ const WhatsappCreate = () => {
                                         />
                                     </Field>
 
-                                    <Field label="Phone Number ID" description="Found in API Setup in Meta Portal" error={errors['credentials.phone_id']}>
+                                    <Field label={t('channels.phone_number_id')} description={t('channels.phone_number_id_desc')} error={errors['credentials.phone_id']}>
                                         <Input
                                             value={data.credentials.phone_id}
                                             onChange={e => set('phone_id', e.target.value)}
@@ -134,13 +136,13 @@ const WhatsappCreate = () => {
                                 className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-sm font-medium transition-colors"
                             >
                                 <Smartphone className="w-4 h-4" />
-                                {processing ? 'Connecting...' : 'Connect WhatsApp'}
+                                {processing ? t('common.connecting') : t('channels.connect_whatsapp')}
                             </button>
                             <Link
                                 href="/admin/channels"
                                 className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Link>
                         </div>
 

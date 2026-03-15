@@ -10,6 +10,7 @@ import {
     Dialog, DialogContent, DialogHeader, DialogTitle,
 } from '@/Components/UI/dialog';
 import Pagination from "@/Components/UI/pagination.jsx";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const ChannelBadge = ({ type }) => (
     <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium ${
@@ -32,6 +33,7 @@ const RateBar = ({ value, color }) => (
 );
 
 const Campaigns = ({ analytics, stats, filters }) => {
+    const { t } = useTranslation();
     const [search, setSearch]           = useState(filters?.search       || '');
     const [channelType, setChannelType] = useState(filters?.channel_type || 'all');
     const [dateFrom, setDateFrom]       = useState(filters?.date_from    || '');
@@ -54,8 +56,8 @@ const Campaigns = ({ analytics, stats, filters }) => {
     };
 
     return (
-        <Layout pageTitle="Campaign Analytics" pageSection="Analytics">
-            <Head title="Campaign Analytics" />
+        <Layout pageTitle={t('analytics.title')} pageSection={t('nav.analytics')}>
+            <Head title={t('analytics.title')} />
 
             <div className="space-y-8 max-w-7xl mx-auto">
 
@@ -63,10 +65,10 @@ const Campaigns = ({ analytics, stats, filters }) => {
                 <section>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
                         {[
-                            { label: 'Total Campaigns', value: stats.total_campaigns,                       icon: BarChart3 },
-                            { label: 'Total Sent',      value: stats.total_sent?.toLocaleString(),          icon: Send,       accent: 'text-blue-600' },
-                            { label: 'Avg Delivery',    value: `${stats.avg_delivery}%`,                    icon: CheckCircle, accent: 'text-emerald-600' },
-                            { label: 'Avg Read Rate',   value: `${stats.avg_read}%`,                        icon: MailOpen,   accent: 'text-purple-600' },
+                            { label: t('analytics.total_campaigns'), value: stats.total_campaigns,                       icon: BarChart3 },
+                            { label: t('analytics.total_sent'),      value: stats.total_sent?.toLocaleString(),          icon: Send,       accent: 'text-blue-600' },
+                            { label: t('analytics.avg_delivery'),    value: `${stats.avg_delivery}%`,                    icon: CheckCircle, accent: 'text-emerald-600' },
+                            { label: t('analytics.avg_read_rate'),   value: `${stats.avg_read}%`,                        icon: MailOpen,   accent: 'text-purple-600' },
                         ].map(({ label, value, icon: Icon, accent }) => (
                             <div key={label} className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
                                 <div className="flex items-center justify-between mb-3">
@@ -82,13 +84,13 @@ const Campaigns = ({ analytics, stats, filters }) => {
                 {/* Filters */}
                 <section>
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">Filters</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-4">{t('common.filters')}</h2>
                         <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                             <div className="space-y-1.5 md:col-span-2">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Search</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.search')}</label>
                                 <input
                                     type="text"
-                                    placeholder="Search by campaign name..."
+                                    placeholder={t('campaigns.search_placeholder')}
                                     value={search}
                                     onChange={e => setSearch(e.target.value)}
                                     onKeyDown={e => e.key === 'Enter' && handleSearch()}
@@ -96,28 +98,28 @@ const Campaigns = ({ analytics, stats, filters }) => {
                                 />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">Channel</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('common.channel')}</label>
                                 <select value={channelType} onChange={e => setChannelType(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600">
-                                    <option value="all">All Channels</option>
+                                    <option value="all">{t('common.all_channels')}</option>
                                     <option value="whatsapp">WhatsApp</option>
                                     <option value="telegram">Telegram</option>
                                 </select>
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">From</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('analytics.date_from')}</label>
                                 <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600" />
                             </div>
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">To</label>
+                                <label className="text-xs font-medium text-zinc-500 uppercase tracking-wider block">{t('analytics.date_to')}</label>
                                 <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600" />
                             </div>
                         </div>
                         <div className="flex gap-2 mt-4">
                             <button onClick={handleSearch} className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 hover:bg-zinc-700 dark:hover:bg-zinc-300 transition-colors">
-                                <Search className="w-4 h-4" /> Search
+                                <Search className="w-4 h-4" /> {t('common.search')}
                             </button>
                             <button onClick={handleReset} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Reset
+                                {t('common.reset')}
                             </button>
                         </div>
                     </div>
@@ -130,7 +132,17 @@ const Campaigns = ({ analytics, stats, filters }) => {
                             <table className="min-w-[1000px] w-full text-sm">
                                 <thead>
                                 <tr className="border-b border-zinc-100 dark:border-zinc-800">
-                                    {['Campaign', 'Channel', 'Sent', 'Delivered', 'Read', 'Replied', 'Failed', 'Rates', 'Actions'].map((h, i) => (
+                                    {[
+                                        t('analytics.col_campaign'),
+                                        t('analytics.col_channel'),
+                                        t('analytics.col_sent'),
+                                        t('analytics.col_delivered'),
+                                        t('analytics.col_read'),
+                                        t('analytics.col_replied'),
+                                        t('analytics.col_failed'),
+                                        t('analytics.col_rates'),
+                                        t('common.actions'),
+                                    ].map((h, i) => (
                                         <th key={i} className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
@@ -179,7 +191,7 @@ const Campaigns = ({ analytics, stats, filters }) => {
                                     <tr>
                                         <td colSpan={9} className="text-center py-12 text-zinc-400 text-sm">
                                             <BarChart3 className="w-8 h-8 mx-auto mb-2 text-zinc-300" />
-                                            No analytics data found
+                                            {t('analytics.no_data')}
                                         </td>
                                     </tr>
                                 )}
@@ -197,7 +209,7 @@ const Campaigns = ({ analytics, stats, filters }) => {
             <Dialog open={showModal} onOpenChange={setShowModal}>
                 <DialogContent className="max-w-lg">
                     <DialogHeader>
-                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">Campaign Analytics</DialogTitle>
+                        <DialogTitle className="text-base font-semibold text-zinc-900 dark:text-zinc-100">{t('analytics.title')}</DialogTitle>
                     </DialogHeader>
                     {selected && (
                         <div className="space-y-4 pt-1">
@@ -209,12 +221,12 @@ const Campaigns = ({ analytics, stats, filters }) => {
                             {/* Metrics grid */}
                             <div className="grid grid-cols-3 gap-3">
                                 {[
-                                    { label: 'Sent',     value: selected.sent?.toLocaleString(),      color: 'text-zinc-800 dark:text-zinc-200' },
-                                    { label: 'Delivered',value: selected.delivered?.toLocaleString(), color: 'text-emerald-600' },
-                                    { label: 'Read',     value: selected.read?.toLocaleString(),      color: 'text-purple-600' },
-                                    { label: 'Replied',  value: selected.replied?.toLocaleString(),   color: 'text-blue-600' },
-                                    { label: 'Failed',   value: selected.failed?.toLocaleString(),    color: 'text-red-500' },
-                                    { label: 'Opted Out',value: selected.opted_out?.toLocaleString(), color: 'text-orange-500' },
+                                    { label: t('analytics.col_sent'),      value: selected.sent?.toLocaleString(),      color: 'text-zinc-800 dark:text-zinc-200' },
+                                    { label: t('analytics.col_delivered'), value: selected.delivered?.toLocaleString(), color: 'text-emerald-600' },
+                                    { label: t('analytics.col_read'),      value: selected.read?.toLocaleString(),      color: 'text-purple-600' },
+                                    { label: t('analytics.col_replied'),   value: selected.replied?.toLocaleString(),   color: 'text-blue-600' },
+                                    { label: t('analytics.col_failed'),    value: selected.failed?.toLocaleString(),    color: 'text-red-500' },
+                                    { label: 'Opted Out',                  value: selected.opted_out?.toLocaleString(), color: 'text-orange-500' },
                                 ].map(({ label, value, color }) => (
                                     <div key={label} className="bg-zinc-50 dark:bg-zinc-800 rounded-lg p-3 text-center">
                                         <div className={`text-lg font-bold ${color}`}>{value}</div>
@@ -225,12 +237,12 @@ const Campaigns = ({ analytics, stats, filters }) => {
 
                             {/* Rates */}
                             <div className="space-y-2">
-                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">Performance Rates</p>
+                                <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider">{t('analytics.performance_rates')}</p>
                                 <div className="space-y-2">
                                     {[
-                                        { label: 'Delivery Rate', value: selected.delivery_rate, color: 'bg-emerald-500' },
-                                        { label: 'Read Rate',     value: selected.read_rate,     color: 'bg-purple-500' },
-                                        { label: 'Reply Rate',    value: selected.reply_rate,    color: 'bg-blue-500' },
+                                        { label: t('analytics.delivery_rate'), value: selected.delivery_rate, color: 'bg-emerald-500' },
+                                        { label: t('analytics.read_rate'),     value: selected.read_rate,     color: 'bg-purple-500' },
+                                        { label: t('analytics.reply_rate'),    value: selected.reply_rate,    color: 'bg-blue-500' },
                                     ].map(({ label, value, color }) => (
                                         <div key={label}>
                                             <div className="flex justify-between text-xs mb-1">
@@ -249,7 +261,7 @@ const Campaigns = ({ analytics, stats, filters }) => {
                             {selected.ai_recommendations?.length > 0 && (
                                 <div className="space-y-2">
                                     <p className="text-xs font-medium text-zinc-400 uppercase tracking-wider flex items-center gap-1">
-                                        <Sparkles className="w-3 h-3 text-purple-500" /> AI Recommendations
+                                        <Sparkles className="w-3 h-3 text-purple-500" /> {t('analytics.ai_recommendations')}
                                     </p>
                                     <ul className="space-y-1.5">
                                         {selected.ai_recommendations.map((rec, i) => (
@@ -262,7 +274,7 @@ const Campaigns = ({ analytics, stats, filters }) => {
                             )}
 
                             <div className="flex justify-end">
-                                <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">Close</button>
+                                <button onClick={() => setShowModal(false)} className="px-4 py-2 text-sm font-medium rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">{t('common.close')}</button>
                             </div>
                         </div>
                     )}

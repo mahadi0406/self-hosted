@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, List } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -13,6 +14,7 @@ const Field = ({ label, description, error, children }) => (
 );
 
 const Create = () => {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name:        '',
         description: '',
@@ -24,8 +26,8 @@ const Create = () => {
     };
 
     return (
-        <Layout pageTitle="Create Contact List" pageSection="Contacts">
-            <Head title="Create Contact List" />
+        <Layout pageTitle={t('contact_lists.create_list')} pageSection={t('nav.contacts')}>
+            <Head title={t('contact_lists.create_list')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -39,16 +41,16 @@ const Create = () => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <List className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Create Contact List</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('contact_lists.create_list')}</h1>
                     </div>
                 </div>
 
                 {/* Form */}
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">List Details</h2>
+                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">{t('contact_lists.list_details')}</h2>
                     <form onSubmit={submit} className="space-y-5">
 
-                        <Field label="List Name" description="A clear name for this contact group" error={errors.name}>
+                        <Field label={t('contact_lists.list_name')} description={t('contact_lists.list_name_desc')} error={errors.name}>
                             <input
                                 type="text"
                                 value={data.name}
@@ -58,7 +60,7 @@ const Create = () => {
                             />
                         </Field>
 
-                        <Field label="Description" description="Optional notes about who is in this list" error={errors.description}>
+                        <Field label={t('common.description')} description={t('contact_lists.description_desc')} error={errors.description}>
                             <textarea
                                 value={data.description}
                                 onChange={e => setData('description', e.target.value)}
@@ -75,13 +77,13 @@ const Create = () => {
                                 className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                             >
                                 <List className="w-4 h-4" />
-                                {processing ? 'Creating...' : 'Create List'}
+                                {processing ? t('contact_lists.creating') : t('contact_lists.create_list_btn')}
                             </button>
                             <Link
                                 href="/admin/contact-lists"
                                 className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Link>
                         </div>
 

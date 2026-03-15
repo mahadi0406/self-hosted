@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, FileText, Plus, X, Smartphone, Send } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -15,6 +16,7 @@ const Field = ({ label, description, error, children }) => (
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600";
 
 const Create = () => {
+    const { t } = useTranslation();
     const [buttons, setButtons] = useState([]);
     const [buttonInput, setButtonInput] = useState('');
 
@@ -57,8 +59,8 @@ const Create = () => {
     };
 
     return (
-        <Layout pageTitle="Create Template" pageSection="Messaging">
-            <Head title="Create Template" />
+        <Layout pageTitle={t('templates.create_template')} pageSection={t('nav.messaging')}>
+            <Head title={t('templates.create_template')} />
 
             <div className="max-w-5xl mx-auto space-y-6">
 
@@ -69,7 +71,7 @@ const Create = () => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <FileText className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Create Template</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('templates.create_template')}</h1>
                     </div>
                 </div>
 
@@ -80,20 +82,20 @@ const Create = () => {
 
                         {/* Basic */}
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Template Info</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('templates.template_info')}</h2>
 
-                            <Field label="Template Name" error={errors.name}>
+                            <Field label={t('templates.template_name')} error={errors.name}>
                                 <input type="text" value={data.name} onChange={e => setData('name', e.target.value)} placeholder="e.g. Welcome Message" className={inputCls} />
                             </Field>
 
                             <div className="grid grid-cols-2 gap-4">
-                                <Field label="Channel" error={errors.channel}>
+                                <Field label={t('common.channel')} error={errors.channel}>
                                     <select value={data.channel} onChange={e => setData('channel', e.target.value)} className={inputCls}>
                                         <option value="whatsapp">WhatsApp</option>
                                         <option value="telegram">Telegram</option>
                                     </select>
                                 </Field>
-                                <Field label="Language" error={errors.language}>
+                                <Field label={t('templates.language')} error={errors.language}>
                                     <select value={data.language} onChange={e => setData('language', e.target.value)} className={inputCls}>
                                         <option value="en">English</option>
                                         <option value="ar">Arabic</option>
@@ -110,13 +112,13 @@ const Create = () => {
 
                         {/* Content */}
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Content</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('templates.content_section')}</h2>
 
-                            <Field label="Header" description="Optional — shown above the body" error={errors.header}>
+                            <Field label={t('templates.header')} description={t('templates.header_desc')} error={errors.header}>
                                 <input type="text" value={data.header} onChange={e => setData('header', e.target.value)} placeholder="e.g. 🎉 Special Offer!" className={inputCls} />
                             </Field>
 
-                            <Field label="Body" description="Main message. Use {{1}}, {{2}} for variables" error={errors.body}>
+                            <Field label={t('templates.body')} description={t('templates.body_desc')} error={errors.body}>
                                 <textarea
                                     value={data.body}
                                     onChange={e => setData('body', e.target.value)}
@@ -126,14 +128,14 @@ const Create = () => {
                                 />
                             </Field>
 
-                            <Field label="Footer" description="Optional — shown below the body" error={errors.footer}>
+                            <Field label={t('templates.footer')} description={t('templates.footer_desc')} error={errors.footer}>
                                 <input type="text" value={data.footer} onChange={e => setData('footer', e.target.value)} placeholder="e.g. Reply STOP to unsubscribe" className={inputCls} />
                             </Field>
                         </div>
 
                         {/* Buttons */}
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Quick Reply Buttons <span className="text-zinc-400 font-normal normal-case text-xs">(optional, max 3)</span></h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('templates.quick_reply_buttons')} <span className="text-zinc-400 font-normal normal-case text-xs">({t('templates.buttons_optional')})</span></h2>
 
                             {buttons.length < 3 && (
                                 <div className="flex gap-2">
@@ -142,7 +144,7 @@ const Create = () => {
                                         value={buttonInput}
                                         onChange={e => setButtonInput(e.target.value)}
                                         onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addButton())}
-                                        placeholder="Button label"
+                                        placeholder={t('templates.button_label_placeholder')}
                                         className={`${inputCls} flex-1`}
                                     />
                                     <button type="button" onClick={addButton} className="px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
@@ -168,10 +170,10 @@ const Create = () => {
                         <div className="flex flex-wrap gap-3">
                             <button type="submit" disabled={processing} className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors">
                                 <FileText className="w-4 h-4" />
-                                {processing ? 'Saving...' : 'Save Template'}
+                                {processing ? t('templates.saving') : t('templates.save_template')}
                             </button>
                             <Link href="/admin/templates" className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
-                                Cancel
+                                {t('common.cancel')}
                             </Link>
                         </div>
 
@@ -180,14 +182,14 @@ const Create = () => {
                     {/* Live Preview — 2 cols */}
                     <div className="lg:col-span-2">
                         <div className="sticky top-6 space-y-3">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider px-1">Live Preview</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider px-1">{t('templates.live_preview')}</h2>
 
                             {/* Phone mockup */}
                             <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4">
                                 <div className="flex items-center gap-2 mb-4 pb-3 border-b border-zinc-100 dark:border-zinc-800">
                                     {data.channel === 'whatsapp'
-                                        ? <><Smartphone className="w-4 h-4 text-emerald-500" /><span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">WhatsApp Preview</span></>
-                                        : <><Send className="w-4 h-4 text-blue-500" /><span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">Telegram Preview</span></>
+                                        ? <><Smartphone className="w-4 h-4 text-emerald-500" /><span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{t('templates.whatsapp_preview')}</span></>
+                                        : <><Send className="w-4 h-4 text-blue-500" /><span className="text-xs font-medium text-zinc-600 dark:text-zinc-400">{t('templates.telegram_preview')}</span></>
                                     }
                                 </div>
 
@@ -202,7 +204,7 @@ const Create = () => {
                                     {preview.body ? (
                                         <p className="text-zinc-700 dark:text-zinc-300 whitespace-pre-wrap text-xs leading-relaxed">{preview.body}</p>
                                     ) : (
-                                        <p className="text-zinc-300 dark:text-zinc-600 italic text-xs">Your message body will appear here...</p>
+                                        <p className="text-zinc-300 dark:text-zinc-600 italic text-xs">{t('templates.preview_placeholder')}</p>
                                     )}
                                     {preview.footer && (
                                         <p className="text-zinc-400 text-xs">{preview.footer}</p>
@@ -232,7 +234,7 @@ const Create = () => {
 
                             {/* Character count */}
                             <div className="text-xs text-zinc-400 px-1 flex justify-between">
-                                <span>Body characters</span>
+                                <span>{t('templates.body_characters')}</span>
                                 <span className={data.body.length > 1024 ? 'text-red-500' : ''}>{data.body.length} / 1024</span>
                             </div>
                         </div>

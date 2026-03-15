@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, Upload, Download, FileText, CheckCircle, XCircle, Users } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -13,6 +14,7 @@ const Field = ({ label, description, error, children }) => (
 );
 
 const Import = ({ lists }) => {
+    const { t } = useTranslation();
     const fileRef = useRef(null);
     const [dragOver, setDragOver] = useState(false);
     const [preview, setPreview]   = useState(null);
@@ -67,8 +69,8 @@ const Import = ({ lists }) => {
     };
 
     return (
-        <Layout pageTitle="Import Contacts" pageSection="Contacts">
-            <Head title="Import Contacts" />
+        <Layout pageTitle={t('contacts.import_csv')} pageSection={t('nav.contacts')}>
+            <Head title={t('contacts.import_csv')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -82,7 +84,7 @@ const Import = ({ lists }) => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Upload className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Import Contacts</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('contacts.import_csv')}</h1>
                     </div>
                 </div>
 
@@ -100,13 +102,13 @@ const Import = ({ lists }) => {
                     {/* Upload Zone */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">CSV File</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.csv_file')}</h2>
                             <button
                                 type="button"
                                 onClick={downloadSample}
                                 className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                             >
-                                <Download className="w-3.5 h-3.5" /> Download Sample
+                                <Download className="w-3.5 h-3.5" /> {t('contacts.download_sample')}
                             </button>
                         </div>
 
@@ -137,8 +139,8 @@ const Import = ({ lists }) => {
                             ) : (
                                 <div className="flex flex-col items-center gap-2">
                                     <Upload className="w-8 h-8 text-zinc-300" />
-                                    <p className="text-sm text-zinc-500">Drag & drop your CSV here, or <span className="text-zinc-700 dark:text-zinc-300 underline">browse</span></p>
-                                    <p className="text-xs text-zinc-400">Max file size: 10MB</p>
+                                    <p className="text-sm text-zinc-500">{t('contacts.drag_drop_csv')} <span className="text-zinc-700 dark:text-zinc-300 underline">{t('contacts.browse')}</span></p>
+                                    <p className="text-xs text-zinc-400">{t('contacts.max_file_size')}</p>
                                 </div>
                             )}
                         </div>
@@ -148,7 +150,7 @@ const Import = ({ lists }) => {
                         {progress && (
                             <div className="space-y-1">
                                 <div className="flex justify-between text-xs text-zinc-400">
-                                    <span>Uploading...</span>
+                                    <span>{t('common.uploading')}</span>
                                     <span>{progress.percentage}%</span>
                                 </div>
                                 <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-full h-1.5">
@@ -165,7 +167,7 @@ const Import = ({ lists }) => {
                     {preview && (
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg overflow-hidden">
                             <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800">
-                                <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Preview (first 5 rows)</h2>
+                                <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.file_preview')}</h2>
                             </div>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-xs">
@@ -193,7 +195,7 @@ const Import = ({ lists }) => {
                     {/* Lists */}
                     {lists.length > 0 && (
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Add to Lists <span className="text-zinc-400 font-normal normal-case text-xs">(optional)</span></h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.add_to_lists')} <span className="text-zinc-400 font-normal normal-case text-xs">({t('common.optional')})</span></h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                 {lists.map(list => (
                                     <label
@@ -224,13 +226,13 @@ const Import = ({ lists }) => {
                             className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                         >
                             <Upload className="w-4 h-4" />
-                            {processing ? 'Importing...' : 'Import Contacts'}
+                            {processing ? t('contacts.importing') : t('contacts.import_button')}
                         </button>
                         <Link
                             href="/admin/contacts"
                             className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>

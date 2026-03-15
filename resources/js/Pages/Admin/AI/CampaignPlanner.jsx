@@ -10,6 +10,7 @@ import {
     ChevronDown, ChevronUp, History, RefreshCw,
     Zap, Radio, MessageSquare, Bell, AlertCircle,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const inputCls = "w-full px-3 py-2 text-sm border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-zinc-300 dark:focus:ring-zinc-600";
 const inputErrorCls = "w-full px-3 py-2 text-sm border border-red-500 dark:border-red-500 rounded-lg bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-red-300 dark:focus:ring-red-600";
@@ -182,7 +183,7 @@ function LoadingSkeleton() {
     );
 }
 
-function EmptyState() {
+function EmptyState({ t }) {
     const features = [
         { icon: Calendar, label: 'Full Schedule', sub: 'Day-by-day plan' },
         { icon: Target, label: 'Strategy', sub: 'Tips & warnings' },
@@ -195,7 +196,7 @@ function EmptyState() {
             <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center mb-4">
                 <Bot className="w-7 h-7 text-indigo-400" />
             </div>
-            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Ready to plan</p>
+            <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">{t('ai_planner.ready_to_plan')}</p>
             <p className="text-xs text-zinc-400 max-w-xs">
                 Describe your business and goal. The AI will build a complete day-by-day campaign with messages, timing, and strategy.
             </p>
@@ -233,37 +234,18 @@ function PlanOverview({ plan, onRegenerate }) {
     );
 }
 
-function PlanStats({ plan }) {
+function PlanStats({ plan, t }) {
     return (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatCard
-                icon={Users}
-                label="Est. Reach"
-                value={plan.estimated_reach?.toLocaleString() || '0'}
-                accent="text-blue-600"
-            />
-            <StatCard
-                icon={TrendingUp}
-                label="Open Rate"
-                value={`${plan.expected_open_rate || 0}%`}
-                accent="text-emerald-600"
-            />
-            <StatCard
-                icon={MessageSquare}
-                label="Reply Rate"
-                value={`${plan.expected_reply_rate || 0}%`}
-                accent="text-purple-600"
-            />
-            <StatCard
-                icon={Calendar}
-                label="Steps"
-                value={plan.steps?.length || 0}
-            />
+            <StatCard icon={Users}        label="Est. Reach"  value={plan.estimated_reach?.toLocaleString() || '0'} accent="text-blue-600" />
+            <StatCard icon={TrendingUp}   label="Open Rate"   value={`${plan.expected_open_rate || 0}%`}            accent="text-emerald-600" />
+            <StatCard icon={MessageSquare} label="Reply Rate" value={`${plan.expected_reply_rate || 0}%`}           accent="text-purple-600" />
+            <StatCard icon={Calendar}     label={t('drip_sequences.steps')} value={plan.steps?.length || 0} />
         </div>
     );
 }
 
-function BestSendTimes({ times }) {
+function BestSendTimes({ times, t }) {
     if (!times || times.length === 0) {
         return null;
     }
@@ -272,29 +254,29 @@ function BestSendTimes({ times }) {
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
             <span className="text-xs font-medium text-zinc-500 uppercase tracking-wider flex items-center gap-1">
                 <Clock className="w-3 h-3" />
-                <span>Best Times</span>
+                <span>{t('ai_planner.best_times')}</span>
             </span>
-            {times.map((t, i) => (
+            {times.map((time, i) => (
                 <span key={i} className="text-xs font-medium text-zinc-700 dark:text-zinc-300 bg-zinc-100 dark:bg-zinc-800 px-2 py-1 rounded">
-                    {t}
+                    {time}
                 </span>
             ))}
         </div>
     );
 }
 
-function CampaignSteps({ steps, channel, onCopyAll }) {
+function CampaignSteps({ steps, channel, onCopyAll, t }) {
     return (
         <div>
             <div className="flex items-center justify-between mb-3">
-                <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Campaign Steps</h3>
+                <h3 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('ai_planner.campaign_steps')}</h3>
                 <button
                     type="button"
                     onClick={onCopyAll}
                     className="inline-flex items-center gap-1.5 text-xs text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                 >
                     <Copy className="w-3.5 h-3.5" />
-                    <span>Copy all messages</span>
+                    <span>{t('ai_planner.copy_all')}</span>
                 </button>
             </div>
             <div>
@@ -306,7 +288,7 @@ function CampaignSteps({ steps, channel, onCopyAll }) {
     );
 }
 
-function TipsSection({ tips }) {
+function TipsSection({ tips, t }) {
     if (!tips || tips.length === 0) {
         return null;
     }
@@ -315,7 +297,7 @@ function TipsSection({ tips }) {
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-4 space-y-3">
             <h3 className="text-xs font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Lightbulb className="w-3.5 h-3.5 text-amber-500" />
-                <span>Tips</span>
+                <span>{t('ai_planner.tips')}</span>
             </h3>
             <ul className="space-y-2">
                 {tips.map((tip, i) => (
@@ -329,7 +311,7 @@ function TipsSection({ tips }) {
     );
 }
 
-function WarningsSection({ warnings }) {
+function WarningsSection({ warnings, t }) {
     if (!warnings || warnings.length === 0) {
         return null;
     }
@@ -338,7 +320,7 @@ function WarningsSection({ warnings }) {
         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 rounded-lg p-4 space-y-3">
             <h3 className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
                 <AlertTriangle className="w-3.5 h-3.5" />
-                <span>Warnings</span>
+                <span>{t('ai_planner.warnings')}</span>
             </h3>
             <ul className="space-y-2">
                 {warnings.map((w, i) => (
@@ -352,7 +334,7 @@ function WarningsSection({ warnings }) {
     );
 }
 
-function RecentHistory({ logs, showHistory, onToggle }) {
+function RecentHistory({ logs, showHistory, onToggle, t }) {
     if (!logs || logs.length === 0) {
         return null;
     }
@@ -366,7 +348,7 @@ function RecentHistory({ logs, showHistory, onToggle }) {
             >
                 <div className="flex items-center gap-2 text-sm font-medium text-zinc-700 dark:text-zinc-300">
                     <History className="w-4 h-4 text-zinc-400" />
-                    <span>Recent Plans ({logs.length})</span>
+                    <span>{t('ai_planner.recent_plans')} ({logs.length})</span>
                 </div>
                 {showHistory ? (
                     <ChevronUp className="w-4 h-4 text-zinc-400" />
@@ -434,6 +416,7 @@ const LANGUAGES = [
 ];
 
 export default function CampaignPlanner({ recent_logs = [], channels = [], contact_lists = [] }) {
+    const { t } = useTranslation();
     const [form, setForm] = useState({
         business_type: '',
         goal: '',
@@ -535,8 +518,8 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
     const hasPlan = plan !== null;
 
     return (
-        <Layout pageTitle="AI Campaign Planner" pageSection="AI Features">
-            <Head title="AI Campaign Planner" />
+        <Layout pageTitle={t('nav.ai_campaign_planner')} pageSection={t('nav.ai_features')}>
+            <Head title={t('nav.ai_campaign_planner')} />
 
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Page Header */}
@@ -545,12 +528,12 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                         <Bot className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">AI Campaign Planner</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('nav.ai_campaign_planner')}</h1>
                         <p className="text-xs text-zinc-400">Generate a full multi-day campaign with messages, timing & strategy</p>
                     </div>
                     <span className="ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400">
                         <Sparkles className="w-3 h-3" />
-                        <span>AI</span>
+                        <span>{t('common.ai')}</span>
                     </span>
                 </div>
 
@@ -559,7 +542,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                     <div className="lg:col-span-2 space-y-5">
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
                             <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">
-                                Campaign Settings
+                                {t('ai_planner.campaign_settings')}
                             </h2>
 
                             {/* API Error Alert */}
@@ -568,7 +551,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                                     <div className="flex items-start gap-2">
                                         <AlertCircle className="w-4 h-4 text-red-500 mt-0.5 flex-shrink-0" />
                                         <div>
-                                            <p className="text-sm font-medium text-red-800 dark:text-red-200">Error</p>
+                                            <p className="text-sm font-medium text-red-800 dark:text-red-200">{t('common.error')}</p>
                                             <p className="text-xs text-red-600 dark:text-red-300 mt-0.5">{apiError}</p>
                                         </div>
                                     </div>
@@ -576,7 +559,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                             )}
 
                             {/* Channel */}
-                            <Field label="Channel" error={errors.channel}>
+                            <Field label={t('common.channel')} error={errors.channel}>
                                 <div className="grid grid-cols-2 gap-2">
                                     {CHANNELS.map(({ value, label, Icon, color }) => {
                                         const isSelected = form.channel === value;
@@ -606,7 +589,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                             </Field>
 
                             {/* Business Type */}
-                            <Field label="Business Type" error={errors.business_type}>
+                            <Field label={t('ai_writer.business_type')} error={errors.business_type}>
                                 <input
                                     type="text"
                                     value={form.business_type}
@@ -618,7 +601,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                             </Field>
 
                             {/* Campaign Goal */}
-                            <Field label="Campaign Goal" description="What do you want to achieve?" error={errors.goal}>
+                            <Field label={t('ai_planner.campaign_goal')} description={t('ai_planner.campaign_goal_desc')} error={errors.goal}>
                                 <textarea
                                     value={form.goal}
                                     onChange={(e) => updateField('goal', e.target.value)}
@@ -630,7 +613,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                             </Field>
 
                             {/* Campaign Type */}
-                            <Field label="Campaign Type" error={errors.campaign_type}>
+                            <Field label={t('ai_planner.campaign_type')} error={errors.campaign_type}>
                                 <div className="space-y-2">
                                     {CAMPAIGN_TYPES.map(({ value, label, desc, Icon }) => {
                                         const isSelected = form.campaign_type === value;
@@ -664,7 +647,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
 
                             {/* Duration & Audience */}
                             <div className="grid grid-cols-2 gap-3">
-                                <Field label="Duration (days)" error={errors.duration_days}>
+                                <Field label={t('ai_planner.duration_days')} error={errors.duration_days}>
                                     <input
                                         type="number"
                                         min={1}
@@ -674,7 +657,7 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                                         className={errors.duration_days ? inputErrorCls : inputCls}
                                     />
                                 </Field>
-                                <Field label="Audience Size" error={errors.audience_size}>
+                                <Field label={t('ai_planner.audience_size')} error={errors.audience_size}>
                                     <input
                                         type="number"
                                         min={1}
@@ -687,18 +670,18 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
 
                             {/* Tone & Language */}
                             <div className="grid grid-cols-2 gap-3">
-                                <Field label="Tone" error={errors.tone}>
+                                <Field label={t('ai_planner.tone')} error={errors.tone}>
                                     <select
                                         value={form.tone}
                                         onChange={(e) => updateField('tone', e.target.value)}
                                         className={errors.tone ? inputErrorCls : inputCls}
                                     >
-                                        {TONES.map((t) => (
-                                            <option key={t.value} value={t.value}>{t.label}</option>
+                                        {TONES.map((tone) => (
+                                            <option key={tone.value} value={tone.value}>{tone.label}</option>
                                         ))}
                                     </select>
                                 </Field>
-                                <Field label="Language" error={errors.language}>
+                                <Field label={t('ai_planner.language')} error={errors.language}>
                                     <select
                                         value={form.language}
                                         onChange={(e) => updateField('language', e.target.value)}
@@ -721,12 +704,12 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                                 {loading ? (
                                     <>
                                         <Loader2 className="w-4 h-4 animate-spin" />
-                                        <span>Planning campaign...</span>
+                                        <span>{t('ai_planner.planning')}</span>
                                     </>
                                 ) : (
                                     <>
                                         <Bot className="w-4 h-4" />
-                                        <span>Generate Campaign Plan</span>
+                                        <span>{t('ai_planner.generate_plan')}</span>
                                     </>
                                 )}
                             </button>
@@ -740,30 +723,32 @@ export default function CampaignPlanner({ recent_logs = [], channels = [], conta
                         {!loading && hasPlan && (
                             <div className="space-y-5">
                                 <PlanOverview plan={plan} onRegenerate={generate} />
-                                <PlanStats plan={plan} />
-                                <BestSendTimes times={plan.best_send_times} />
+                                <PlanStats plan={plan} t={t} />
+                                <BestSendTimes times={plan.best_send_times} t={t} />
 
                                 {plan.steps && plan.steps.length > 0 && (
                                     <CampaignSteps
                                         steps={plan.steps}
                                         channel={form.channel}
                                         onCopyAll={copyAll}
+                                        t={t}
                                     />
                                 )}
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <TipsSection tips={plan.tips} />
-                                    <WarningsSection warnings={plan.warnings} />
+                                    <TipsSection tips={plan.tips} t={t} />
+                                    <WarningsSection warnings={plan.warnings} t={t} />
                                 </div>
                             </div>
                         )}
 
-                        {!loading && !hasPlan && <EmptyState />}
+                        {!loading && !hasPlan && <EmptyState t={t} />}
 
                         <RecentHistory
                             logs={recent_logs}
                             showHistory={showHistory}
                             onToggle={toggleHistory}
+                            t={t}
                         />
                     </div>
                 </div>

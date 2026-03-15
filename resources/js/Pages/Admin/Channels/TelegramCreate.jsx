@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, Send, ExternalLink } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -21,6 +22,7 @@ const Input = ({ type = 'text', ...props }) => (
 );
 
 const TelegramCreate = () => {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name:         '',
         bot_token:    '',
@@ -33,8 +35,8 @@ const TelegramCreate = () => {
     };
 
     return (
-        <Layout pageTitle="Add Telegram Channel" pageSection="Channels">
-            <Head title="Add Telegram Channel" />
+        <Layout pageTitle={t('channels.add_telegram')} pageSection={t('nav.channels')}>
+            <Head title={t('channels.add_telegram')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -48,7 +50,7 @@ const TelegramCreate = () => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Send className="w-5 h-5 text-blue-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Connect Telegram</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('channels.connect_telegram')}</h1>
                     </div>
                 </div>
 
@@ -69,10 +71,10 @@ const TelegramCreate = () => {
 
                 {/* Form */}
                 <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5">
-                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">Bot Details</h2>
+                    <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider mb-5">{t('channels.bot_details')}</h2>
                     <form onSubmit={submit} className="space-y-5">
 
-                        <Field label="Channel Name" description="A friendly label to identify this bot" error={errors.name}>
+                        <Field label={t('channels.channel_name')} description={t('channels.channel_name_bot_desc')} error={errors.name}>
                             <Input
                                 value={data.name}
                                 onChange={e => setData('name', e.target.value)}
@@ -81,10 +83,10 @@ const TelegramCreate = () => {
                         </Field>
 
                         <div className="border-t border-zinc-100 dark:border-zinc-800 pt-5">
-                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">Telegram Bot Credentials</h3>
+                            <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-4">{t('channels.telegram_credentials')}</h3>
                             <div className="space-y-5">
 
-                                <Field label="Bot Token" description="Token provided by @BotFather after creating your bot" error={errors.bot_token}>
+                                <Field label={t('channels.bot_token')} description={t('channels.bot_token_desc')} error={errors.bot_token}>
                                     <Input
                                         type="password"
                                         value={data.bot_token}
@@ -93,7 +95,7 @@ const TelegramCreate = () => {
                                     />
                                 </Field>
 
-                                <Field label="Bot Username" description="Your bot's username without the @ symbol" error={errors.bot_username}>
+                                <Field label={t('channels.bot_username')} description={t('channels.bot_username_desc')} error={errors.bot_username}>
                                     <div className="relative">
                                         <span className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 text-sm">@</span>
                                         <input
@@ -116,13 +118,13 @@ const TelegramCreate = () => {
                                 className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-sm font-medium transition-colors"
                             >
                                 <Send className="w-4 h-4" />
-                                {processing ? 'Connecting...' : 'Connect Telegram'}
+                                {processing ? t('common.connecting') : t('channels.connect_telegram')}
                             </button>
                             <Link
                                 href="/admin/channels"
                                 className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                             >
-                                Cancel
+                                {t('common.cancel')}
                             </Link>
                         </div>
 

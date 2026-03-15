@@ -13,19 +13,19 @@ import {Menu, ChevronRight, User, Settings, LogOut, Moon, Globe, Check, Loader2}
 import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Topbar = ({
-                    darkMode = false,
-                    pageTitle = 'Overview',
-                    pageSection = 'Dashboard',
-                    onToggleSidebar,
-                    onToggleDarkMode,
-                    sidebarOpen = true,
-                    isMobile = false,
-                    currentUser = {
-                        name: 'Admin User',
-                        email: 'admin@example.com',
-                        avatar: null
-                    }
-                }) => {
+        darkMode = false,
+        pageTitle = 'Overview',
+        pageSection = 'Dashboard',
+        onToggleSidebar,
+        onToggleDarkMode,
+        sidebarOpen = true,
+        isMobile = false,
+        currentUser = {
+            name: 'Admin User',
+            email: 'admin@example.com',
+            avatar: null
+        }
+    }) => {
     const { t, currentLanguage, languages, changeLanguage, isChanging } = useTranslation();
 
     const getUserInitials = () => {
@@ -42,7 +42,6 @@ const Topbar = ({
     };
 
     const handleLogout = () => router.post('/logout');
-
     return (
         <header
             className="fixed top-0 right-0 h-16 z-40 bg-white dark:bg-[#0F0F10] border-b border-border/40 transition-all duration-300"
@@ -69,7 +68,7 @@ const Topbar = ({
                 {/* Right: Actions */}
                 <div className="flex items-center gap-2">
                     {/* Language Switcher */}
-                    {languages.length > 1 && (
+                    {languages.length >= 1 && (
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <button
@@ -97,7 +96,7 @@ const Topbar = ({
                                         onClick={() => changeLanguage(lang.code)}
                                         className="flex items-center gap-2 cursor-pointer"
                                     >
-                                        <span className="text-base">{lang.flag || '🌐'}</span>
+                                        <span className="text-base">{lang.flag || ''}</span>
                                         <span className="flex-1 text-sm">{lang.native_name || lang.name}</span>
                                         {currentLanguage?.code === lang.code && (
                                             <Check className="w-3.5 h-3.5 text-emerald-500" />

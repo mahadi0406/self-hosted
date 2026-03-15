@@ -2,6 +2,7 @@ import React from 'react';
 import Layout from "@/Layouts/admin/layout.jsx";
 import { Head, useForm, Link } from "@inertiajs/react";
 import { ArrowLeft, Users } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation.jsx";
 
 const Field = ({ label, description, error, children }) => (
     <div className="space-y-1.5">
@@ -20,6 +21,7 @@ const Input = ({ ...props }) => (
 );
 
 const Create = ({ lists }) => {
+    const { t } = useTranslation();
     const { data, setData, post, processing, errors } = useForm({
         name:        '',
         phone:       '',
@@ -44,8 +46,8 @@ const Create = ({ lists }) => {
     };
 
     return (
-        <Layout pageTitle="Add Contact" pageSection="Contacts">
-            <Head title="Add Contact" />
+        <Layout pageTitle={t('contacts.add_contact')} pageSection={t('nav.contacts')}>
+            <Head title={t('contacts.add_contact')} />
 
             <div className="max-w-2xl mx-auto space-y-6">
 
@@ -59,7 +61,7 @@ const Create = ({ lists }) => {
                     </Link>
                     <div className="flex items-center gap-2">
                         <Users className="w-5 h-5 text-zinc-500" />
-                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">Add Contact</h1>
+                        <h1 className="text-lg font-semibold text-zinc-800 dark:text-zinc-100">{t('contacts.add_contact')}</h1>
                     </div>
                 </div>
 
@@ -67,40 +69,40 @@ const Create = ({ lists }) => {
 
                     {/* Basic Info */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Basic Info</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.basic_info')}</h2>
 
-                        <Field label="Full Name" error={errors.name}>
+                        <Field label={t('contacts.full_name')} error={errors.name}>
                             <Input value={data.name} onChange={e => setData('name', e.target.value)} placeholder="John Doe" />
                         </Field>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field label="Phone Number" description="WhatsApp number with country code" error={errors.phone}>
+                            <Field label={t('contacts.phone_number')} description={t('contacts.phone_whatsapp_desc')} error={errors.phone}>
                                 <Input value={data.phone} onChange={e => setData('phone', e.target.value)} placeholder="+1234567890" />
                             </Field>
-                            <Field label="Telegram ID" description="Telegram user ID" error={errors.telegram_id}>
+                            <Field label={t('contacts.telegram_id')} description={t('contacts.telegram_id_desc')} error={errors.telegram_id}>
                                 <Input value={data.telegram_id} onChange={e => setData('telegram_id', e.target.value)} placeholder="123456789" />
                             </Field>
                         </div>
 
-                        <Field label="Email" error={errors.email}>
+                        <Field label={t('contacts.email')} error={errors.email}>
                             <Input type="email" value={data.email} onChange={e => setData('email', e.target.value)} placeholder="john@example.com" />
                         </Field>
                     </div>
 
                     {/* Extra Info */}
                     <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-5">
-                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Extra Info</h2>
+                        <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.extra_info')}</h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                            <Field label="Country" description="ISO code e.g. US, GB, IN" error={errors.country}>
+                            <Field label={t('contacts.country')} description={t('contacts.country_desc')} error={errors.country}>
                                 <Input value={data.country} onChange={e => setData('country', e.target.value)} placeholder="US" />
                             </Field>
-                            <Field label="Language" description="Language code e.g. en, ar, hi" error={errors.language}>
+                            <Field label={t('contacts.language')} description={t('contacts.language_desc')} error={errors.language}>
                                 <Input value={data.language} onChange={e => setData('language', e.target.value)} placeholder="en" />
                             </Field>
                         </div>
 
-                        <Field label="Tags" description="Comma separated e.g. vip, lead, customer" error={errors.tags}>
+                        <Field label={t('contacts.tags')} description={t('contacts.tags_desc')} error={errors.tags}>
                             <Input value={data.tags} onChange={e => setData('tags', e.target.value)} placeholder="vip, customer, lead" />
                         </Field>
                     </div>
@@ -108,7 +110,7 @@ const Create = ({ lists }) => {
                     {/* Lists */}
                     {lists.length > 0 && (
                         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-lg p-5 space-y-4">
-                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">Add to Lists</h2>
+                            <h2 className="text-sm font-semibold text-zinc-700 dark:text-zinc-300 uppercase tracking-wider">{t('contacts.add_to_lists')}</h2>
                             <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                                 {lists.map(list => (
                                     <label
@@ -139,13 +141,13 @@ const Create = ({ lists }) => {
                             className="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-zinc-900 dark:bg-zinc-100 hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-50 text-white dark:text-zinc-900 text-sm font-medium transition-colors"
                         >
                             <Users className="w-4 h-4" />
-                            {processing ? 'Saving...' : 'Save Contact'}
+                            {processing ? t('common.saving') : t('contacts.save_contact')}
                         </button>
                         <Link
                             href="/admin/contacts"
                             className="px-5 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                         >
-                            Cancel
+                            {t('common.cancel')}
                         </Link>
                     </div>
                 </form>
