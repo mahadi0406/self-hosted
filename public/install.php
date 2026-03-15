@@ -189,15 +189,13 @@ class LaravelInstaller {
 
     private function processEnvironmentForm(): void
     {
-        $purchaseCode = $_POST['purchase_code'] ?? '';
-        $buyerEmail = $_POST['buyer_email'] ?? '';
-        $appName = $_POST['app_name'] ?? 'TokenHive';
+        $appName = $_POST['app_name'] ?? 'BlastBot';
         $appUrl = $_POST['app_url'] ?? '';
         $adminEmail = $_POST['admin_email'] ?? '';
         $adminPassword = $_POST['admin_password'] ?? '';
         $adminPasswordConfirm = $_POST['admin_password_confirm'] ?? '';
 
-        if (empty($purchaseCode) || empty($buyerEmail) || empty($appName) || empty($appUrl) || empty($adminEmail) || empty($adminPassword)) {
+        if (empty($appName) || empty($appUrl) || empty($adminEmail) || empty($adminPassword)) {
             $this->errors[] = 'Please fill in all required fields.';
             return;
         }
@@ -217,20 +215,17 @@ class LaravelInstaller {
             return;
         }
 
-        if (!filter_var($buyerEmail, FILTER_VALIDATE_EMAIL)) {
-            $this->errors[] = 'Please enter a valid buyer email address.';
-            return;
-        }
+
 
         try {
-            $this->createEnvFile($appName, $appUrl, $purchaseCode, $this->cleanDomain($appUrl));
+            $this->createEnvFile($appName, $appUrl, '', $this->cleanDomain($appUrl));
             $_SESSION['admin_config'] = [
                 'email' => $adminEmail,
                 'password' => $adminPassword
             ];
 
             $_SESSION['license_verified'] = true;
-            $_SESSION['purchase_code']    = $purchaseCode;
+            $_SESSION['purchase_code']    = '';
             $_SESSION['licensed_domain']  = $this->cleanDomain($appUrl);
 
             header('Location: install.php?step=4');
