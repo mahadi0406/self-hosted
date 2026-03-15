@@ -548,6 +548,14 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
         }
     }
 
+    private function cleanDomain(string $url): string
+    {
+        $host = parse_url(trim($url), PHP_URL_HOST) ?? $url;
+        // Remove www. prefix
+        $host = preg_replace('/^www\./i', '', $host);
+        return strtolower(trim($host));
+    }
+
     private function generateUuid(): string
     {
         return sprintf(

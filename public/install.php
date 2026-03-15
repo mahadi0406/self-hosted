@@ -17,13 +17,12 @@ class LaravelInstaller {
     private array $errors = [];
     private int $step = 1;
     private string $laravelRoot;
-
     private string $licenseApiUrl = 'https://kloudinnovation.com/api/license/register';
     private string $apiToken = 'B77MsI9905rTCtdoWy8v06WkeMgrsiXDpZH3WDpO';
 
     public function __construct() {
         $this->step = isset($_GET['step']) ? (int)$_GET['step'] : 1;
-        $this->laravelRoot = dirname(__DIR__);
+        $this->laravelRoot = __DIR__;
     }
 
     public function run(): void
@@ -234,6 +233,7 @@ class LaravelInstaller {
 
         try {
             $this->createEnvFile($appName, $appUrl, $purchaseCode, $this->cleanDomain($appUrl));
+
             $_SESSION['admin_config'] = [
                 'email' => $adminEmail,
                 'password' => $adminPassword
@@ -515,6 +515,7 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
 
             echo "Admin user created successfully with UID: " . $uid;
 
+            // Write application integrity signature
             $this->writeAppSignature($pdo, $purchaseCode, $licensedDomain);
 
         } catch(Exception $e) {
@@ -542,8 +543,17 @@ VITE_PUSHER_APP_CLUSTER=\"\${PUSHER_APP_CLUSTER}\"";
             ");
             $stmt->execute(['app_integrity_hash', $sig, $now, $now]);
         } catch (\Exception $e) {
+            // Non-fatal — log and continue
             error_log('Could not write app signature: ' . $e->getMessage());
         }
+    }
+
+    private function cleanDomain(string $url): string
+    {
+        $host = parse_url(trim($url), PHP_URL_HOST) ?? $url;
+        // Remove www. prefix
+        $host = preg_replace('/^www\./i', '', $host);
+        return strtolower(trim($host));
     }
 
     private function generateUuid(): string
