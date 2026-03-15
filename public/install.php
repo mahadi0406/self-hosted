@@ -221,16 +221,6 @@ class LaravelInstaller {
             return;
         }
 
-        $licenseVerification = $this->verifyLicense($purchaseCode, $buyerEmail, 'BlastBot');
-        if (!$licenseVerification['success']) {
-            $this->errors[] = $licenseVerification['message'];
-            return;
-        }
-
-        if (!empty($this->errors)) {
-            return;
-        }
-
         try {
             $this->createEnvFile($appName, $appUrl, $purchaseCode, $this->cleanDomain($appUrl));
 

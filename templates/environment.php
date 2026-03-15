@@ -216,42 +216,7 @@
         </div>
     <?php endif; ?>
 
-    <?php if(isset($_SESSION['license_verified']) && $_SESSION['license_verified']): ?>
-        <div class="success-list">
-            <strong>License Verified:</strong> Your purchase code has been successfully verified and registered.
-        </div>
-    <?php endif; ?>
-
-    <div class="info-box">
-        <strong>Application Setup:</strong> Configure your application settings, verify your purchase code, and create an admin account.
-    </div>
-
     <form method="POST" action="install.php?step=3" id="mainForm">
-        <div class="card">
-            <h2>License Verification</h2>
-
-            <div class="form-group">
-                <label for="purchase_code">Purchase Code</label>
-                <input type="text" id="purchase_code" name="purchase_code"
-                       value="<?php echo htmlspecialchars($_POST['purchase_code'] ?? ''); ?>"
-                       placeholder="Enter your purchase code from CodeCanyon" required>
-                <small>Your purchase code from CodeCanyon (e.g., 12345678-1234-1234-1234-123456789012)</small>
-            </div>
-
-            <div class="form-group">
-                <label for="buyer_email">Buyer Email</label>
-                <input type="email" id="buyer_email" name="buyer_email"
-                       value="<?php echo htmlspecialchars($_POST['buyer_email'] ?? ''); ?>"
-                       placeholder="Email used for CodeCanyon purchase" required>
-                <small>The email address associated with your CodeCanyon account</small>
-            </div>
-
-            <div class="loading" id="licenseLoading">
-                <div class="spinner"></div>
-                <span>Verifying license...</span>
-            </div>
-        </div>
-
         <div class="card">
             <h2>Application Configuration</h2>
             <div class="form-group">
